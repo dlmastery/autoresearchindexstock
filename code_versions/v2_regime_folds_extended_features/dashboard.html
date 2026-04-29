@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AutoResearch QQQ Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }
+  h1 { color: #58a6ff; margin-bottom: 4px; font-size: 1.6em; }
+  .subtitle { color: #8b949e; margin-bottom: 20px; font-size: 0.9em; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+  .card .label { color: #8b949e; font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card .value { font-size: 1.8em; font-weight: 700; margin-top: 4px; }
+  .positive { color: #3fb950; }
+  .negative { color: #f85149; }
+  .neutral { color: #58a6ff; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 0.85em; }
+  th { background: #161b22; color: #8b949e; text-align: left; padding: 8px 10px; border-bottom: 2px solid #30363d; font-weight: 600; text-transform: uppercase; font-size: 0.75em; letter-spacing: 0.5px; }
+  #exp-table thead th { position: sticky; top: 0; z-index: 10; background: #161b22; }
+  td { padding: 7px 10px; border-bottom: 1px solid #21262d; }
+  tr:hover { background: #1c2128; }
+  tr.keep { border-left: 3px solid #3fb950; }
+  tr.discard { border-left: 3px solid #f85149; }
+  tr.crash { border-left: 3px solid #d29922; }
+  tr.clickable { cursor: pointer; }
+  tr.clickable:hover { background: #1f2937; }
+  tr.selected { background: #1a2332 !important; border-left: 3px solid #58a6ff !important; }
+  tr.best-row { background: #0d2818 !important; border-left: 4px solid #00d26a !important; }
+  tr.best-row td { font-weight: 600; }
+  .winner-box { background: #0d2818; border: 2px solid #3fb950; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+  .winner-box .label { color: #3fb950; font-size: 0.75em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .winner-box .main { font-size: 1.1em; color: #c9d1d9; margin-bottom: 8px; }
+  .winner-box .metrics { font-family: monospace; font-size: 0.85em; color: #8b949e; white-space: pre; }
+  .section-title { color: #58a6ff; font-size: 1.1em; margin: 20px 0 10px 0; font-weight: 600; }
+  .timestamp { color: #484f58; font-size: 0.75em; }
+  .status-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .status-dot.running { background: #3fb950; animation: pulse 1.5s infinite; }
+  .status-dot.idle { background: #484f58; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .config-box { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px; font-family: monospace; font-size: 0.82em; white-space: pre; margin-bottom: 16px; }
+  #error { color: #f85149; padding: 10px; display: none; }
+  .detail-panel { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 20px; display: none; }
+  .detail-panel.visible { display: block; }
+  .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .detail-header h3 { color: #58a6ff; font-size: 1em; }
+  .close-btn { background: #21262d; border: 1px solid #30363d; color: #8b949e; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
+  .close-btn:hover { background: #30363d; color: #c9d1d9; }
+  .detail-config { font-family: monospace; font-size: 0.8em; color: #8b949e; margin-bottom: 12px; }
+  .window-table td { font-size: 0.8em; }
+  .mini-bar { display: inline-block; height: 14px; border-radius: 2px; vertical-align: middle; margin-left: 4px; }
+</style>
+</head>
+<body>
+<h1>AutoResearch &mdash; QQQ Index Stock Dashboard</h1>
+<div class="subtitle">QQQ (Nasdaq-100 ETF) — equity-index variant of the FX autoresearch loop. Optimisation target: <b style="color:#58a6ff">A — fwd_ret_1d</b>. Plotted side-by-side: A (1d return), B (5d return), D (vol-adjusted 1d). 7-fold walk-forward 2007 → 2025-12 (no 2026 data). Buy-and-hold baseline tracked alongside strategy Sharpe. &mdash; <span id="last-update">loading...</span>
+  &nbsp;|&nbsp; <a href="autoresearch_report.md" style="color:#58a6ff">Full Report</a>
+  &nbsp;|&nbsp; <a href="experiment_summary.md" style="color:#58a6ff">Summary</a>
+</div>
+<div class="status-bar">
+  <div class="status-dot" id="status-dot"></div>
+  <span id="status-text">Connecting...</span>
+</div>
+<div id="error"></div>
+
+<div class="grid" id="summary-cards"></div>
+
+<div class="section-title" id="running-title" style="display:none">Currently Running</div>
+<div class="config-box" id="running-config" style="display:none;border-color:#3fb950"></div>
+
+<div class="section-title">Best Config</div>
+<div class="config-box" id="best-config">Loading...</div>
+
+<div id="winner-section" style="display:none">
+  <div class="section-title">Winner</div>
+  <div class="winner-box">
+    <div class="label">BEST COMPOSITE SCORE</div>
+    <div class="main" id="winner-title"></div>
+    <div class="metrics" id="winner-metrics"></div>
+  </div>
+</div>
+
+<div class="section-title">Experiment Log <span style="color:#484f58;font-size:0.7em;font-weight:400">(click row for per-window breakdown, click header to sort)</span></div>
+<div id="backbone-tabs" style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap"></div>
+<div id="ensemble-trade-links" style="margin:6px 0;display:none"></div>
+<div style="color:#8b949e;font-size:0.85em;margin:6px 0 4px 0" id="exp-count-hint">Scroll inside the table below to browse every experiment — <span id="exp-visible-count">?</span> shown. Click <strong style="color:#58a6ff">&#128202; CSV</strong> in the rightmost column to download that experiment&#39;s daily win/loss spreadsheet.</div>
+<div id="exp-table-scroll" style="max-height:75vh;overflow-y:auto;border:1px solid #30363d;border-radius:6px;position:relative">
+<table id="exp-table" style="margin-bottom:0">
+  <thead>
+    <tr>
+      <th data-sort="experiment_num" style="cursor:pointer">#</th>
+      <th data-sort="status" style="cursor:pointer">Status</th>
+      <th data-sort="description" style="cursor:pointer">Description</th>
+      <th data-sort="composite" style="cursor:pointer">Composite</th>
+      <th data-sort="sharpe" style="cursor:pointer">Test Sharpe</th>
+      <th data-sort="val_sharpe" style="cursor:pointer">Val Sharpe</th>
+      <th data-sort="train_sharpe" style="cursor:pointer">Train Sharpe</th>
+      <th data-sort="ic" style="cursor:pointer">IC</th>
+      <th data-sort="hit" style="cursor:pointer">Hit%</th>
+      <th data-sort="psr" style="cursor:pointer">PSR</th>
+      <th data-sort="equity" style="cursor:pointer">$Equity</th>
+      <th data-sort="confidence_mean" style="cursor:pointer">Conf</th>
+      <th data-sort="aleatoric_mean" style="cursor:pointer">Ale</th>
+      <th data-sort="precision" style="cursor:pointer">Prec</th>
+      <th data-sort="recall" style="cursor:pointer">Rec</th>
+      <th data-sort="f1" style="cursor:pointer">F1</th>
+      <th data-sort="f2" style="cursor:pointer">F2</th>
+      <th data-sort="mcc" style="cursor:pointer">MCC</th>
+      <th data-sort="accuracy" style="cursor:pointer">Acc</th>
+      <th>T+/V+</th>
+      <th data-sort="elapsed_sec" style="cursor:pointer">Time</th>
+      <th data-sort="timestamp" style="cursor:pointer">When</th>
+      <th title="Per-day win/loss CSV (trade_logs/expN_trades.csv)">Trades</th>
+    </tr>
+  </thead>
+  <tbody id="exp-body"></tbody>
+</table>
+</div>
+
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-header">
+    <h3 id="detail-title">Per-Window Breakdown</h3>
+    <button class="close-btn" onclick="closeDetail()">Close</button>
+  </div>
+  <div class="detail-config" id="detail-config"></div>
+  <div id="detail-reasoning" style="background:#0d1117;border-left:3px solid #58a6ff;border-radius:4px;padding:12px;margin-bottom:12px;font-size:0.85em;color:#c9d1d9;line-height:1.5;display:none">
+    <div style="font-weight:600;color:#58a6ff;margin-bottom:6px;font-size:0.85em;letter-spacing:0.5px">DIAGNOSIS · CITATIONS · HYPOTHESIS · PREDICTION · VERDICT</div>
+    <div id="detail-reasoning-body"></div>
+  </div>
+  <div style="margin-bottom:10px">
+    <button class="close-btn" id="tab-test" onclick="switchTab('test')" style="background:#1a2332;color:#58a6ff">Test</button>
+    <button class="close-btn" id="tab-val" onclick="switchTab('val')">Validation</button>
+    <button class="close-btn" id="tab-train" onclick="switchTab('train')">Train</button>
+    <span style="color:#484f58;font-size:0.75em;margin-left:8px" id="tab-summary"></span>
+  </div>
+  <!-- Target selector: switch the equity curve + per-fold table between
+       targets A (1d return — PRIMARY), B (5d return), and D (vol-adjusted 1d).
+       Per CLAUDE.md the optimisation is on A, but B and D are tracked + plotted. -->
+  <div style="margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+    <span style="color:#8b949e;font-size:0.78em;letter-spacing:0.5px">TARGET:</span>
+    <button class="close-btn" id="target-A" onclick="switchTarget('A')" style="background:#1a2332;color:#58a6ff" title="Primary: 1-day forward return (the KEEP/DISCARD driver)">A — 1d return</button>
+    <button class="close-btn" id="target-B" onclick="switchTarget('B')" title="Auxiliary: 5-day forward return">B — 5d return</button>
+    <button class="close-btn" id="target-D" onclick="switchTarget('D')" title="Vol-adjusted 1d return (orthogonalises trend from skill)">D — vol-adj 1d</button>
+    <span id="target-summary" style="color:#484f58;font-size:0.75em;margin-left:8px"></span>
+  </div>
+  <!-- Equity curve: strategy returns vs initial investment baseline, across folds -->
+  <div id="detail-chart-wrap" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:12px;margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div style="font-weight:600;color:#58a6ff;font-size:0.85em;letter-spacing:0.5px">EQUITY CURVE — Returns vs Investment across folds</div>
+      <div style="font-size:0.75em;color:#8b949e" id="chart-legend">
+        <span style="color:#3fb950">— Strategy</span> &nbsp;
+        <span style="color:#8b949e">— $1000 flat investment</span>
+        &nbsp;&nbsp;
+        <a id="chart-excel-link" href="autoresearch_equity.xlsx" download
+           style="background:#238636;color:#fff;text-decoration:none;padding:3px 8px;border-radius:4px;font-weight:600">
+          📥 Excel (all experiments + charts)
+        </a>
+      </div>
+    </div>
+    <svg id="detail-chart" width="100%" height="220" viewBox="0 0 900 220" preserveAspectRatio="none" style="display:block"></svg>
+    <div style="font-size:0.7em;color:#484f58;margin-top:4px">X axis: fold index (1..7, concatenated test windows). Y axis: equity ($) starting at $1000. Strategy line compounds per-fold returns chronologically across the 7 disjoint test folds.</div>
+  </div>
+  <table class="window-table">
+    <thead>
+      <tr><th>Fold</th><th>Regime</th><th>Sharpe</th><th>Visual</th><th>Sortino</th><th>Return%</th><th>Equity</th><th>MaxDD%</th><th>WinRate%</th><th>PF</th><th>IC</th><th>Hit%</th><th>Conf</th><th>Aleatoric</th><th>Epistemic</th><th>Prec</th><th>Rec</th><th>F1</th><th>F2</th><th>MCC</th><th>Acc</th><th>n</th></tr>
+    </thead>
+    <tbody id="window-body"></tbody>
+  </table>
+</div>
+
+<div class="section-title">Best Run Per-Window Breakdown</div>
+<div style="margin-bottom:10px">
+  <button class="close-btn" id="best-tab-test" onclick="switchBestTab('test')" style="background:#1a2332;color:#58a6ff">Test</button>
+  <button class="close-btn" id="best-tab-val" onclick="switchBestTab('val')">Validation</button>
+  <button class="close-btn" id="best-tab-train" onclick="switchBestTab('train')">Train</button>
+  <span style="color:#484f58;font-size:0.75em;margin-left:8px" id="best-tab-summary"></span>
+</div>
+<table class="window-table" id="best-window-table">
+  <thead>
+    <tr><th>Fold</th><th>Regime</th><th>Sharpe</th><th>Visual</th><th>Sortino</th><th>Return%</th><th>Equity</th><th>MaxDD%</th><th>WinRate%</th><th>PF</th><th>IC</th><th>Hit%</th><th>Conf</th><th>Aleatoric</th><th>Epistemic</th><th>Prec</th><th>Rec</th><th>F1</th><th>F2</th><th>MCC</th><th>Acc</th><th>n</th></tr>
+  </thead>
+  <tbody id="best-window-body"></tbody>
+</table>
+
+<div class="section-title">Fold Reference (Super-Fold Structure)</div>
+<table style="font-size:0.82em;margin-bottom:24px">
+  <thead>
+    <tr><th>Fold</th><th>Regime</th><th>Train</th><th>Val Window</th><th>Test Window</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>fold_1</td><td>Pre-crisis + GFC onset</td><td rowspan="7" style="vertical-align:middle;text-align:center;background:#161b22;color:#58a6ff;font-weight:600">2005-01 to 2023-12<br><br>3,113 rows<br>(holes punched<br>+ 10d buffer)</td><td>2007-04 to 2007-09 (130)</td><td>2008-01 to 2008-06 (130)</td></tr>
+    <tr><td>fold_2</td><td>Post-crash recovery</td><td>2009-04 to 2009-09 (131)</td><td>2010-01 to 2010-06 (129)</td></tr>
+    <tr><td>fold_3</td><td>Eurozone debt plateau</td><td>2012-04 to 2012-09 (130)</td><td>2013-01 to 2013-06 (129)</td></tr>
+    <tr><td>fold_4</td><td>Strong USD downturn</td><td>2014-07 to 2014-12 (132)</td><td>2015-04 to 2015-12 (197)</td></tr>
+    <tr><td>fold_5</td><td>Low-vol plateau</td><td>2018-04 to 2018-09 (130)</td><td>2019-01 to 2019-09 (195)</td></tr>
+    <tr><td>fold_6</td><td>EUR crisis downturn</td><td>2021-04 to 2021-09 (131)</td><td>2022-01 to 2022-09 (195)</td></tr>
+    <tr><td>fold_7</td><td>Recent mixed/upturn</td><td>2024-04 to 2024-09 (131)</td><td>2025-01 to 2025-09 (195)</td></tr>
+    <tr style="background:#161b22;font-weight:600"><td colspan="2">TOTAL (Super-Fold)</td><td style="text-align:center">3,113 train</td><td>915 val</td><td>1,170 test</td></tr>
+    <tr style="background:#0d1117"><td colspan="5" style="color:#3fb950;font-size:0.85em;padding:8px">Zero overlap: train-val=0 | train-test=0 | val-test=0 | Label buffer=10 calendar days before each window</td></tr>
+  </tbody>
+</table>
+
+<script>
+const LOG_PATH = 'experiment_log.jsonl';
+const BEST_PATH = 'best_config.json';
+const REFRESH_MS = 300000; // 5 minutes
+
+let allEntries = [];
+let selectedIdx = -1;
+let activeTab = 'test';
+// Multi-target plotting state (per CLAUDE.md: A=1d primary, B=5d, D=vol-adj 1d).
+// `activeTarget` swaps which prefix the chart + per-fold table reads from
+// each per-window dict. Each row carries A_*, B_*, D_* keys plus unprefixed
+// aliases of the A_* values, so 'A' selects the unprefixed path (default).
+let activeTarget = 'A';
+
+function switchTarget(t) {
+  activeTarget = t;
+  ['A','B','D'].forEach(x => {
+    const el = document.getElementById('target-' + x);
+    if (el) { el.style.background = t === x ? '#1a2332' : '#21262d'; el.style.color = t === x ? '#58a6ff' : '#8b949e'; }
+  });
+  if (selectedIdx >= 0) updateDetailWindows();
+}
+
+// Project a per-window dict so that w.sharpe / w.return_pct / etc. read from
+// whichever target is currently selected. Mutates a shallow copy and returns
+// it; the original window dict is left intact.
+function projectTarget(w) {
+  if (!w || activeTarget === 'A') return w;  // A is the default unprefixed path
+  const prefix = activeTarget + '_';
+  const out = Object.assign({}, w);
+  // Copy <prefix>_X over the unprefixed X for the keys the chart + table read.
+  ['sharpe','return_pct','excess_sharpe','bh_sharpe','bh_return_pct',
+   'sortino','ic','hit_rate','psr','n'].forEach(k => {
+    const v = w[prefix + k];
+    if (v !== undefined) out[k] = v;
+  });
+  // The runner emits hit_rate as the canonical key but the dashboard table
+  // reads w.hit. Keep both populated.
+  if (out.hit_rate !== undefined) out.hit = out.hit_rate;
+  if (out.return_pct != null) out.equity = 1000 * (1 + out.return_pct / 100);
+  return out;
+}
+// Set of experiment numbers that have a per-day trade CSV in trade_logs/.
+// Populated from trade_logs/manifest.json on each refresh.
+let tradeLogsManifest = new Set();
+let ensembleTradeLogs = [];
+
+function tradeLink(n) {
+  // Render a download link to the per-day trade CSV if it exists for this
+  // experiment, otherwise a dim placeholder. Click is intercepted so the
+  // surrounding row's showDetail() does not fire.
+  if (n == null || !tradeLogsManifest.has(Number(n))) {
+    return '<span style="color:#484f58" title="No trade_logs/exp' + (n||'?') + '_trades.csv on disk">--</span>';
+  }
+  return '<a href="trade_logs/exp' + n + '_trades.csv" download '
+       + 'onclick="event.stopPropagation()" '
+       + 'style="color:#58a6ff;text-decoration:none;font-weight:600" '
+       + 'title="Download daily win/loss CSV (date, fold, regime, prediction, '
+       + 'pred_direction, actual_return, strategy_return, correct, pnl_bps)">'
+       + '&#128202; CSV</a>';
+}
+
+function renderEnsembleLinks() {
+  const wrap = document.getElementById('ensemble-trade-links');
+  if (!wrap) return;
+  if (!ensembleTradeLogs || ensembleTradeLogs.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  wrap.innerHTML = '<span style="color:#8b949e;font-size:0.8em;margin-right:8px">Ensemble winner trade logs:</span>'
+    + ensembleTradeLogs.map(e =>
+        '<a href="trade_logs/' + e.file + '" download '
+      + 'style="color:#58a6ff;text-decoration:none;font-weight:600;'
+      + 'background:#0d1117;border:1px solid #30363d;border-radius:4px;'
+      + 'padding:3px 8px;margin-right:6px;font-size:0.8em" '
+      + 'title="' + (e.label || e.name) + ' — Sharpe ' + (e.sharpe||'?') + ', ' + (e.rows||'?') + ' daily rows">'
+      + '&#128202; ' + (e.label || e.name) + ' CSV (Sharpe '
+      + (e.sharpe != null ? (e.sharpe >= 0 ? '+' : '') + Number(e.sharpe).toFixed(4) : '?')
+      + ')</a>').join('');
+}
+
+function fmt(v, d=4) { return v != null ? Number(v).toFixed(d) : '--'; }
+function fmtSign(v, d=4) { if (v == null) return '--'; let s = Number(v).toFixed(d); return v >= 0 ? '+' + s : s; }
+function cls(v) { return v > 0 ? 'positive' : v < 0 ? 'negative' : 'neutral'; }
+
+function sharpeBar(v) {
+  if (v == null) return '';
+  const maxW = 80;
+  const clamped = Math.max(-3, Math.min(3, v));
+  const w = Math.abs(clamped) / 3 * maxW;
+  return `<span class="mini-bar" style="width:${w}px;background:${sharpeColor(v)};border-radius:3px"></span>`;
+}
+
+function renderWindows(windows, tbodyId, aggMetrics) {
+  const tbody = document.getElementById(tbodyId);
+  if (!windows || !windows.length) { tbody.innerHTML = '<tr><td colspan="16" style="color:#484f58">No data</td></tr>'; return; }
+  const confColor = v => v == null ? '' : v >= 0.9 ? 'color:#3fb950' : v >= 0.8 ? 'color:#58a6ff' : v >= 0.7 ? 'color:#d29922' : 'color:#f85149';
+  const rows = windows.filter(w => !w.skipped).map(w =>
+    `<tr>
+      <td>${w.fold}</td>
+      <td>${(w.regime || '').substring(0, 30)}</td>
+      <td style="color:${sharpeColor(w.sharpe)}">${fmtSign(w.sharpe)}</td>
+      <td>${sharpeBar(w.sharpe)}</td>
+      <td class="${cls(w.sortino)}">${w.sortino != null ? fmtSign(w.sortino) : '--'}</td>
+      <td class="${cls(w.return_pct)}">${w.return_pct != null ? fmtSign(w.return_pct, 2) + '%' : '--'}</td>
+      <td>${w.equity != null ? '$' + fmt(w.equity, 0) : '--'}</td>
+      <td>${w.max_dd != null ? fmt(w.max_dd, 2) + '%' : '--'}</td>
+      <td>${w.win_rate != null ? fmt(w.win_rate, 1) + '%' : '--'}</td>
+      <td>${w.profit_factor != null ? fmt(w.profit_factor, 3) : '--'}</td>
+      <td>${fmtSign(w.ic, 3)}</td>
+      <td>${fmt(w.hit, 1)}</td>
+      <td style="${confColor(w.confidence_mean)}">${w.confidence_mean != null ? fmt(w.confidence_mean, 3) : '--'}</td>
+      <td>${w.aleatoric_mean != null ? w.aleatoric_mean.toExponential(1) : '--'}</td>
+      <td>${w.epistemic_mean != null ? w.epistemic_mean.toExponential(1) : '--'}</td>
+      <td>${w.precision != null ? fmt(w.precision, 3) : '--'}</td>
+      <td>${w.recall != null ? fmt(w.recall, 3) : '--'}</td>
+      <td>${w.f1 != null ? fmt(w.f1, 3) : '--'}</td>
+      <td>${w.f2 != null ? fmt(w.f2, 3) : '--'}</td>
+      <td style="${w.mcc != null ? (w.mcc > 0.1 ? 'color:#3fb950' : w.mcc < -0.05 ? 'color:#f85149' : '') : ''}">${w.mcc != null ? fmtSign(w.mcc, 3) : '--'}</td>
+      <td>${w.accuracy != null ? fmt(w.accuracy, 3) : '--'}</td>
+      <td>${w.n || 0}</td>
+    </tr>`
+  );
+  // Super-fold aggregate row
+  if (aggMetrics) {
+    const pos = windows.filter(w => !w.skipped && w.sharpe > 0).length;
+    const total = windows.filter(w => !w.skipped).length;
+    const totalN = windows.filter(w => !w.skipped).reduce((s,w) => s + (w.n||0), 0);
+    rows.push(`<tr style="background:#161b22;font-weight:600;border-top:2px solid #58a6ff">
+      <td colspan="2" style="color:#58a6ff">SUPER-FOLD (${pos}/${total} positive)</td>
+      <td style="color:${sharpeColor(aggMetrics.sharpe)}">${fmtSign(aggMetrics.sharpe)}</td>
+      <td>${sharpeBar(aggMetrics.sharpe)}</td>
+      <td class="${cls(aggMetrics.sortino)}">${aggMetrics.sortino != null ? fmtSign(aggMetrics.sortino) : '--'}</td>
+      <td class="${cls(aggMetrics.return_pct)}">${aggMetrics.return_pct != null ? fmtSign(aggMetrics.return_pct, 2) + '%' : '--'}</td>
+      <td>${aggMetrics.equity != null ? '$' + fmt(aggMetrics.equity, 0) : '--'}</td>
+      <td>${aggMetrics.max_dd != null ? fmt(aggMetrics.max_dd, 2) + '%' : '--'}</td>
+      <td>${aggMetrics.win_rate != null ? fmt(aggMetrics.win_rate, 1) + '%' : '--'}</td>
+      <td>${aggMetrics.profit_factor != null ? fmt(aggMetrics.profit_factor, 3) : '--'}</td>
+      <td>${fmtSign(aggMetrics.ic, 3)}</td>
+      <td>${fmt(aggMetrics.hit, 1)}</td>
+      <td>${aggMetrics.confidence_mean != null ? fmt(aggMetrics.confidence_mean, 3) : '--'}</td>
+      <td>${aggMetrics.aleatoric_mean != null ? aggMetrics.aleatoric_mean.toExponential(1) : '--'}</td>
+      <td>${aggMetrics.epistemic_mean != null ? aggMetrics.epistemic_mean.toExponential(1) : '--'}</td>
+      <td>${aggMetrics.precision != null ? fmt(aggMetrics.precision, 3) : '--'}</td>
+      <td>${aggMetrics.recall != null ? fmt(aggMetrics.recall, 3) : '--'}</td>
+      <td>${aggMetrics.f1 != null ? fmt(aggMetrics.f1, 3) : '--'}</td>
+      <td>${aggMetrics.f2 != null ? fmt(aggMetrics.f2, 3) : '--'}</td>
+      <td>${aggMetrics.mcc != null ? fmtSign(aggMetrics.mcc, 3) : '--'}</td>
+      <td>${aggMetrics.accuracy != null ? fmt(aggMetrics.accuracy, 3) : '--'}</td>
+      <td>${totalN}</td>
+    </tr>`);
+  }
+  tbody.innerHTML = rows.join('');
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  ['test','val','train'].forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) { el.style.background = tab === t ? '#1a2332' : '#21262d'; el.style.color = tab === t ? '#58a6ff' : '#8b949e'; }
+  });
+  if (selectedIdx >= 0) updateDetailWindows();
+}
+
+// Industry-standard Sharpe color scale:
+//   >= 3.0  brilliant green (exceptional)
+//   >= 2.0  strong green (excellent)
+//   >= 1.0  green (good)
+//   >= 0.5  light green (acceptable)
+//   >= 0.0  pale green (marginal)
+//   >= -0.5 pale red (weak)
+//   >= -1.0 red (poor)
+//   < -1.0  dark red (terrible)
+function sharpeColor(v) {
+  if (v == null) return '#8b949e';
+  if (v >= 3.0) return '#00d26a';
+  if (v >= 2.0) return '#3fb950';
+  if (v >= 1.0) return '#56d364';
+  if (v >= 0.5) return '#7ee787';
+  if (v >= 0.0) return '#aff5b4';
+  if (v >= -0.5) return '#ffc1ba';
+  if (v >= -1.0) return '#ff7b72';
+  return '#f85149';
+}
+
+function updateDetailWindows() {
+  const e = allEntries[selectedIdx];
+  if (!e) return;
+  let windows, label, pfx;
+  if (activeTab === 'train') {
+    windows = e.train_per_window || [];
+    label = 'TRAIN (Overfitting Check)';
+    pfx = 'train_';
+  } else if (activeTab === 'val') {
+    windows = e.val_per_window || [];
+    label = 'VALIDATION (Super-Fold)';
+    pfx = 'val_';
+  } else {
+    windows = e.per_window || [];
+    label = 'TEST (Super-Fold)';
+    pfx = '';
+  }
+  const s = e[pfx+'sharpe'] != null ? e[pfx+'sharpe'] : (e['sharpe'] || 0);
+  const ic = e[pfx+'ic'] != null ? e[pfx+'ic'] : 0;
+  const hit = e[pfx+'hit'] != null ? e[pfx+'hit'] : null;
+  const eq = pfx === '' ? e.equity : null;
+  const agg = {
+    sharpe: s, ic: ic, hit: hit, equity: eq,
+    sortino: e[pfx+'sortino'] || null,
+    return_pct: e[pfx+'return_pct'] || null,
+    max_dd: e[pfx+'max_dd'] || null,
+    win_rate: e[pfx+'win_rate'] || null,
+    profit_factor: e[pfx+'profit_factor'] || null,
+    confidence_mean: e[pfx+'confidence_mean'] != null ? e[pfx+'confidence_mean'] : null,
+    aleatoric_mean: e[pfx+'aleatoric_mean'] != null ? e[pfx+'aleatoric_mean'] : null,
+    epistemic_mean: e[pfx+'epistemic_mean'] != null ? e[pfx+'epistemic_mean'] : null,
+    precision: e[pfx+'precision'] != null ? e[pfx+'precision'] : null,
+    recall: e[pfx+'recall'] != null ? e[pfx+'recall'] : null,
+    f1: e[pfx+'f1'] != null ? e[pfx+'f1'] : null,
+    f2: e[pfx+'f2'] != null ? e[pfx+'f2'] : null,
+    mcc: e[pfx+'mcc'] != null ? e[pfx+'mcc'] : null,
+    accuracy: e[pfx+'accuracy'] != null ? e[pfx+'accuracy'] : null,
+  };
+  // Project the per-window dicts onto the active target (A/B/D). For
+  // target A this is a no-op (returns the original windows); for B/D
+  // the unprefixed sharpe/return_pct/etc. are swapped to that target's.
+  const projWindows = (windows || []).map(projectTarget);
+  // Update the target-summary chip with the aggregate metric for activeTarget
+  const tgtSum = document.getElementById('target-summary');
+  if (tgtSum) {
+    const tag = activeTarget;
+    const ts = e[tag === 'A' ? 'sharpe' : (tag + '_sharpe')];
+    const tx = e[tag === 'A' ? 'excess_sharpe' : (tag + '_excess_sharpe')];
+    const tr = e[tag === 'A' ? 'return_pct' : (tag + '_return_pct')];
+    const lbl = tag === 'A' ? '1d return' : (tag === 'B' ? '5d return' : 'vol-adj 1d');
+    tgtSum.innerHTML = `<strong>${tag}</strong> (${lbl}): ` +
+      `Sharpe=<span style="color:${sharpeColor(ts)}">${fmtSign(ts)}</span>  ` +
+      `Excess=<span style="color:${sharpeColor(tx)}">${fmtSign(tx)}</span>  ` +
+      `Ret=${tr != null ? fmtSign(tr,2)+'%' : '--'}`;
+  }
+  renderWindows(projWindows, 'window-body', agg);
+  renderEquityChart(projWindows, activeTab, e, selectedIdx);
+  const psr = activeTab === 'test' ? fmt(e.psr) : '--';
+  const eqStr = eq != null ? '$' + fmt(eq, 0) : '--';
+  document.getElementById('tab-summary').innerHTML =
+    `<strong style="color:#c9d1d9">${label}:</strong> ` +
+    `Sharpe=<span style="color:${sharpeColor(s)}">${fmtSign(s)}</span>  ` +
+    `IC=${fmtSign(ic,3)}  Hit=${hit != null ? fmt(hit,1)+'%' : '--'}  PSR=${psr}  ${eqStr}`;
+}
+
+// Hardcoded fold date ranges (from data/splits.py FOLDS)
+const FOLD_DATES = {
+  test: [
+    {name:'fold_1', range:'2008-01/06', regime:'Pre-crisis+GFC'},
+    {name:'fold_2', range:'2010-01/06', regime:'Post-crash'},
+    {name:'fold_3', range:'2013-01/06', regime:'Eurozone debt'},
+    {name:'fold_4', range:'2015-04/12', regime:'Strong USD'},
+    {name:'fold_5', range:'2019-01/09', regime:'Low-vol'},
+    {name:'fold_6', range:'2022-01/09', regime:'EUR crisis'},
+    {name:'fold_7', range:'2025-01/09', regime:'Recent mixed'},
+  ],
+  val: [
+    {name:'fold_1', range:'2007-04/09', regime:'Pre-crisis'},
+    {name:'fold_2', range:'2009-04/09', regime:'Post-crash recovery'},
+    {name:'fold_3', range:'2012-04/09', regime:'Eurozone'},
+    {name:'fold_4', range:'2014-07/12', regime:'Strong USD'},
+    {name:'fold_5', range:'2018-04/09', regime:'Low-vol'},
+    {name:'fold_6', range:'2021-04/09', regime:'EUR crisis'},
+    {name:'fold_7', range:'2024-04/09', regime:'Recent'},
+  ],
+  train: [{name:'all_train', range:'2005-2023 (hole-punched)', regime:'Training'}],
+};
+
+// Parse CSV text to rows of {date, cumulative_return, fold}
+function parseTradesCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const hdr = lines[0].split(',');
+  const iDate = hdr.indexOf('date'), iFold = hdr.indexOf('fold'),
+        iCum = hdr.indexOf('cumulative_return'), iStrat = hdr.indexOf('strategy_return');
+  const out = [];
+  for (let i = 1; i < lines.length; i++) {
+    const p = lines[i].split(',');
+    if (p.length < 5) continue;
+    out.push({
+      date: p[iDate], fold: p[iFold],
+      cum: parseFloat(p[iCum]), strat: parseFloat(p[iStrat]),
+    });
+  }
+  return out;
+}
+
+// Compute daily equity across all folds, compounding forward through fold boundaries
+function computeDailyEquity(trades, startCapital) {
+  if (!trades || trades.length === 0) return { series: [], boundaries: [] };
+  // Group by fold, compound within then carry forward
+  let eq = startCapital;
+  const series = [{date: 'start', fold: 'start', eq: startCapital, idx: 0}];
+  const boundaries = [];
+  let curFold = null;
+  let foldStartIdx = 0;
+  trades.forEach((t, i) => {
+    if (t.fold !== curFold) {
+      if (curFold !== null) {
+        boundaries.push({fold: curFold, startIdx: foldStartIdx, endIdx: i});
+      }
+      curFold = t.fold;
+      foldStartIdx = i + 1;  // +1 because we add the "start" point
+    }
+    eq *= (1 + (t.strat || 0));
+    series.push({date: t.date, fold: t.fold, eq, idx: i + 1});
+  });
+  if (curFold !== null) {
+    boundaries.push({fold: curFold, startIdx: foldStartIdx, endIdx: trades.length});
+  }
+  return { series, boundaries };
+}
+
+// --- Equity-curve chart: strategy vs flat investment baseline across folds ---
+async function renderEquityChart(windows, tab, expEntry, rowIdx) {
+  const svg = document.getElementById('detail-chart');
+  if (!svg) return;
+  const folds = (windows || []).filter(w => w && !w.skipped && w.return_pct != null);
+  if (folds.length === 0) {
+    svg.innerHTML = '<text x="450" y="110" text-anchor="middle" fill="#8b949e" font-size="14">No fold data to plot</text>';
+    return;
+  }
+  const startCapital = 1000;
+  const expNum = expEntry && expEntry.experiment_num;
+  let daily = null;
+
+  // Try to fetch per-trade CSV for daily-resolution curve (test tab only;
+  // trade_logs are only emitted for the test split)
+  if (tab === 'test' && expNum != null) {
+    try {
+      const r = await fetch(`trade_logs/exp${expNum}_trades.csv?t=${Date.now()}`);
+      if (r.ok) {
+        const csvText = await r.text();
+        const trades = parseTradesCSV(csvText);
+        if (trades.length > 0) daily = computeDailyEquity(trades, startCapital);
+      }
+    } catch (err) { /* fall back */ }
+  }
+
+  const viewW = 900, viewH = 240;
+  const padL = 60, padR = 20, padT = 18, padB = 52;  // more bottom for fold labels
+  const plotW = viewW - padL - padR;
+  const plotH = viewH - padT - padB;
+
+  // Build series
+  let points, foldMeta, n;
+  if (daily && daily.series.length > 1) {
+    // Daily-resolution mode: one point per trading day, keep fold boundaries
+    points = daily.series.map(s => s.eq);
+    foldMeta = daily.boundaries;  // [{fold, startIdx, endIdx}]
+    n = points.length;
+  } else {
+    // Stepped per-fold fallback (used for train/val + any test run without trade_log)
+    points = [startCapital];
+    let cur = startCapital;
+    folds.forEach(w => {
+      cur *= (1 + (w.return_pct || 0) / 100);
+      points.push(cur);
+    });
+    // Segment i occupies points [i .. i+1] so shaded band + label cover the fold
+    foldMeta = folds.map((w, i) => ({
+      fold: w.fold || `fold_${i+1}`,
+      startIdx: i,
+      endIdx: i + 1,
+    }));
+    n = points.length;
+  }
+
+  // For "train" tab with a single aggregated row, synthesise a minimal 2-point
+  // curve so the chart still renders meaningfully (single segment).
+  if (n < 2) {
+    svg.innerHTML = '<text x="450" y="110" text-anchor="middle" fill="#8b949e" font-size="14">Not enough fold data to plot (n < 2)</text>';
+    return;
+  }
+
+  const maxE = Math.max(...points, startCapital * 1.05);
+  const minE = Math.min(...points, startCapital * 0.95);
+  const useLog = maxE / Math.max(minE, 1) > 4;  // log-scale if dynamic range > 4x
+  const toY = v => {
+    const frac = useLog
+      ? (Math.log(v) - Math.log(minE)) / (Math.log(maxE) - Math.log(minE) || 1)
+      : (v - minE) / (maxE - minE || 1);
+    return padT + plotH - frac * plotH;
+  };
+  const toX = i => padL + (i / Math.max(n - 1, 1)) * plotW;
+
+  // Build SVG
+  let svgHtml = '';
+
+  // Horizontal gridlines + Y-axis ticks
+  const numTicks = 5;
+  for (let k = 0; k < numTicks; k++) {
+    const frac = k / (numTicks - 1);
+    const v = useLog
+      ? Math.exp(Math.log(minE) + frac * (Math.log(maxE) - Math.log(minE)))
+      : minE + frac * (maxE - minE);
+    const y0 = toY(v);
+    svgHtml += `<line x1="${padL}" y1="${y0.toFixed(1)}" x2="${viewW - padR}" y2="${y0.toFixed(1)}" stroke="#30363d" stroke-width="0.5" stroke-dasharray="3,3"/>`;
+    const lbl = v >= 10000 ? (v/1000).toFixed(1)+'k' : v.toFixed(0);
+    svgHtml += `<text x="${padL - 8}" y="${(y0 + 4).toFixed(1)}" text-anchor="end" fill="#8b949e" font-size="10">$${lbl}</text>`;
+  }
+
+  // Fold boundary shading (alternating bands) + labels with date ranges
+  const foldRanges = FOLD_DATES[tab] || FOLD_DATES.test;
+  foldMeta.forEach((fm, fi) => {
+    const x1 = toX(Math.max(fm.startIdx, 0));
+    const x2 = toX(Math.min(fm.endIdx, n - 1));
+    if (fi % 2 === 0) {
+      svgHtml += `<rect x="${x1.toFixed(1)}" y="${padT}" width="${(x2 - x1).toFixed(1)}" height="${plotH}" fill="#161b22" opacity="0.4"/>`;
+    }
+    // Mid-fold label with date range
+    const mid = (x1 + x2) / 2;
+    const meta = foldRanges[fi] || {name: fm.fold, range: '', regime: ''};
+    svgHtml += `<text x="${mid.toFixed(1)}" y="${(viewH - 28).toFixed(1)}" text-anchor="middle" fill="#c9d1d9" font-size="10" font-weight="600">${meta.name}</text>`;
+    svgHtml += `<text x="${mid.toFixed(1)}" y="${(viewH - 16).toFixed(1)}" text-anchor="middle" fill="#8b949e" font-size="9">${meta.range}</text>`;
+    svgHtml += `<text x="${mid.toFixed(1)}" y="${(viewH - 5).toFixed(1)}" text-anchor="middle" fill="#484f58" font-size="8">${meta.regime}</text>`;
+    // Thin vertical fold boundary marker
+    if (fi > 0) {
+      svgHtml += `<line x1="${x1.toFixed(1)}" y1="${padT}" x2="${x1.toFixed(1)}" y2="${(padT + plotH).toFixed(1)}" stroke="#484f58" stroke-width="0.5" stroke-dasharray="2,2"/>`;
+    }
+  });
+
+  // Investment baseline ($1000)
+  const y1000 = toY(startCapital);
+  svgHtml += `<line x1="${padL}" y1="${y1000.toFixed(1)}" x2="${(viewW - padR).toFixed(1)}" y2="${y1000.toFixed(1)}" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6,4"/>`;
+  svgHtml += `<text x="${(padL + 4).toFixed(1)}" y="${(y1000 - 4).toFixed(1)}" fill="#8b949e" font-size="9">$1000 investment baseline</text>`;
+
+  // Strategy equity polyline
+  const stratPts = points.map((v, i) => `${toX(i).toFixed(1)},${toY(v).toFixed(1)}`).join(' ');
+  svgHtml += `<polyline points="${stratPts}" fill="none" stroke="#3fb950" stroke-width="2"/>`;
+
+  // Mark fold-END points only (not every daily point — keeps chart readable)
+  if (daily) {
+    foldMeta.forEach(fm => {
+      const i = Math.min(fm.endIdx, n - 1);
+      const v = points[i];
+      const cx = toX(i).toFixed(1), cy = toY(v).toFixed(1);
+      const col = v >= startCapital ? '#3fb950' : '#f85149';
+      svgHtml += `<circle cx="${cx}" cy="${cy}" r="3" fill="${col}" stroke="#0d1117" stroke-width="1"/>`;
+      svgHtml += `<title>${fm.fold} end: $${v.toFixed(0)}</title>`;
+    });
+  } else {
+    points.forEach((v, i) => {
+      const col = v >= startCapital ? '#3fb950' : '#f85149';
+      svgHtml += `<circle cx="${toX(i).toFixed(1)}" cy="${toY(v).toFixed(1)}" r="3" fill="${col}" stroke="#0d1117" stroke-width="1"/>`;
+    });
+  }
+
+  // Final equity annotation at right
+  const finalEq = points[n - 1];
+  const finalRet = ((finalEq / startCapital - 1) * 100);
+  const finalCol = finalEq >= startCapital ? '#3fb950' : '#f85149';
+  svgHtml += `<text x="${(viewW - padR - 4).toFixed(1)}" y="${(toY(finalEq) - 8).toFixed(1)}" text-anchor="end" fill="${finalCol}" font-size="12" font-weight="600">$${finalEq.toFixed(0)} (${finalRet >= 0 ? '+' : ''}${finalRet.toFixed(1)}%)</text>`;
+
+  // Header label (tab + mode + scale)
+  const modeLbl = daily ? 'DAILY (from trade log)' : 'STEPPED (per-fold)';
+  const scaleLbl = useLog ? 'log-scale' : 'linear';
+  svgHtml += `<text x="${padL}" y="12" fill="#58a6ff" font-size="10" font-weight="600">${tab.toUpperCase()} · ${modeLbl} · ${scaleLbl} Y</text>`;
+
+  svg.innerHTML = svgHtml;
+
+  // Update download link
+  const dl = document.getElementById('chart-excel-link');
+  if (dl) dl.href = `autoresearch_equity.xlsx?t=${Date.now()}`;
+}
+
+function showDetail(idx) {
+  const e = allEntries[idx];
+  if (!e) return;
+  selectedIdx = idx;
+  const panel = document.getElementById('detail-panel');
+  panel.className = 'detail-panel visible';
+  document.getElementById('detail-title').textContent = `Exp ${e.experiment_num}: ${e.description}`;
+  const c = e.config || {};
+  document.getElementById('detail-config').textContent =
+    `lr=${c.lr}  bs=${c.batch_size}  seq=${c.seq_len}  wd=${c.weight_decay}  pat=${c.patience}  ep=${c.epochs}  hd=${c.head_dropout}  huber=${c.huber_delta}  |  Status: ${e.status}  |  ValLoss: ${e.val_loss}`;
+  // Reasoning panel (arxiv cites, diagnosis, hypothesis, verdict)
+  const ra = (window._reasoningAnnotations || {})[String(e.experiment_num)];
+  const reasoningBox = document.getElementById('detail-reasoning');
+  const body = document.getElementById('detail-reasoning-body');
+  if (ra) {
+    const parts = [];
+    if (ra.diagnosis) parts.push(`<div style="margin-bottom:8px"><strong style="color:#d29922">Diagnosis:</strong> ${ra.diagnosis}</div>`);
+    if (ra.citations) parts.push(`<div style="margin-bottom:8px"><strong style="color:#3fb950">Citations:</strong> ${ra.citations}</div>`);
+    if (ra.hypothesis) parts.push(`<div style="margin-bottom:8px"><strong style="color:#58a6ff">Hypothesis:</strong> ${ra.hypothesis}</div>`);
+    if (ra.prediction) parts.push(`<div style="margin-bottom:8px"><strong style="color:#a371f7">Prediction:</strong> ${ra.prediction}</div>`);
+    if (ra.verdict) parts.push(`<div style="margin-bottom:8px"><strong style="color:${ra.verdict.startsWith('KEEP') || ra.verdict.includes('CHAMP') ? '#3fb950' : '#f85149'}">Verdict:</strong> ${ra.verdict}</div>`);
+    if (ra.learning) parts.push(`<div><strong style="color:#c9d1d9">Learning:</strong> ${ra.learning}</div>`);
+    body.innerHTML = parts.join('');
+    reasoningBox.style.display = 'block';
+  } else {
+    // Fallback: extract citations from description parentheses
+    const citeMatch = (e.description || '').match(/\(([^)]+)\)/);
+    if (citeMatch) {
+      body.innerHTML = `<div><strong style="color:#3fb950">Referenced:</strong> ${citeMatch[1]}</div><div style="margin-top:4px;color:#8b949e;font-size:0.9em">No detailed annotation yet. Run <code>backfill_reasoning.py</code> to extract full reasoning from research_journal.md.</div>`;
+      reasoningBox.style.display = 'block';
+    } else {
+      reasoningBox.style.display = 'none';
+    }
+  }
+  updateDetailWindows();
+  document.querySelectorAll('#exp-body tr').forEach((r,i) => r.classList.toggle('selected', i === idx));
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').className = 'detail-panel';
+  selectedIdx = -1;
+  document.querySelectorAll('#exp-body tr').forEach(r => r.classList.remove('selected'));
+}
+
+let bestActiveTab = 'test';
+
+function switchBestTab(tab) {
+  bestActiveTab = tab;
+  ['test','val','train'].forEach(t => {
+    const el = document.getElementById('best-tab-' + t);
+    if (el) { el.style.background = tab === t ? '#1a2332' : '#21262d'; el.style.color = tab === t ? '#58a6ff' : '#8b949e'; }
+  });
+  updateBestWindows();
+}
+
+function updateBestWindows() {
+  const b = window._bestData;
+  if (!b) return;
+  let windows, pfx;
+  if (bestActiveTab === 'train') { windows = b.train_per_window || []; pfx = 'train_'; }
+  else if (bestActiveTab === 'val') { windows = b.val_per_window || []; pfx = 'val_'; }
+  else { windows = b.per_window || []; pfx = ''; }
+  const agg = {
+    sharpe: b[pfx+'sharpe'] || 0, ic: b[pfx+'ic'] || 0, hit: b[pfx+'hit'] || 0,
+    equity: pfx === '' ? b.equity : null,
+    sortino: b[pfx+'sortino'] || null, return_pct: b[pfx+'return_pct'] || null,
+    max_dd: b[pfx+'max_dd'] || null, win_rate: b[pfx+'win_rate'] || null,
+    profit_factor: b[pfx+'profit_factor'] || null,
+    confidence_mean: b[pfx+'confidence_mean'] != null ? b[pfx+'confidence_mean'] : null,
+    aleatoric_mean: b[pfx+'aleatoric_mean'] != null ? b[pfx+'aleatoric_mean'] : null,
+    epistemic_mean: b[pfx+'epistemic_mean'] != null ? b[pfx+'epistemic_mean'] : null,
+    precision: b[pfx+'precision'] != null ? b[pfx+'precision'] : null,
+    recall: b[pfx+'recall'] != null ? b[pfx+'recall'] : null,
+    f1: b[pfx+'f1'] != null ? b[pfx+'f1'] : null,
+    f2: b[pfx+'f2'] != null ? b[pfx+'f2'] : null,
+    mcc: b[pfx+'mcc'] != null ? b[pfx+'mcc'] : null,
+    accuracy: b[pfx+'accuracy'] != null ? b[pfx+'accuracy'] : null,
+  };
+  renderWindows(windows, 'best-window-body', agg);
+  const labels = { test: 'TEST', val: 'VALIDATION', train: 'TRAIN' };
+  document.getElementById('best-tab-summary').innerHTML =
+    `<strong style="color:#c9d1d9">${labels[bestActiveTab]}:</strong> ` +
+    `Sharpe=<span style="color:${sharpeColor(agg.sharpe)}">${fmtSign(agg.sharpe)}</span>  ` +
+    `IC=${fmtSign(agg.ic,3)}  Hit=${agg.hit != null ? fmt(agg.hit,1)+'%' : '--'}`;
+}
+
+// Sortable columns — persists across refresh cycles
+let sortKey = null, sortAsc = false;
+function applySortToEntries(entries) {
+  if (!sortKey) return entries.slice().reverse(); // default: newest first
+  return entries.slice().sort((a, b) => {
+    let va = a[sortKey], vb = b[sortKey];
+    if (va == null) va = -Infinity;
+    if (vb == null) vb = -Infinity;
+    if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortAsc ? va - vb : vb - va;
+  });
+}
+// Delegate click on the exp-table for sorting
+document.getElementById('exp-table').addEventListener('click', e => {
+  const th = e.target.closest('th[data-sort]');
+  if (!th) return;
+  e.stopPropagation();
+  const key = th.dataset.sort;
+  if (sortKey === key) sortAsc = !sortAsc;
+  else { sortKey = key; sortAsc = false; }
+  // Update header indicators
+  document.querySelectorAll('#exp-table th[data-sort]').forEach(h => {
+    h.textContent = h.textContent.replace(/ [▲▼]/g, '');
+    if (h.dataset.sort === sortKey) {
+      h.textContent += sortAsc ? ' ▲' : ' ▼';
+    }
+  });
+  renderExpTable();
+});
+
+let activeBackbone = 'all';
+function renderBackboneTabs() {
+  const counts = {};
+  allEntries.forEach(e => { const b = e.backbone || 'unknown'; counts[b] = (counts[b]||0)+1; });
+  const backbones = ['all', ...Object.keys(counts).sort()];
+  const tabBar = document.getElementById('backbone-tabs');
+  if (!tabBar) return;
+  tabBar.innerHTML = backbones.map(b => {
+    const cnt = b === 'all' ? allEntries.length : (counts[b] || 0);
+    const isActive = b === activeBackbone;
+    const bg = isActive ? '#1a2332' : '#21262d';
+    const col = isActive ? '#58a6ff' : '#8b949e';
+    const bd = isActive ? 'border:1px solid #58a6ff' : 'border:1px solid #30363d';
+    return `<button onclick="setBackboneTab('${b}')" style="${bd};background:${bg};color:${col};padding:6px 14px;border-radius:4px;cursor:pointer;font-size:0.85em;font-weight:600">${b.toUpperCase()} (${cnt})</button>`;
+  }).join('');
+}
+function setBackboneTab(b) { activeBackbone = b; renderBackboneTabs(); renderExpTable(); }
+
+function renderExpTable() {
+  const filteredEntries = activeBackbone === 'all' ? allEntries : allEntries.filter(e => (e.backbone||'unknown') === activeBackbone);
+  const validEntries = filteredEntries.filter(e => e.composite != null && e.status !== 'CRASH');
+  const bestComposite = validEntries.length ? Math.max(...validEntries.map(e => e.composite)) : -999;
+  const sorted = applySortToEntries(filteredEntries);
+  const tbody = document.getElementById('exp-body');
+  // Surface the row count so users see all past experiments are loaded
+  const cnt = document.getElementById('exp-visible-count');
+  if (cnt) cnt.textContent = activeBackbone === 'all'
+    ? `${filteredEntries.length} experiments (all backbones)`
+    : `${filteredEntries.length} ${activeBackbone} experiments (of ${allEntries.length} total — click ALL to see every backbone)`;
+  if (sorted.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="23" style="padding:24px;text-align:center;color:#8b949e">
+      No experiments to display. allEntries.length=${allEntries.length}, activeBackbone=${activeBackbone}.
+      If allEntries=0 the JSONL fetch failed — check browser DevTools console.
+    </td></tr>`;
+    return;
+  }
+  tbody.innerHTML = sorted.map(e => {
+    const origIdx = allEntries.indexOf(e);
+    const isBest = e.composite != null && e.composite === bestComposite;
+    const rowClass = (isBest ? 'best-row' : e.status === 'KEEP' ? 'keep' : e.status === 'CRASH' ? 'crash' : 'discard')
+      + ' clickable' + (origIdx === selectedIdx ? ' selected' : '');
+    return `<tr class="${rowClass}" onclick="showDetail(${origIdx})">
+      <td>${e.experiment_num || ''}</td>
+      <td>${e.status || ''}</td>
+      <td>${e.description || ''}</td>
+      <td style="color:${sharpeColor(e.composite)};font-weight:600">${e.composite != null ? fmtSign(e.composite) : '--'}</td>
+      <td style="color:${sharpeColor(e.sharpe)}">${fmtSign(e.sharpe)}</td>
+      <td style="color:${sharpeColor(e.val_sharpe)}">${fmtSign(e.val_sharpe)}</td>
+      <td style="color:${sharpeColor(e.train_sharpe)}">${e.train_sharpe != null ? fmtSign(e.train_sharpe) : '--'}</td>
+      <td>${fmtSign(e.ic, 3)}</td>
+      <td>${fmt(e.hit, 1)}</td>
+      <td>${fmt(e.psr)}</td>
+      <td>$${fmt(e.equity, 0)}</td>
+      <td style="${e.confidence_mean != null ? (e.confidence_mean >= 0.9 ? 'color:#3fb950' : e.confidence_mean >= 0.8 ? 'color:#58a6ff' : 'color:#d29922') : ''}">${e.confidence_mean != null ? fmt(e.confidence_mean, 3) : '--'}</td>
+      <td>${e.aleatoric_mean != null ? e.aleatoric_mean.toExponential(1) : '--'}</td>
+      <td>${e.precision != null ? fmt(e.precision, 3) : '--'}</td>
+      <td>${e.recall != null ? fmt(e.recall, 3) : '--'}</td>
+      <td>${e.f1 != null ? fmt(e.f1, 3) : '--'}</td>
+      <td>${e.f2 != null ? fmt(e.f2, 3) : '--'}</td>
+      <td style="${e.mcc != null ? (e.mcc > 0.1 ? 'color:#3fb950' : e.mcc < -0.05 ? 'color:#f85149' : '') : ''}">${e.mcc != null ? fmtSign(e.mcc, 3) : '--'}</td>
+      <td>${e.accuracy != null ? fmt(e.accuracy, 3) : '--'}</td>
+      <td>${e.test_pos_folds||'?'}/${e.val_pos_folds||'?'}</td>
+      <td>${e.elapsed_sec || 0}s</td>
+      <td class="timestamp">${e.timestamp || ''}</td>
+      <td>${tradeLink(e.experiment_num)}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function fetchText(url) {
+  const r = await fetch(url + '?t=' + Date.now());
+  if (!r.ok) throw new Error(r.status);
+  return r.text();
+}
+
+async function refresh() {
+  const now = new Date().toLocaleTimeString();
+  document.getElementById('last-update').textContent = now;
+
+  // Check for currently running experiment
+  try {
+    const runText = await fetchText('running.json');
+    const running = JSON.parse(runText);
+    const c = running.config || {};
+    document.getElementById('running-title').style.display = 'block';
+    const el = document.getElementById('running-config');
+    el.style.display = 'block';
+    el.textContent =
+      `${running.backbone || '?'}: ${running.description || '?'}\n` +
+      `lr: ${c.lr}    batch_size: ${c.batch_size}    seq_len: ${c.seq_len}\n` +
+      `weight_decay: ${c.weight_decay}    patience: ${c.patience}    epochs: ${c.epochs}\n` +
+      `Started: ${running.started || '?'}`;
+  } catch(e) {
+    document.getElementById('running-title').style.display = 'none';
+    document.getElementById('running-config').style.display = 'none';
+  }
+
+  let best = null;
+
+  try {
+    const logText = await fetchText(LOG_PATH);
+    // Split on either LF or CRLF; surface parse failures so a single bad line
+    // doesn't wipe the whole table.
+    const rawLines = logText.split(/\r?\n/).filter(l => l.trim());
+    allEntries = [];
+    let parseErrors = 0;
+    for (const line of rawLines) {
+      try { allEntries.push(JSON.parse(line)); }
+      catch (err) { parseErrors++; }
+    }
+    console.log(`[AutoResearch dashboard] loaded ${allEntries.length} experiments from ${LOG_PATH}, ${parseErrors} parse errors`);
+    if (parseErrors > 0) {
+      const err = document.getElementById('error');
+      if (err) { err.textContent = `Warning: ${parseErrors} JSONL lines failed to parse (showing ${allEntries.length} valid)`; err.style.display = 'block'; }
+    }
+  } catch(e) {
+    const err = document.getElementById('error');
+    if (err) { err.textContent = `Failed to load experiment log from ${LOG_PATH}: ${e.message}`; err.style.display = 'block'; }
+    console.error('[AutoResearch dashboard] fetchText failed:', e);
+  }
+
+  // Load reasoning annotations (citations + thought process per experiment)
+  try {
+    const raText = await fetchText('reasoning_annotations.json');
+    window._reasoningAnnotations = JSON.parse(raText);
+  } catch(e) {
+    window._reasoningAnnotations = {};
+  }
+
+  // Load trade_logs manifest so the Trades column knows which experiments
+  // have a per-day CSV available.
+  try {
+    const manText = await fetchText('trade_logs/manifest.json');
+    const man = JSON.parse(manText);
+    tradeLogsManifest = new Set((man.experiments || []).map(Number));
+    ensembleTradeLogs = man.ensembles || [];
+    renderEnsembleLinks();
+    console.log(`[AutoResearch dashboard] trade_logs manifest: ${tradeLogsManifest.size} experiments + ${ensembleTradeLogs.length} ensemble winners`);
+  } catch(e) {
+    tradeLogsManifest = new Set();
+    ensembleTradeLogs = [];
+    renderEnsembleLinks();
+    console.warn('[AutoResearch dashboard] trade_logs/manifest.json not found — Trades column will show -- for all rows');
+  }
+  try {
+    const _ = null; // block marker for compatibility
+  } catch(e) {
+    if (e.message !== '404') {
+      document.getElementById('error').textContent = 'Log: ' + e.message;
+      document.getElementById('error').style.display = 'block';
+    }
+  }
+
+  try {
+    const bestText = await fetchText(BEST_PATH);
+    best = JSON.parse(bestText);
+  } catch(e) {}
+
+  // Status
+  const dot = document.getElementById('status-dot');
+  const stxt = document.getElementById('status-text');
+  if (allEntries.length > 0) {
+    const last = allEntries[allEntries.length - 1];
+    const elapsed = (Date.now() - new Date(last.timestamp).getTime()) / 1000;
+    if (elapsed < 600) {
+      dot.className = 'status-dot running';
+      stxt.textContent = `Running -- ${allEntries.length} experiments, last ${Math.round(elapsed)}s ago`;
+    } else {
+      dot.className = 'status-dot idle';
+      stxt.textContent = `Idle -- ${allEntries.length} experiments completed`;
+    }
+  }
+
+  // Summary cards
+  const keeps = allEntries.filter(e => e.status === 'KEEP');
+  const discards = allEntries.filter(e => e.status === 'DISCARD');
+  const crashes = allEntries.filter(e => e.status === 'CRASH');
+  const bestSharpe = best ? best.sharpe : 0;
+  const bestPSR = best ? best.psr : 0;
+  const bestEquity = best ? best.equity : 1000;
+
+  document.getElementById('summary-cards').innerHTML = `
+    <div class="card"><div class="label">Best Sharpe</div><div class="value ${cls(bestSharpe)}">${fmtSign(bestSharpe)}</div></div>
+    <div class="card"><div class="label">PSR</div><div class="value ${bestPSR>0.95?'positive':'neutral'}">${fmt(bestPSR)}</div></div>
+    <div class="card"><div class="label">Equity ($1000)</div><div class="value ${bestEquity>1000?'positive':'negative'}">$${fmt(bestEquity,0)}</div></div>
+    <div class="card"><div class="label">Experiments</div><div class="value neutral">${allEntries.length}</div></div>
+    <div class="card"><div class="label">Kept</div><div class="value positive">${keeps.length}</div></div>
+    <div class="card"><div class="label">Discarded</div><div class="value negative">${discards.length}</div></div>
+  `;
+
+  // Best config
+  if (best) {
+    const c = best.config;
+    document.getElementById('best-config').textContent =
+      `lr: ${c.lr}    batch_size: ${c.batch_size}    seq_len: ${c.seq_len}\n` +
+      `weight_decay: ${c.weight_decay}    patience: ${c.patience}    epochs: ${c.epochs}\n` +
+      `--- Exp ${best.experiment_num}: "${best.description}"`;
+  }
+
+  // Experiment table (newest first)
+  // Find best composite and populate winner section
+  const validEntries = allEntries.filter(e => e.composite != null && e.status !== 'CRASH');
+  const bestComposite = validEntries.length ? Math.max(...validEntries.map(e => e.composite)) : -999;
+  const winner = validEntries.find(e => e.composite === bestComposite);
+  if (winner) {
+    document.getElementById('winner-section').style.display = 'block';
+    const c = winner.config || {};
+    const tw = (winner.per_window || []).filter(w => !w.skipped);
+    const vw = (winner.val_per_window || []).filter(w => !w.skipped);
+    const tp = tw.filter(w => w.sharpe > 0).length;
+    const vp = vw.filter(w => w.sharpe > 0).length;
+    document.getElementById('winner-title').innerHTML =
+      `Exp ${winner.experiment_num || '?'}: <span style="color:#3fb950">${winner.description || ''}</span>`;
+    document.getElementById('winner-metrics').textContent =
+      `Composite: ${fmtSign(winner.composite)}    Test Sharpe: ${fmtSign(winner.sharpe)}    Val Sharpe: ${fmtSign(winner.val_sharpe)}\n` +
+      `PSR: ${fmt(winner.psr)}    Equity: $${fmt(winner.equity,0)}    Test: ${tp}/${tw.length} pos    Val: ${vp}/${vw.length} pos\n` +
+      `lr: ${c.lr}    batch_size: ${c.batch_size}    seq_len: ${c.seq_len}    wd: ${c.weight_decay}    patience: ${c.patience}    epochs: ${c.epochs}\n` +
+      `Confidence: ${winner.confidence_mean != null ? fmt(winner.confidence_mean, 3) : '--'}    Aleatoric: ${winner.aleatoric_mean != null ? winner.aleatoric_mean.toExponential(2) : '--'}    Epistemic: ${winner.epistemic_mean != null ? winner.epistemic_mean.toExponential(2) : '--'}`;
+  }
+
+  renderBackboneTabs();
+  renderExpTable();
+
+  // Best run per-window
+  const bestWindows = best ? (best.per_window || []) : [];
+  // Store best globally for tab switching
+  window._bestData = best;
+  updateBestWindows();
+
+  // Update selected detail if still open
+  if (selectedIdx >= 0 && allEntries[selectedIdx]) {
+    renderWindows(allEntries[selectedIdx].per_window, 'window-body');
+  }
+
+  document.getElementById('error').style.display = 'none';
+}
+
+refresh();
+setInterval(refresh, REFRESH_MS);
+</script>
+</body>
+</html>

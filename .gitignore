@@ -1,0 +1,8 @@
+﻿.data_cache_qqq/
+__pycache__/
+*.pyc
+*.pyo
+packages/
+*.bak_pre_nan_fix
+.DS_Store
+Thumbs.db

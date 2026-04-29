@@ -1,0 +1,22 @@
+{
+  "seq_len": 60,
+  "lr": 0.0005,
+  "batch_size": 32,
+  "epochs": 100,
+  "weight_decay": 0.1,
+  "patience": 20,
+  "warmup_epochs": 10,
+  "head_dropout": 0.1,
+  "huber_delta": 1.0,
+  "grad_clip": 1.0,
+  "seed": 42,
+  "hidden_size": null,
+  "num_layers": null,
+  "max_depth": null,
+  "gbm_lr": null,
+  "n_estimators": null,
+  "experiment_num": 52,
+  "backbone": "mamba",
+  "composite": 1.3216,
+  "description": "dMamba @ exp 48 d_state=32 (up from 16) - SSM memory capacity test; Gu-Dao 2024 canonical range"
+}

@@ -1,0 +1,28 @@
+{
+  "multi_seed_runs": [
+    {
+      "exp": 178,
+      "seed": 42,
+      "composite": 0.4193,
+      "A_sharpe": 0.6193,
+      "val_sharpe": 0.7345,
+      "excess_sharpe": 0.0151,
+      "test_pos": 5,
+      "val_pos": 5
+    },
+    {
+      "exp": 179,
+      "seed": 7,
+      "composite": 0.3421,
+      "A_sharpe": 0.4421,
+      "val_sharpe": 0.9938,
+      "excess_sharpe": -0.1622,
+      "test_pos": 6,
+      "val_pos": 5
+    }
+  ],
+  "median_composite": 0.38070000000000004,
+  "mean_composite": 0.38070000000000004,
+  "std_composite": 0.05458864350760146,
+  "n_seeds": 2
+}

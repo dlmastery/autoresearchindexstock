@@ -1,0 +1,49 @@
+{
+  "multi_seed_runs": [
+    {
+      "exp": 48,
+      "seed": 42,
+      "composite": 1.1887,
+      "A_sharpe": 1.2887,
+      "excess_sharpe": 0.0686,
+      "test_pos": 6,
+      "val_pos": 6
+    },
+    {
+      "exp": 49,
+      "seed": 0,
+      "composite": 0.698,
+      "A_sharpe": 0.798,
+      "excess_sharpe": -0.4221,
+      "test_pos": 6,
+      "val_pos": 5
+    },
+    {
+      "exp": 50,
+      "seed": 7,
+      "composite": 1.0182,
+      "A_sharpe": 1.1182,
+      "excess_sharpe": -0.1019,
+      "test_pos": 6,
+      "val_pos": 5
+    },
+    {
+      "exp": 51,
+      "seed": 99,
+      "composite": -1.1484,
+      "A_sharpe": -0.6484,
+      "excess_sharpe": -1.8685,
+      "test_pos": 2,
+      "val_pos": 5
+    }
+  ],
+  "median_composite": 0.8581,
+  "mean_composite": 0.439125,
+  "std_composite": 1.077720190572055,
+  "compare_expand_4": {
+    "4-seed median": -0.253,
+    "4-seed mean": -0.1264,
+    "4-seed std": 0.7521,
+    "note": "expand=4 dMamba prior (exps 17/19/20/21)"
+  }
+}
