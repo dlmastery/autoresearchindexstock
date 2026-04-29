@@ -1,0 +1,39 @@
+MIT License
+
+Copyright (c) 2026 dlmastery / AutoResearch contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=== DISCLAIMER (Financial Research Use) ===
+
+This repository contains code and analysis for financial machine learning
+research on EUR/USD directional prediction. The results shown (backtested
+Sharpe ratios, returns, per-fold performance) are from historical data with
+idealized transaction cost assumptions. Past backtest performance does NOT
+guarantee future results. Foreign exchange markets carry substantial risk of
+loss. Do not use this code for live trading without:
+  1. Independent replication of results
+  2. Rigorous out-of-sample validation on unseen data
+  3. Realistic transaction cost, slippage, and spread modeling
+  4. Risk management (position limits, stop-losses, drawdown caps)
+  5. Consultation with a qualified financial professional
+
+The authors accept no liability for financial losses resulting from use of
+this software. See also the "Known Limitations & Risks" section of the
+Medium article in autoresearch/autoresearch_results/medium_article.md.
