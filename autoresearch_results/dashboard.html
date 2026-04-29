@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AutoResearch QQQ Dashboard (build 20260429-054000)</title>
+<title>AutoResearch QQQ Dashboard (build 20260429-061500)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }
@@ -582,13 +582,26 @@ async function renderEquityChart(windows, tab, expEntry, rowIdx) {
     return;
   }
 
-  const maxE = Math.max(...points, startCapital * 1.05);
-  const minE = Math.min(...points, startCapital * 0.95);
-  const useLog = maxE / Math.max(minE, 1) > 4;  // log-scale if dynamic range > 4x
+  // Clamp non-positive equity to a small positive floor so log scale stays valid.
+  // QQQ daily strategy with -1.0 cumulative_return → equity=0; without floor
+  // Math.log(0) = -Infinity → frac = NaN → blank chart.
+  const eqFloor = Math.max(1.0, startCapital * 0.01);
+  const safePoints = points.map(v => (v && isFinite(v) && v > 0) ? v : eqFloor);
+  const maxE = Math.max(...safePoints, startCapital * 1.05);
+  const minE = Math.max(Math.min(...safePoints, startCapital * 0.95), eqFloor);
+  const useLog = (minE > 0) && (maxE / minE > 4);  // log-scale if dynamic range > 4x AND minE positive
   const toY = v => {
-    const frac = useLog
-      ? (Math.log(v) - Math.log(minE)) / (Math.log(maxE) - Math.log(minE) || 1)
-      : (v - minE) / (maxE - minE || 1);
+    const vSafe = (v && isFinite(v) && v > 0) ? v : eqFloor;
+    let frac;
+    if (useLog) {
+      const num = Math.log(vSafe) - Math.log(minE);
+      const den = Math.log(maxE) - Math.log(minE);
+      frac = den > 0 ? num / den : 0;
+    } else {
+      const den = maxE - minE;
+      frac = den > 0 ? (vSafe - minE) / den : 0;
+    }
+    if (!isFinite(frac)) frac = 0;
     return padT + plotH - frac * plotH;
   };
   const toX = i => padL + (i / Math.max(n - 1, 1)) * plotW;
