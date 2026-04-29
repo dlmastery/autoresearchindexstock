@@ -638,15 +638,37 @@ def main() -> None:
         "f2":               test_eval.get("A_f2",        0.0),
         "mcc":              test_eval.get("A_mcc",       0.0),
         "accuracy":         test_eval.get("A_accuracy",  0.0),
+        "tp":               test_eval.get("A_tp", 0),
+        "fp":               test_eval.get("A_fp", 0),
+        "tn":               test_eval.get("A_tn", 0),
+        "fn":               test_eval.get("A_fn", 0),
         "val_precision":    val_eval.get("A_precision",  0.0),
         "val_recall":       val_eval.get("A_recall",     0.0),
         "val_f1":           val_eval.get("A_f1",         0.0),
         "val_f2":           val_eval.get("A_f2",         0.0),
         "val_mcc":          val_eval.get("A_mcc",        0.0),
         "val_accuracy":     val_eval.get("A_accuracy",   0.0),
+        "val_tp":           val_eval.get("A_tp", 0),
+        "val_fp":           val_eval.get("A_fp", 0),
+        "val_tn":           val_eval.get("A_tn", 0),
+        "val_fn":           val_eval.get("A_fn", 0),
+        # Test-side alias for dashboards expecting `test_sharpe` instead of `sharpe`.
+        "test_sharpe":      test_sharpe_a,
         "per_window":       test_eval["per_window"],
         "per_window_val":   val_eval["per_window"],
     }
+    # Expose every A_*/B_*/D_* key from test_eval/val_eval at top level so the
+    # multi-target dashboard switcher (CLAUDE.md: A=1d primary, B=5d, D=vol-adj)
+    # has access to all variants without having to re-derive them.
+    for prefix_src, prefix_dst_pfx in (("test_eval", ""), ("val_eval", "val_")):
+        src_dict = test_eval if prefix_src == "test_eval" else val_eval
+        for k, v in src_dict.items():
+            if k.startswith(("A_", "B_", "D_")):
+                # Skip per_window which is a list (already merged separately).
+                if k == "per_window": continue
+                key = (prefix_dst_pfx + k) if prefix_dst_pfx else k
+                if key not in entry:
+                    entry[key] = v
 
     # KEEP/DISCARD status — set BEFORE appending so the dashboard's status column
     # populates. Mirrors FX runner line 485. Compares against current global best.
