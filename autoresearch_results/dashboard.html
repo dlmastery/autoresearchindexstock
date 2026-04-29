@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AutoResearch QQQ Dashboard (build 20260429-061500)</title>
+<title>AutoResearch QQQ Dashboard (build 20260429-062100)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }
@@ -475,16 +475,42 @@ const FOLD_DATES = {
   train: [{name:'all_train', range:'2005-2023 (hole-punched)', regime:'Training'}],
 };
 
-// Parse CSV text to rows of {date, cumulative_return, fold}
+// Parse CSV text to rows of {date, cumulative_return, fold}.
+// Quote-aware split: regime field can contain commas (e.g. fold_7
+// "Inflation bear, AI rally and 2025") and gets emitted by Python csv as
+// double-quoted. Naive .split(',') corrupts column indices for all
+// subsequent fields → broken equity curve at fold 7. Fixed via
+// minimal RFC-4180 splitter handling double-quoted fields with escaped
+// inner quotes ("").
+function splitCSVLine(line) {
+  const out = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') { cur += '"'; i++; }
+        else inQuotes = false;
+      } else cur += ch;
+    } else {
+      if (ch === '"') inQuotes = true;
+      else if (ch === ',') { out.push(cur); cur = ''; }
+      else cur += ch;
+    }
+  }
+  out.push(cur);
+  return out;
+}
 function parseTradesCSV(text) {
-  const lines = text.trim().split('\n');
+  const lines = text.trim().split(/\r?\n/);
   if (lines.length < 2) return [];
-  const hdr = lines[0].split(',');
+  const hdr = splitCSVLine(lines[0]);
   const iDate = hdr.indexOf('date'), iFold = hdr.indexOf('fold'),
         iCum = hdr.indexOf('cumulative_return'), iStrat = hdr.indexOf('strategy_return');
   const out = [];
   for (let i = 1; i < lines.length; i++) {
-    const p = lines[i].split(',');
+    const p = splitCSVLine(lines[i]);
     if (p.length < 5) continue;
     out.push({
       date: p[iDate], fold: p[iFold],
