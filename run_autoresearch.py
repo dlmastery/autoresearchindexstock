@@ -392,8 +392,13 @@ def main() -> None:
                         help="GBM only — boosting learning rate")
     parser.add_argument("--n-estimators", type=int, default=None)
     parser.add_argument("--mamba-variant", type=str, default=None,
-                        choices=[None, "vanilla", "s_mamba", "dmamba", "mambats"],
-                        help="Mamba: variant (FX winner = dmamba)")
+                        choices=[None, "vanilla", "s_mamba", "dmamba", "mambats",
+                                 "mambastock", "samba", "hybrid_mamba", "crossmamba"],
+                        help="Mamba: variant (FX winner = dmamba). "
+                             "New 2024-25 variants: mambastock (Shi 2024 arXiv:2402.18959), "
+                             "samba (Ren 2024 arXiv:2406.07522 — Mamba+SWA), "
+                             "hybrid_mamba (AI21 Jamba 2024 arXiv:2403.19887 — Mamba+Transformer), "
+                             "crossmamba (Zhao 2024 — cross-attn time+variate scans)")
     parser.add_argument("--expand", type=int, default=None,
                         help="Mamba: d_inner = d_model * expand (FX winner = 4)")
     parser.add_argument("--d-state", type=int, default=None,

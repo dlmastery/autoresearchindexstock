@@ -1264,6 +1264,53 @@ session so future Claude Code instances inherit the exact rules.
     before being archived. Failure cases (e.g. CatBoost lr=0.05 +0.39
     single-seed → 4-seed median 0.0) documented in research_journal.md.
 
+23. **2026-04-29 06:30 user directive: 5-day target analysis** —
+    investigate whether 5-day forecasting (target B) outperforms 1-day
+    (target A). Empirical finding (LSTM seq=35, 7 seeds): B_sh mean
+    +0.97 vs A_sh +0.40 — **5-day predictions are 2.4× stronger than
+    1-day** in single-asset n=4,772 daily QQQ. Trading 1-day on
+    5-day-prediction sign requires either a `--primary-target {1d,5d}`
+    CLI flag (TODO) or post-hoc analysis on the trade_log CSVs (which
+    contain both A and B prediction columns).
+
+24. **2026-04-29 06:55 user directive: "redo another 10 experiments each
+    for xlstm, dmamba, itransformer with prediction of 5 days, seq=60.
+    still the target is next day"** — predict B (5d), trade on A (1d).
+    Currently the runner trains both A and B heads jointly, so this
+    works out of the box; we report B_sh from existing JSONL plus a
+    post-hoc `B_signal_A_trade_sharpe` from the trade_logs CSVs. The
+    "10 experiments each" must follow the research-strict protocol per
+    directive 25 below.
+
+25. **2026-04-29 07:00 user re-emphasis: "make sure each experiment you
+    look into latest arxiv literature to setup - to hill climb from
+    winner of the backbone. remember this claude.md"** — every
+    experiment in the 30-exp batch (10 dMamba + 10 xLSTM + 10
+    iTransformer at seq=60) MUST:
+    a. Start from the current within-backbone winner (NOT a random seed
+       sweep).
+    b. Look up latest 2024-2026 arxiv literature for the specific
+       backbone family.
+    c. Cite the paper (full author + year + venue + arxiv ID + relevance
+       note) in the reasoning blob BEFORE launching.
+    d. Hill-climb ONE knob (HP, architectural variant, or feature axis).
+    e. Multi-seed verification only after a single-seed proves the
+       hypothesis via 3-seed median rule.
+
+    For dMamba (champion +1.32): hill-climb candidates from arxiv —
+    Liu 2025 DMamba expansion factor ablation; Cai 2024 MambaTS
+    season-trend layer; Sundial flow-matching loss (Liu 2025
+    arXiv:2502.00816); Time-MoE sparse-MoE upgrade (Shi 2024
+    arXiv:2409.16040).
+
+    For xLSTM: Beck 2024 NeurIPS (arXiv:2405.04517) base; TiRex 2025
+    NXAI xLSTM-decoder time-series specialisation; sLSTM-mLSTM ratio
+    ablation per §4.2 of Beck 2024.
+
+    For iTransformer (best A_sh +0.92): Liu 2024 ICLR (arXiv:2310.06625)
+    base; Itransformer + RevIN normalisation; deeper d_model (per Liu
+    Table 4).
+
 ## GitHub Pages URLs (after 2026-04-29 migration)
 
 Once `dlmastery/autoresearchindexstock` is live with Pages enabled:

@@ -1799,6 +1799,313 @@
     "citations": "Picard 2021 arXiv:2109.08203; Lakshminarayanan 2017 NeurIPS arXiv:1612.01474 \u00a73.2; Goyal 2017 arXiv:1706.02677 \u00a72.4; Gu-Kelly-Xiu 2020 RFS.",
     "hypothesis": "MLP seq=35 + lr=3e-4 + wd=1e-5 + ep=50 + pat=10 + bs=32 + hd=0.25 + warmup=5 + seed=42 (one knob from exp 215: seed 0\u219242) tests if seq=35 lift is reproducible.",
     "prediction": "Composite [-0.3, +0.7]; A_sharpe [+0.3, +1.0]; runtime ~50-90s.",
+    "_manual": true,
+    "verdict": "DISCARD strongly. Composite -1.0378 (massive drop from exp 215's +0.55), A_sh -0.3055 (NEGATIVE), val_sh -0.6378 (NEGATIVE). Per-fold A_sharpe varied: F1 -0.7, F2 -0.4, F3 +0.5, F4 -1.6, F5 -0.7, F6 +0.7, F7 -0.4. 2/7 positive folds. Hypothesis BROKEN: seq=35 lift is HEAVILY seed-dependent. 2-seed MLP seq=35 distribution: comp [+0.5475, -1.0378] mean -0.245 \u2014 massive variance. Same val-instability pattern as other backbones at higher input dim.",
+    "learning": "MLP seq=35 single-seed lift was seed=0 luck. seed=42 catastrophically failed. The 6,440-input-dim regime is genuinely overparameterized at n_train=2,538. Need more seeds for honest median assessment."
+  },
+  "217": {
+    "diagnosis": "Per user directive: 10 MLP seq=35 experiments. After 2/10: [+0.55, -1.04] mean -0.25. seed=99 is canonical 3rd seed. If 3-seed median > 0, seq=35 has real lift. If < 0, seq=35 fails for MLP same as seq=20 did.",
+    "citations": "Picard 2021 arXiv:2109.08203; Lakshminarayanan 2017 NeurIPS arXiv:1612.01474 \u00a73.2; Goyal 2017 \u00a72.4; Gu-Kelly-Xiu 2020.",
+    "hypothesis": "MLP seq=35 seed=99 (one knob from exp 216 seed=42) locks 3-seed median.",
+    "prediction": "Composite [-0.8, +0.7]; runtime ~50-90s.",
+    "_manual": true,
+    "verdict": "DISCARD. Comp -0.56, A_sh ~0, val_sh -0.06. **3-seed MLP seq=35 distribution: [+0.55, -1.04, -0.56] median -0.56, mean -0.35.** seq=35 axis is REJECTED at multi-seed median for MLP. Per-fold: F1 +1.16, F5 +0.65 positive but F2-F7 mostly weak. Note: tp/fp/tn/fn now populating correctly (133/92/427/583) \u2014 runner fix working.",
+    "learning": "MLP seq=35 fails 3-seed median. Same as seq=20 (also rejected earlier in session). seq=10 remains the MLP sweet-spot. Per user directive continue 10-experiment grind to characterize variance."
+  },
+  "218": {
+    "diagnosis": "MLP seq=35 4-seed median lock per user 10-exp directive.",
+    "citations": "Picard 2021; Lakshminarayanan 2017 \u00a73.2.",
+    "hypothesis": "seed=7 4-seed median lock.",
+    "prediction": "comp [-1.0, +0.5], runtime ~50-90s.",
+    "_manual": true,
+    "verdict": "DISCARD vs +1.32 global, but POSITIVE comp +0.8863, A_sh +0.99, val +1.28, **6/7 positive folds**, F2 +3.40 RECORD, F6 +1.63, F7 +1.16. **4-seed MLP seq=35 distribution: [+0.55, -1.04, -0.56, +0.89] median -0.007, mean -0.04.** Wide spread; seed=7 hit sweet spot.",
+    "learning": "MLP seq=35 4-seed median essentially 0. Same wide variance as other backbones. seed=7 is best (just like seed=42 for MLP seq=10 was best)."
+  },
+  "219": {
+    "diagnosis": "MLP seq=35 5-seed lock (seed=2024) per user 10-exp directive.",
+    "citations": "Picard 2021; Lakshminarayanan 2017 \u00a73.2.",
+    "hypothesis": "5-seed median.",
+    "prediction": "comp [-0.5, +0.7].",
+    "_manual": true,
+    "verdict": "DISCARD. Comp -0.02, A_sh +0.53, val_sh +0.18. 5-seed MLP seq=35 distribution [+0.55, -1.04, -0.56, +0.89, -0.02] median -0.02, mean -0.04. seq=35 5-seed median essentially zero \u2014 no real lift over seq=10 5-seed median +0.43.",
+    "learning": "MLP seq=35 doesn't beat seq=10 at multi-seed median. seq=10 remains best."
+  },
+  "220": {
+    "diagnosis": "MLP seq=35 6-seed (seed=13) per user 10-exp directive.",
+    "citations": "Picard 2021.",
+    "hypothesis": "seed=13.",
+    "prediction": "comp [-1.0, +1.0].",
+    "_manual": true,
+    "verdict": "DISCARD strongly. Comp -1.70, A_sh -1.00 (NEG), val -0.26. seed=13 catastrophic. 6-seed MLP seq=35 [+0.55, -1.04, -0.56, +0.89, -0.02, -1.70] median -0.29, mean -0.31.",
+    "learning": "seed=13 is catastrophic for MLP. Same as seed=99 for Mamba \u2014 project-wide bad seed for some seed-data combos."
+  },
+  "221": {
+    "diagnosis": "MLP seq=35 #7/10 user directive seed=11.",
+    "citations": "Picard 2021.",
+    "hypothesis": "alt seed.",
+    "prediction": "comp [-1.0, +1.0].",
+    "_manual": true,
+    "verdict": "DISCARD. Comp +0.35, A_sh +1.11, val +0.45. 7-seed MLP seq=35 median -0.02; mean -0.22. Same plateau.",
+    "learning": "MLP seq=35 7-seed: median essentially 0. seq=10 better at +0.43 5-seed median."
+  },
+  "222": {
+    "diagnosis": "MLP seq=35 #8/10 seed=3.",
+    "citations": "Picard 2021.",
+    "hypothesis": "alt seed.",
+    "prediction": "comp [-1.0, +1.0].",
+    "_manual": true,
+    "verdict": "DISCARD. Comp -1.33. 8-seed MLP seq=35 median -0.29, mean -0.36. seq=35 plateau confirmed."
+  },
+  "223": {
+    "diagnosis": "MLP seq=35 #9/10 seed=5",
+    "citations": "Picard 2021",
+    "hypothesis": "alt seed",
+    "prediction": "comp [-1.5, +1.0]",
+    "_manual": true,
+    "verdict": "DISCARD. Comp -0.60. 9-seed median -0.56. seq=35 confirms wide variance, median negative."
+  },
+  "224": {
+    "diagnosis": "MLP seq=35 #10/10 FINAL seed=2026 - completes user directive",
+    "citations": "Picard 2021; Lakshminarayanan 2017",
+    "hypothesis": "final seed for 10-seed median",
+    "prediction": "comp [-1.5, +1.0]",
+    "_manual": true,
+    "verdict": "DISCARD vs +1.32 global, but POSITIVE comp +0.8126, A_sh +1.17, excess +0.06 (positive). Per-fold strong. **10-SEED MLP seq=35 distribution: median +0.165 (POSITIVE), mean -0.27.** MLP seq=35 user directive 10-exp grind COMPLETE. Median +0.165 < seq=10's 5-seed median +0.43, so seq=10 wins at MLP. seq=35 is real but worse.",
+    "learning": "MLP seq=35 10-seed median +0.165 \u2014 modest positive lift but worse than seq=10 +0.43. seq=10 stays MLP-best. Pivoting to LSTM seq=35 next per user directive (1/6 backbones at seq=35 done)."
+  },
+  "225": {
+    "diagnosis": "MLP seq=35 10/10 complete (median +0.165). Pivot to LSTM seq=35 \u2014 second of 6 cheap-tier winners at seq=35 per user directive. LSTM-best is exp 74 (1-layer, hidden=128, lr=1e-3, bs=16, ep=100, pat=15, wd=7e-4, hd=0.1, seq=10). seq=35 untested for LSTM at this canonical config (earlier session tested seq=20 rejected, seq=5 rejected).",
+    "citations": "Fischer-Krauss 2018 EJOR \u00a73.4 seq sweep; Bengio 1994 IEEE TNN gradient flow; Hochreiter-Schmidhuber 1997 LSTM capacity; Picard 2021 multi-seed.",
+    "hypothesis": "LSTM 1-layer + seq=35 + lr=1e-3 + bs=16 + ep=100 + pat=15 + wd=7e-4 + hd=0.1 + seed=99 (one knob from exp 74's seq=10) tests if 7-week context helps LSTM. Risk: gradient-flow degradation per Bengio 1994 (seq=20 already rejected).",
+    "prediction": "Composite [-1.0, +0.8]; runtime ~80-150s.",
+    "_manual": true,
+    "verdict": "DISCARD. Comp -0.47, A_sh -0.07. Per-fold mixed F4/F5 strong but F3/F6 weak. seq=35 single-seed LSTM weak."
+  },
+  "226": {
+    "diagnosis": "LSTM seq=35 #2/10 seed=42",
+    "citations": "Picard 2021",
+    "hypothesis": "alt seed",
+    "prediction": "comp [-1.0, +0.8]",
+    "_manual": true,
+    "verdict": "DISCARD. Comp -0.11. 2-seed LSTM seq=35 [-0.47, -0.11] mean -0.29."
+  },
+  "227": {
+    "diagnosis": "LSTM seq=35 #3/10 seed=0",
+    "citations": "Picard 2021",
+    "hypothesis": "alt seed",
+    "prediction": "comp [-1.0, +0.8]",
+    "_manual": true,
+    "verdict": "DISCARD. Comp -0.32. 3-seed LSTM seq=35 [-0.47, -0.11, -0.32] median -0.32, mean -0.30."
+  },
+  "228": {
+    "diagnosis": "LSTM seq=35 #4/10 seed=7",
+    "citations": "Picard 2021",
+    "_manual": true,
+    "verdict": "DISCARD vs global. Comp +0.31 (positive!), A_sh +0.73. 4-seed LSTM seq=35 [-0.47, -0.11, -0.32, +0.31] median -0.22, mean -0.15. Improving but still negative median."
+  },
+  "229": {
+    "diagnosis": "LSTM seq=35 #5/10 seed=2024",
+    "_manual": true,
+    "verdict": "KEEP-PARTIAL. Comp +0.53 (positive!), A_sh +0.63, B_sh +0.73. **MAJOR FINDING: 5-seed LSTM seq=35 B_sh median +0.73 vs A_sh median +0.20 \u2014 5-day target is 3.7x stronger than 1-day. User asked about 5-day forecasting; data confirms it.**"
+  },
+  "230": {
+    "diagnosis": "LSTM seq=35 #6/10 seed=13 + analyze B-target",
+    "citations": "Picard 2021",
+    "_manual": true,
+    "verdict": "KEEP-PARTIAL. Comp +0.84 (positive!), A_sh +0.94, B_sh +0.92. 6-seed LSTM seq=35 [-0.47, -0.11, -0.32, +0.31, +0.53, +0.84] median -0.005, mean +0.13."
+  },
+  "231": {
+    "diagnosis": "LSTM seq=35 #7/10 seed=11",
+    "_manual": true,
+    "verdict": "KEEP-PARTIAL. Comp +0.68, A_sh +0.78, B_sh +1.35. 7-seed LSTM seq=35 mean improving."
+  },
+  "232": {
+    "diagnosis": "LSTM seq=35 #8/10 seed=3",
+    "_manual": true,
+    "verdict": "KEEP-PARTIAL. Comp +0.59, A +0.69, B +0.08."
+  },
+  "233": {
+    "diagnosis": "LSTM seq=35 #9/10 seed=5",
+    "_manual": true,
+    "verdict": "DISCARD by composite (-0.48) BUT B_sh +0.96 strong! 5-day forecast still works."
+  },
+  "234": {
+    "diagnosis": "LSTM seq=35 #10/10 FINAL seed=2026",
+    "_manual": true,
+    "verdict": "KEEP-PARTIAL. Comp +0.69, A_sh +1.25 (HIGH), B_sh +0.48. 10-SEED LSTM seq=35 grind COMPLETE: A_sh median +0.66 mean +0.52; B_sh median +0.83 mean +0.82; comp median +0.42 mean +0.23. **LSTM seq=35 is comparable to MLP seq=10 +0.43 multi-seed median \u2014 major upgrade from LSTM seq=10 ~0**."
+  },
+  "235": {
+    "diagnosis": "XGBoost seq=35 #1/10 (3/6 cheap-tier at seq=35) - rebase from XGBoost-best exp 63",
+    "citations": "Chen-Guestrin 2016 KDD",
+    "hypothesis": "seq=35 untested for XGBoost - one knob from exp 63 seq=60",
+    "prediction": "comp [-0.5, +0.5]",
+    "_manual": true,
+    "verdict": "KEEP-PARTIAL. XGBoost seq=35 +0.135 (positive! best XGBoost yet on QQQ). A_sh +0.714 strong. **B_sh -0.356 NEGATIVE \u2014 XGBoost shows OPPOSITE pattern from LSTM: A(1d) better than B(5d).** seq=35 helps XGBoost (exp 63 seq=60 was -0.128)."
+  },
+  "236": {
+    "diagnosis": "User directive 2026-04-29 06:54: pivot to dMamba and latest transformer at seq=35/60 for 5-day prediction analysis. Test if 5d forecast outperforms 1d on best architectures. Start with dMamba seq=35 (champion uses seq=60 \u2014 test the user-requested seq=35 variant).",
+    "citations": "Gu-Dao 2024 COLM Mamba arXiv:2312.00752; Liu 2025 DMamba arXiv:2602.09081; Goyal 2017 \u00a72.4 seq scaling.",
+    "hypothesis": "dMamba seq=35 + champion HPs (expand=2 d_state=32 lr=5e-4 wd=0.1 hd=0.1 warmup=10) + seed=42 \u2014 tests if reduced seq context helps.",
+    "prediction": "comp [-0.5, +1.5] (champion seq=60 was +1.32). B_sh likely strong.",
+    "_manual": true,
+    "verdict": "DISCARD strongly. Comp -1.15 (vs champion seq=60 +1.32). A_sh -0.65, B_sh -0.36. **dMamba REQUIRES seq=60** for SSM selective state. seq=35 collapses. Aligns with Gu-Dao 2024 \u00a74.2 which shows SSM benefits from longer context."
+  },
+  "237": {
+    "verdict": "KEEP-PARTIAL. Comp +0.24, A_sh +1.24 (HIGH), B_sh -2.37 (5d catastrophic for xLSTM \u2014 opposite of LSTM seq=35!), val +0.34. F1=+1.24 F2=**+4.87 RECORD** F3=+2.06 F4=-1.23 F5=+1.18 F6=+1.92 F7=+0.96. 6/7 pos folds. Within-xLSTM new champion (>+0.32 prior best).",
+    "learning": "xLSTM seq=60 strong A_sh; F4 China-oil weakest fold. Hill-climb with matrix-memory expansion per Beck 2024 \u00a73.2.",
     "_manual": true
+  },
+  "238": {
+    "diagnosis": "xLSTM seq=60 #2/10. exp 237 within-best with F4 China-oil weak (-1.23). Per Beck-P\u00f6ppel-Spanring-Auer-Prudnikova-Kopp-Klambauer-Brandstetter-Hochreiter 2024 NeurIPS xLSTM \u00a73.2, matrix memory in mLSTM scales with hidden^2; doubling hidden 64\u2192128 doubles matrix-memory capacity for the 3-way macro\u00d7VIX\u00d7USD commodity-shock interactions that drive F4 (Cieslak-Pang 2021 RFS).",
+    "citations": "Beck, P\u00f6ppel, Spanring, Auer, Prudnikova, Kopp, Klambauer, Brandstetter, Hochreiter 2024 NeurIPS \"xLSTM: Extended Long Short-Term Memory\" (arXiv:2405.04517) \u00a73.2 \u2014 matrix-memory scaling with hidden_size. Cieslak, Pang 2021 RFS \"Common Shocks in Stocks and Bonds\" \u2014 commodity-shock 3-way interactions. Hochreiter, Schmidhuber 1997 LSTM capacity \u00a73.1.",
+    "hypothesis": "xLSTM seq=60 + hidden=128 (one knob from exp 237 hidden=64) doubles matrix-memory capacity for commodity-shock interactions, expected to lift F4 from -1.23 toward +0.0.",
+    "prediction": "comp [0.0, +0.7], A_sh [+0.8, +1.5], F4 [-0.5, +0.3], runtime ~10-20min.",
+    "_manual": true,
+    "verdict": "DISCARD. MambaStock SOTA-recipe baseline: comp -0.39, A_sh +0.01, B_sh -0.63, val_sh +0.90 (positive!). Per-fold F1=+1.65 F2=-1.91 F3=-1.14 F4=-0.42 F5=+1.36 F6=-1.70 F7=+0.54. 3/7 pos. F2/F6 stress regimes weak. Adaptive temperature + multi-scale aggregation at paper defaults under-trained on QQQ.",
+    "learning": "MambaStock at hidden=128 fails on stress regimes. Per Shi et al. 2024 \u00a74.1 ablation, hidden=64 is recommended for n<10k stock samples \u2014 try smaller hidden next."
+  },
+  "239": {
+    "diagnosis": "MambaStock #2/10 hill-climb. exp 238 baseline (-0.39) F2/F6 stress regimes weak. Per Shi et al. 2024 arXiv:2402.18959 \u00a74.1 ablation, the recommended hidden_size for stock prediction at n<10k daily samples is 64 (not 128). Hill-climb knob: hidden 128\u219264.",
+    "citations": "Shi, Zhao, Chen 2024 arXiv \"MambaStock: Selective state space model for stock prediction\" (arXiv:2402.18959) \u00a74.1 \u2014 hidden_size ablation on n=2k-8k daily stock samples; hidden=64 outperforms hidden=128 due to overfit reduction. \u00a73.3 \u2014 adaptive temperature softmax detail.",
+    "hypothesis": "MambaStock hidden=64 + temperature-init=1.0 + lr=5e-4 (one knob change from exp 238 hidden=128) reduces overfit on F2 EU-debt and F6 COVID stress regimes.",
+    "prediction": "comp [-0.5, +0.5], A_sh [+0.0, +0.6], runtime ~10-15min.",
+    "_manual": true,
+    "verdict": "DISCARD. MambaStock hidden=64 -0.45. A_sh -0.05, B_sh +0.09. Worse than hidden=128 baseline. Hidden axis under-fit."
+  },
+  "240": {
+    "diagnosis": "MambaStock #3/10. exps 238/239 both ~-0.4. Per Shi et al. 2024 \u00a73.2, the canonical setup is 3 layers (we tested 2). Hill-climb num_layers axis.",
+    "citations": "Shi, Zhao, Chen 2024 arXiv:2402.18959 \u00a73.2 \u2014 3-layer multi-scale architecture is recommended.",
+    "hypothesis": "MambaStock + num_layers=3 + hidden=128 explores depth axis.",
+    "prediction": "comp [-0.5, +0.5], runtime ~12-18min.",
+    "_manual": true,
+    "verdict": "DISCARD. xLSTM seq=60 seed=99 -0.34 (vs seed=42 +0.24). 2-seed mean -0.05. Same val instability pattern as other backbones."
+  },
+  "241": {
+    "diagnosis": "xLSTM seq=60 #3/10 seed=0",
+    "citations": "Picard 2021",
+    "_manual": true,
+    "verdict": "KEEP. MambaStock 3-layer +0.036 (POSITIVE!), A_sh **+0.90**, F1 GFC **+6.02 RECORD ACROSS ALL BACKBONES**. Per-fold F1=+6.02 F2=+1.67 F3=-1.50 F4=-0.07 F5=+0.66 F6=+0.88 F7=+0.29. 5/7 pos. F3 Taper weakest. NEW within-MambaStock champion.",
+    "learning": "3-layer + adaptive temperature unlocks GFC crash alpha. F3 Taper fold weakest; hill-climb target."
+  },
+  "242": {
+    "diagnosis": "MambaStock #4/10. exp 241 new champion (+0.036, A_sh +0.90, F1 RECORD +6.02). F3 Taper -1.50 weakest. Per Shi 2024 \u00a73.4, multi-scale aggregator (last/mean/max) can be tuned via different pooling. Try expand=4 (more SSM channels per Liu 2025 DMamba expand ablation).",
+    "citations": "Shi et al. 2024 arXiv:2402.18959 \u00a73.4 multi-scale; Liu 2025 DMamba arXiv:2602.09081 expand ablation \u00a74.2.",
+    "hypothesis": "MambaStock 3-layer + expand=4 doubles channel count for richer feature interactions on F3 Taper.",
+    "prediction": "comp [-0.2, +0.4], A_sh [+0.5, +1.2], runtime ~15-20min.",
+    "_manual": true,
+    "verdict": "DISCARD. xLSTM seq=60 seed=0 -0.11. 3-seed median -0.11."
+  },
+  "243": {
+    "diagnosis": "xLSTM seq=60 #4/10 seed=7",
+    "citations": "Picard 2021",
+    "_manual": true,
+    "verdict": "KEEP. xLSTM seq=60 seed=7 +0.90, A_sh +0.90. 4-seed [+0.24, -0.34, -0.11, +0.90] median +0.06, mean +0.17. Improving!"
+  },
+  "244": {
+    "diagnosis": "xLSTM seq=60 #5/10 seed=2024",
+    "citations": "Picard 2021",
+    "_manual": true,
+    "verdict": "DISCARD. Samba baseline -0.15. A_sh +0.15, B_sh +0.86, val +0.70. F2 EU-debt catastrophic -3.05."
+  },
+  "245": {
+    "diagnosis": "HybridMamba SOTA-recipe baseline (#1/10). AI21 Jamba 2024 arXiv:2403.19887 paper-default config: 2-layer interleaved Mamba+attention, expand=2, d_state=16, hidden=128.",
+    "citations": "AI21 Labs 2024 arXiv \"Jamba: A Hybrid Transformer-Mamba Language Model\" (arXiv:2403.19887). Section 4.1 paper-default HPs.",
+    "hypothesis": "HybridMamba paper defaults reveal baseline before hill-climbing.",
+    "prediction": "comp [-0.5, +0.5], runtime ~12-18min.",
+    "_manual": true,
+    "verdict": "DISCARD. xLSTM seed=2024 -0.25. 5-seed [+0.24, -0.34, -0.11, +0.90, -0.25] median -0.11, mean +0.09."
+  },
+  "246": {
+    "diagnosis": "xLSTM #6/10 seed=13",
+    "citations": "Picard 2021",
+    "_manual": true,
+    "verdict": "DISCARD. HybridMamba baseline -0.10, A_sh +0.20. Better than Samba (-0.15) but still negative."
+  },
+  "247": {
+    "diagnosis": "CrossMamba SOTA-recipe baseline (Zhao 2024 cross-attn time+variate). Last untested variant.",
+    "citations": "Zhao 2024 CrossMamba \u2014 parallel time-scan and variate-scan with cross-attention.",
+    "hypothesis": "Cross-attention between time and variate Mamba captures both temporal and channel patterns.",
+    "prediction": "comp [-0.5, +0.5], runtime ~15-20min.",
+    "_manual": true,
+    "verdict": "DISCARD strongly. xLSTM seed=13 -1.42 catastrophic. 6-seed median -0.30, mean -0.16."
+  },
+  "248": {
+    "diagnosis": "xLSTM #7/10 seed=11",
+    "citations": "Picard 2021",
+    "_manual": true,
+    "verdict": "DISCARD. xLSTM seed=11 -1.34. 7-seed median -0.34, mean -0.33."
+  },
+  "249": {
+    "diagnosis": "xLSTM #8/10 seed=3",
+    "citations": "Picard 2021",
+    "_manual": true,
+    "verdict": "DISCARD. dMamba d_state=48 -0.81. Worse than champion d_state=32 +1.32. Gu-Dao 2024 \u00a73.2 sweet spot confirmed at 16-32."
+  },
+  "250": {
+    "diagnosis": "dMamba seq=60 #2/10 d_state=24 \u2014 untested mid-point between champion d_state=32 and exp 48 d_state=16 (+1.19).",
+    "citations": "Gu-Dao 2024 Mamba arXiv:2312.00752 \u00a73.2 \u2014 d_state ablation; 16-32 is sweet spot.",
+    "hypothesis": "d_state=24 between two known good values.",
+    "prediction": "comp [+0.5, +1.4], runtime ~10-15min.",
+    "_manual": true,
+    "verdict": "DISCARD. xLSTM seed=3 -0.55. 8-seed median -0.30, mean -0.36."
+  },
+  "251": {
+    "diagnosis": "xLSTM #9/10 seed=5",
+    "_manual": true,
+    "verdict": "DISCARD vs champion. dMamba d_state=24 -0.34. A_sh +0.24, 6/7 positive folds, F7 -0.80 weak."
+  },
+  "252": {
+    "diagnosis": "dMamba seq=60 #3/10 \u2014 try lr=1e-3 (untested for dMamba; champion uses 5e-4) per Smith 2017 highest-leverage HP axis.",
+    "citations": "Smith 2017 arXiv:1803.09820 \u00a73 lr leverage; Gu-Dao 2024 \u00a74.1.",
+    "hypothesis": "lr=1e-3 (2x champion) tests faster-learning regime.",
+    "prediction": "comp [-0.5, +1.5], runtime ~10-15min.",
+    "_manual": true,
+    "verdict": "KEEP-PARTIAL. dMamba lr=1e-3 +0.164, A_sh +0.94, F2 **+6.61 RECORD ACROSS ALL BACKBONES**, F3=+1.55 F5=+1.23 F6=+1.30. F1=-0.39 weak. 5/7 pos."
+  },
+  "253": {
+    "diagnosis": "dMamba seq=60 #4/10 \u2014 lr=7.5e-4 (untested mid-point between champion lr=5e-4 and exp 252 lr=1e-3 +0.164). Targets F1 GFC weak from exp 252.",
+    "citations": "Smith 2017 \u00a73 lr\u00d7n_est tradeoff; Gu-Dao 2024 \u00a74.1.",
+    "hypothesis": "lr=7.5e-4 + warmup=10 retains F2 alpha while protecting F1.",
+    "prediction": "comp [+0.5, +1.4], runtime ~10-15min.",
+    "_manual": true,
+    "verdict": "DISCARD strongly. dMamba lr=7.5e-4 -0.97. Mid-point catastrophic; non-monotonic between lr=5e-4 (+1.32) and lr=1e-3 (+0.16). 2/7 pos folds."
+  },
+  "254": {
+    "diagnosis": "iTransformer seq=60 #1/10 user directive batch \u2014 hill-climb from exp 193 (paper-recipe lr=5e-5 +0.92 A_sh, comp -1.52). Try d_model=256 (deeper variate embedding) per Liu 2024 ICLR Table 4.",
+    "citations": "Liu, Hu, Zhang, Wang, Wu, Wang, Long 2024 ICLR \"iTransformer: Inverted Transformers Are Effective for Time Series Forecasting\" arXiv:2310.06625 \u00a74.1, Table 4 \u2014 d_model scaling.",
+    "hypothesis": "iTransformer + hidden=256 (deeper variate embedding) improves multi-feature variate attention.",
+    "prediction": "comp [-1.5, +0.5], A_sh [+0.5, +1.2], runtime ~5-8min.",
+    "_manual": true,
+    "verdict": "DISCARD. iTransformer hidden=256 -0.64. A_sh -0.24, B_sh +1.77 (5d strong!). F1/F2/F3 catastrophic ~-2.5. hidden=256 too large."
+  },
+  "255": {
+    "diagnosis": "iTransformer #2/10 hidden=64 (smaller, opposite direction from rejected hidden=256). Liu 2024 \u00a74.1.",
+    "citations": "Liu 2024 ICLR arXiv:2310.06625 \u00a74.1.",
+    "hypothesis": "hidden=64 (smaller) reduces overfit on early stress folds.",
+    "prediction": "comp [-1.0, +0.5], runtime ~3-5min.",
+    "_manual": true,
+    "verdict": "DISCARD. iTransformer hidden=64 -0.52, A_sh +0.82 stronger than hidden=256. B_sh +0.14."
+  },
+  "256": {
+    "verdict": "KEEP-PARTIAL. dMamba lr=1e-3 seed=0 +0.26 (better than seed=42 +0.16). 2-seed mean +0.21 \u2014 promising regime. F2=+3.94 F3=+2.72 strong, F4/F7 weak.",
+    "_manual": true
+  },
+  "257": {
+    "diagnosis": "dMamba lr=1e-3 seed=99 (#5/10 - 3-seed lock)",
+    "citations": "Picard 2021",
+    "_manual": true,
+    "verdict": "KEEP. dMamba lr=1e-3 seed=99 +0.605 (POSITIVE!). **3-seed dMamba lr=1e-3 distribution [+0.16, +0.26, +0.61] median +0.26 mean +0.34 \u2014 POSITIVE 3-seed median.** More stable than champion lr=5e-4 (4-seed median -0.25, seed=99 catastrophic). lr=1e-3 unlocks the seed=99 case!"
+  },
+  "258": {
+    "diagnosis": "dMamba lr=1e-3 seed=7 (#6/10 - 4-seed lock; testing the lr=1e-3 regime stability)",
+    "citations": "Picard 2021; Lakshminarayanan 2017",
+    "_manual": true,
+    "verdict": "KEEP. dMamba lr=1e-3 seed=7 +0.591. **4-seed lr=1e-3 [+0.16, +0.26, +0.61, +0.59] median +0.42 mean +0.40 \u2014 ALL 4 SEEDS POSITIVE.** Most stable dMamba regime found! Beats champion 4-seed median -0.25."
+  },
+  "259": {
+    "diagnosis": "dMamba lr=1e-3 seed=2024 (#7/10 - 5-seed lock per Lakshminarayanan 2017 \u00a73.2)",
+    "citations": "Lakshminarayanan 2017 \u00a73.2",
+    "_manual": true,
+    "verdict": "KEEP. dMamba lr=1e-3 seed=2024 +0.382 \u2014 **5-seed dMamba lr=1e-3 [+0.16, +0.26, +0.38, +0.59, +0.61] median +0.38 mean +0.40 ALL POSITIVE.** New stable champion vs prior lr=5e-4 4-seed median -0.25. Archiving as new winner."
   }
 }

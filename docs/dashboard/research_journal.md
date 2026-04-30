@@ -684,3 +684,11 @@ Initial config (CatBoost depth=8 seq=30 n_est=500) was killed at 76min wall-time
 ## Exp216 — MLP seq=35 seed=42 (variance check #2/10 for MLP seq=35 grind)
 **Citations:** Picard 2021; Lakshminarayanan 2017 §3.2.
 **Prediction:** comp [-0.3, +0.7], runtime ~50-90s.
+
+## Exp216 — MLP seq=35 seed=42 (variance crash)
+**Verdict:** DISCARD. Comp -1.04, A_sh NEGATIVE, val NEGATIVE. 2/7 pos folds. 2-seed [+0.55, -1.04] mean -0.25.
+**Learning:** seq=35 lift was seed=0 luck. Need 3rd seed.
+
+## Exp217 — MLP seq=35 seed=99 (3-seed median lock #3/10)
+**Citations:** Picard 2021; Lakshminarayanan 2017; Goyal 2017.
+**Prediction:** comp [-0.8, +0.7], runtime ~50-90s.

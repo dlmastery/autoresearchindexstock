@@ -1,0 +1,53 @@
+{
+  "multi_seed_runs": [
+    {
+      "exp": 252,
+      "seed": 42,
+      "composite": 0.1637,
+      "A_sharpe": 0.9429,
+      "val_sharpe": 0.3637,
+      "B_sharpe": -0.5752,
+      "test_pos": 5
+    },
+    {
+      "exp": 256,
+      "seed": 0,
+      "composite": 0.2621,
+      "A_sharpe": 0.4621,
+      "val_sharpe": 0.6517,
+      "B_sharpe": 0.3102,
+      "test_pos": 5
+    },
+    {
+      "exp": 257,
+      "seed": 99,
+      "composite": 0.6045,
+      "A_sharpe": 0.8019,
+      "val_sharpe": 0.7045,
+      "B_sharpe": -0.0919,
+      "test_pos": 6
+    },
+    {
+      "exp": 258,
+      "seed": 7,
+      "composite": 0.5908,
+      "A_sharpe": 0.6908,
+      "val_sharpe": 1.4145,
+      "B_sharpe": -0.3327,
+      "test_pos": 6
+    },
+    {
+      "exp": 259,
+      "seed": 2024,
+      "composite": 0.3819,
+      "A_sharpe": 0.5819,
+      "val_sharpe": 1.1662,
+      "B_sharpe": -0.3083,
+      "test_pos": 5
+    }
+  ],
+  "median_composite": 0.3819,
+  "mean_composite": 0.4006,
+  "std_composite": 0.1958346241092213,
+  "all_positive": true
+}

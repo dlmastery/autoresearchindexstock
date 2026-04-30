@@ -636,3 +636,12 @@ roadmap.
 - **Rationale:** Picard 2021 + Lakshminarayanan 2017
 - **Prediction:** comp [-0.3, +0.7], runtime ~50-90s
 - **Result:** PENDING
+
+### Exp216: MLP seq=35 seed=42 (variance crash)
+- **Result:** Comp -1.04 | A_sh -0.31 NEG | val NEG. 2-seed mean -0.25.
+- **Status:** DISCARD; seq=35 lift was seed=0 luck.
+
+### Exp217: MLP seq=35 seed=99 (3-seed median lock)
+- **Config delta from exp 216:** seed 42→99
+- **Prediction:** comp [-0.8, +0.7], runtime ~50-90s
+- **Result:** PENDING
