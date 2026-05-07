@@ -1321,3 +1321,57 @@ Once `dlmastery/autoresearchindexstock` is live with Pages enabled:
 
 Until migration complete, current URL stays at
 <https://dlmastery.github.io/autoresearch/index_stock_dashboard/>.
+
+## User Directives Log -- Session 2026-05-06 (mirrored from SPY project)
+
+### Directive 64 (2026-05-06) -- Strategy CSVs MUST carry the full 16-column rich schema
+
+User: *make sure all the csvs should have all the columns - update claude.md to make this mandatory.*
+
+**MANDATORY 16-column schema** for every per-strategy daily CSV written by any builder (`run_oos_inference.py`, `run_oos_top30.py`, `run_oos_ensemble.py`, future smart-strategy / hedging builders, etc.):
+
+| # | column | meaning |
+|---|---|---|
+| 1 | `date` | YYYY-MM-DD trade date |
+| 2 | `position` | signed continuous position after sizing/overlay |
+| 3 | `pred_direction` | sign(position): -1 / 0 / +1 |
+| 4 | `traded` | 1 if position != 0 else 0 (binary participation flag) |
+| 5 | `actual_ret_1d` | next-day QQQ log return (the realised market move) |
+| 6 | `bh_log_ret` | buy-hold log return per day |
+| 7 | `strategy_pnl` | per-day signed log P&L = position * actual_ret_1d |
+| 8 | `correct` | 1 if sign(position) == sign(actual) AND traded, else 0 |
+| 9 | `equity_dollars` | compounded $ equity from $1000 base |
+| 10 | `buy_hold_dollars` | BH compounded $ equity from $1000 base |
+| 11 | `excess_dollars` | equity_dollars - buy_hold_dollars (per-day) |
+| 12 | `cumret_pct` | (equity_dollars / 1000 - 1) * 100 |
+| 13 | `bh_cumret_pct` | (buy_hold_dollars / 1000 - 1) * 100 |
+| 14 | `excess_cumret_pct` | cumret_pct - bh_cumret_pct |
+| 15 | `drawdown_pct` | peak-to-trough on strategy equity |
+| 16 | `underwater` | 1 if eq < peak else 0 |
+
+**Implementation contract:** align all columns to a single `dates` index BEFORE building the dict; reindex `.fillna(0)` if any series is shorter; coerce to numpy arrays of equal length. Use `float_format="%.6f"` on `to_csv()`. Compounded equity uses `$1000 * exp(sum_log_returns)` (NOT linear sum).
+
+**A 6/7-column CSV is a P0 regression -- fix before next sync.** The `correct` column is the per-day input to hit rate (Directive 65) -- losing it loses the winner-metric audit trail.
+
+### Directive 65 (2026-05-06) -- HIT RATE is the SOLE winner-identification metric
+
+User: *update the charter claude.md to focus on hit rate as the sole metric for identifying the winner. update the charts with appropriately. add hit rate as top level prominent box in the dashboard given that is the top metric now*
+
+**MANDATORY CHANGE:** the SOLE metric for identifying a "winner" (per-strategy, per-experiment, per-OOS) is **HIT RATE** (= percent of traded days where `sign(prediction) == sign(actual_ret_1d)`). All prior composite-, Sharpe-, equity-, and PSR-based winner declarations are SUPERSEDED.
+
+**Why hit rate?**
+1. **Robust to small-sample Sharpe inflation.** With ~100 OOS days, Sharpe std-error is ~1.56 -- a true Sharpe of +1 can show as +5+ by chance. Hit rate is bounded [0%, 100%] and binomial; std-error at n=100 is ~5%. Inflation-resistant.
+2. **No leverage / sizing distortion.** Sharpe and equity reward variance management more than directional skill. Hit rate isolates pure directional accuracy -- the only thing the model is actually trained to predict (sign of `fwd_ret_1d`).
+3. **Aligned with deployment intent.** The deployable signal is `sign(prediction)` traded on next-day QQQ return; everything else (sizing, hedging, overlays) is downstream. Pick the model that gets direction right most often, then layer overlays.
+
+**Scope of change:**
+- **Per-experiment champion (`best_config.json`)**: rank by `hit_rate_pct` (or `hit` field) on the test set. KEEP/DISCARD becomes: `hit > prev_best_hit` -> KEEP. Composite is now SECONDARY.
+- **Headline summary cards**: lead with "HIT RATE CHAMPION" (gold-bordered, gold accent, larger font). Sharpe / $ / Composite become secondary readouts. Composite Champion card explicitly tagged "SECONDARY (Directive 65)".
+- **Tables**: default sort by hit-rate descending (`Hit%` column).
+- **OOS panels (when added)**: filter OOS Hit-Rate Champion display to strategies with `n_traded_days >= 20` so the rate is statistically meaningful.
+
+**Tie-breaking when hit rates are equal:** prefer (1) higher `n_traded_days` (more chances to be wrong), (2) higher PSR, (3) higher composite. Document the tie chain on every champion archive.
+
+**Days Traded column mandate:** any table that surfaces hit-rate MUST also surface `n_traded_days` immediately to the right. A 60% hit rate over 5 traded days is binomial noise (95% CI: 15%-95%); 60% over 80 traded days is signal (95% CI: 49%-71%). Without `Days Traded` visible, the Hit% column is misleading.
+
+**Build stamp on dashboard updates** must change every time these rules are added, removed, or amended -- enforces browser-cache invalidation.

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AutoResearch QQQ Dashboard (build 20260429-062100)</title>
+<title>AutoResearch QQQ Dashboard (build 20260506-080000 + hit-rate-champion + directive-65)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }
@@ -1009,8 +1009,23 @@ async function refresh() {
   const bestPSR = best ? best.psr : 0;
   const bestEquity = best ? best.equity : 1000;
 
+  // 2026-05-06 -- CLAUDE.md Directive 65 (mirrored from SPY): Hit Rate is the
+  // SOLE winner-identification metric. Show as the most-prominent gold card.
+  const validHit = allEntries.filter(e => e.hit != null && !isNaN(e.hit));
+  const bestHitEntry = validHit.length ? validHit.reduce((a, b) => (a.hit > b.hit ? a : b)) : null;
+  const bestHitVal = bestHitEntry ? bestHitEntry.hit : 0;
+
   document.getElementById('summary-cards').innerHTML = `
-    <div class="card"><div class="label">Best Sharpe</div><div class="value ${cls(bestSharpe)}">${fmtSign(bestSharpe)}</div></div>
+    <div class="card" id="hit-rate-champion-card" style="border:2px solid #fbbf24;background:linear-gradient(135deg,#1a1a0a,#161b22)" title="HIT RATE CHAMPION — sole winner-identification metric per CLAUDE.md Directive 65 (2026-05-06). Highest direction-prediction accuracy across all experiments. Hit rate isolates pure directional skill (the only thing the model is trained to predict) and is robust to small-sample Sharpe inflation.">
+      <div class="label" style="color:#fbbf24;font-weight:700;font-size:0.85em">🎯 HIT RATE CHAMPION ★ (all exps)</div>
+      <div class="value" style="color:#fbbf24;font-size:1.5em;font-weight:700">${bestHitEntry ? bestHitVal.toFixed(2) + '%' : '—'}</div>
+      <div style="color:#8b949e;font-size:0.7em;margin-top:2px">${bestHitEntry ? `Exp ${bestHitEntry.experiment_num} ${bestHitEntry.backbone||''} (${bestHitEntry.status||'?'})` : '—'}</div>
+    </div>
+    <div class="card" title="Best test-set Sharpe across all experiments. Note: Sharpe at small samples can be inflated; per Directive 65 hit rate is the deciding metric.">
+      <div class="label">Best Sharpe</div>
+      <div class="value ${cls(bestSharpe)}">${fmtSign(bestSharpe)}</div>
+      <div style="color:#8b949e;font-size:0.7em;margin-top:2px">SECONDARY (Directive 65)</div>
+    </div>
     <div class="card"><div class="label">PSR</div><div class="value ${bestPSR>0.95?'positive':'neutral'}">${fmt(bestPSR)}</div></div>
     <div class="card"><div class="label">Equity ($1000)</div><div class="value ${bestEquity>1000?'positive':'negative'}">$${fmt(bestEquity,0)}</div></div>
     <div class="card"><div class="label">Experiments</div><div class="value neutral">${allEntries.length}</div></div>
