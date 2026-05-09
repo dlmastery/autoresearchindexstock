@@ -273,6 +273,20 @@ def run_oos_for_checkpoint(ckpt_path: Path, raw: dict, exp_num: int,
     metrics["buy_hold_total_return_pct"] = round(float(df["bh_cumret_pct"].iloc[-1]), 4)
     metrics["excess_return_pct"] = round(float(df["excess_cumret_pct"].iloc[-1]), 4)
     metrics["max_drawdown_pct"] = round(float(df["drawdown_pct"].min()), 4)
+    # PSR (Bailey-Lopez de Prado 2012) — required by dashboard "OOS PSR" column
+    try:
+        from scipy import stats as _st
+        pnl = valid["strategy_pnl"].values if len(valid) > 1 else df["strategy_pnl"].values
+        if len(pnl) >= 3 and pd.Series(pnl).std() > 0:
+            s = pd.Series(pnl)
+            sh = float(s.mean() / s.std())
+            skew = float(s.skew()) if len(pnl) > 2 else 0.0
+            kurt = float(s.kurtosis()) if len(pnl) > 3 else 0.0
+            denom = max(1e-9, (1 - skew * sh + ((kurt - 1) / 4) * sh ** 2) / (len(pnl) - 1))
+            z = sh * np.sqrt(len(pnl) - 1) / np.sqrt(denom)
+            metrics["psr"] = round(float(_st.norm.cdf(z)), 4)
+    except Exception:
+        metrics["psr"] = None
     metrics["equity_curve"] = {
         "dates": df["date"].tolist(),
         "strategy_dollars": [round(float(v), 2) for v in df["equity_dollars"].tolist()],
@@ -309,6 +323,9 @@ def main():
             "seed": e.get("seed", e.get("config", {}).get("seed")),
             "description": (e.get("description") or "")[:80],
             "train_composite": round(e.get("composite") or 0, 4),
+            "train_val_sharpe": round(e.get("val_sharpe") or 0, 4) if e.get("val_sharpe") is not None else None,
+            "train_test_pos_folds": e.get("test_pos_folds"),
+            "train_return_pct": round(e.get("return_pct") or 0, 4) if e.get("return_pct") is not None else None,
             "checkpoint_status": "available" if ckpt_path else "missing",
         }
         if ckpt_path is None:

@@ -531,7 +531,10 @@
           5.819
         ]
       },
-      "oos_status": "completed"
+      "oos_status": "completed",
+      "train_val_sharpe": 1.4831,
+      "train_test_pos_folds": 7,
+      "oos_psr": 1.0
     },
     {
       "rank": 2,
@@ -1056,7 +1059,10 @@
           5.819
         ]
       },
-      "oos_status": "completed"
+      "oos_status": "completed",
+      "train_val_sharpe": 2.073,
+      "train_test_pos_folds": 6,
+      "oos_psr": 1.0
     },
     {
       "rank": 3,
@@ -1066,7 +1072,10 @@
       "description": "LSTM 1-layer + features seed=99 - 4th seed feature impact",
       "train_composite": 1.0528,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 1.0528,
+      "train_test_pos_folds": 7,
+      "oos_psr": null
     },
     {
       "rank": 4,
@@ -1076,7 +1085,10 @@
       "description": "dMamba @ exp 48 expand=2 seed=7 - 3rd seed of multi-seed sweep",
       "train_composite": 1.0182,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 1.8779,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 5,
@@ -1086,7 +1098,10 @@
       "description": "MLP @ exp 6 warmup=5 (up from 0) - Goyal 2017 LR warmup stability axis untested ",
       "train_composite": 0.9735,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.9735,
+      "train_test_pos_folds": 7,
+      "oos_psr": null
     },
     {
       "rank": 6,
@@ -1096,7 +1111,10 @@
       "description": "MLP exp 79 + wd=1e-4 (Loshchilov-Hutter canonical AdamW) - one knob from champio",
       "train_composite": 0.9735,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.9735,
+      "train_test_pos_folds": 7,
+      "oos_psr": null
     },
     {
       "rank": 7,
@@ -1106,7 +1124,10 @@
       "description": "dMamba @ exp 52 d_state=32 seed=7 - 3rd seed multi-seed",
       "train_composite": 0.9729,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 1.0739,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 8,
@@ -1116,7 +1137,10 @@
       "description": "dMamba @ exp 52 seed=7 (5-seed exists - already done) - try seed 13 instead",
       "train_composite": 0.9729,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 1.0739,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 9,
@@ -1126,7 +1150,10 @@
       "description": "xLSTM seq=60 seed=7 #4/10",
       "train_composite": 0.8953,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 1.188,
+      "train_test_pos_folds": 7,
+      "oos_psr": null
     },
     {
       "rank": 10,
@@ -1136,7 +1163,10 @@
       "description": "MLP seq=35 seed=7 (4-seed median lock #4/10) - Picard 2021",
       "train_composite": 0.8863,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 1.2789,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 11,
@@ -1661,7 +1691,10 @@
           5.819
         ]
       },
-      "oos_status": "completed"
+      "oos_status": "completed",
+      "train_val_sharpe": 1.1645,
+      "train_test_pos_folds": 7,
+      "oos_psr": 0.0
     },
     {
       "rank": 12,
@@ -1671,7 +1704,10 @@
       "description": "LSTM seq=35 seed=13 (#6/10, also analyzing 5-day B target which is 3.7x stronger",
       "train_composite": 0.8356,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 1.6105,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 13,
@@ -1681,7 +1717,10 @@
       "description": "MLP seq=35 seed=2026 (FINAL #10/10 user directive) - Lakshminarayanan 2017",
       "train_composite": 0.8126,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.9126,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 14,
@@ -1691,7 +1730,10 @@
       "description": "DLinear+features (was -0.04 baseline, F5 +1.82 alpha) - feature impact",
       "train_composite": 0.8004,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.9004,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 15,
@@ -1701,7 +1743,10 @@
       "description": "LSTM 1-layer hidden=256 seed=42 (variance check) - confirm exp172 A_sh+0.90 repr",
       "train_composite": 0.7488,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.9591,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 16,
@@ -1711,7 +1756,10 @@
       "description": "LSTM @ exp 71 num_layers=1 seed=99 - 4th seed for stable-champion median lock",
       "train_composite": 0.7365,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.8365,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 17,
@@ -1721,7 +1769,10 @@
       "description": "dMamba @ exp 48 NEW CHAMP seed=0 - multi-seed variance check (vs seed=42 +1.19)",
       "train_composite": 0.698,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.9257,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 18,
@@ -1731,7 +1782,10 @@
       "description": "LSTM seq=35 seed=2026 (FINAL #10/10 user directive)",
       "train_composite": 0.6917,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.7917,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 19,
@@ -1741,7 +1795,10 @@
       "description": "LSTM seq=35 seed=11 (#7/10)",
       "train_composite": 0.6836,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.8645,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 20,
@@ -1751,7 +1808,10 @@
       "description": "LightGBM @ exp 10 n_est=1500 (between 1000 and 2000) - capacity refinement",
       "train_composite": 0.6105,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.7105,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 21,
@@ -1761,7 +1821,10 @@
       "description": "LSTM @ exp 71 num_layers=1 seed=7 - 3rd seed for stable-champion verification",
       "train_composite": 0.606,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.606,
+      "train_test_pos_folds": 7,
+      "oos_psr": null
     },
     {
       "rank": 22,
@@ -1771,7 +1834,10 @@
       "description": "dMamba lr=1e-3 seed=99 (#5/10 user dir - 3-seed lock; both 42/0 positive)",
       "train_composite": 0.6045,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.7045,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 23,
@@ -1781,7 +1847,10 @@
       "description": "LSTM seq=35 seed=3 (#8/10)",
       "train_composite": 0.5921,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.9294,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 24,
@@ -1791,7 +1860,10 @@
       "description": "dMamba lr=1e-3 seed=7 (#6/10 user dir - 4-seed lock on emerging stable regime)",
       "train_composite": 0.5908,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 1.4145,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 25,
@@ -1801,7 +1873,10 @@
       "description": "MLP @ exp 6 grad_clip=0.5 (down from 1.0) - Pascanu 2013 tighter clip on QQQ",
       "train_composite": 0.5897,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.7871,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 26,
@@ -1811,7 +1886,10 @@
       "description": "MLP @ FX champion HPs (Exp32: residual MLP head_dropout=0.25 seed=0 lr=3e-4 ep=5",
       "train_composite": 0.5799,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.7871,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 27,
@@ -1821,7 +1899,10 @@
       "description": "MLP @ exp 6 wd=1e-4 (up from 1e-5 default, 10x) - Loshchilov 2019 log-spaced Ada",
       "train_composite": 0.5799,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.7871,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 28,
@@ -1831,7 +1912,10 @@
       "description": "MLP @ exp 112 NEW-FEATURES baseline + lr 3e-4 \u2192 1e-4 - HP hill-climb on new-feat",
       "train_composite": 0.576,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.7953,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 29,
@@ -1841,7 +1925,10 @@
       "description": "MLP exp 79 + seq_len=35 (user directive: cheap-tier winners +10 exps each at seq",
       "train_composite": 0.5475,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 0.6475,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     },
     {
       "rank": 30,
@@ -1851,7 +1938,10 @@
       "description": "LSTM seq=35 seed=2024 (#5/10) - Picard 2021",
       "train_composite": 0.5324,
       "checkpoint_status": "missing",
-      "oos_status": "skipped \u2014 checkpoint not archived"
+      "oos_status": "skipped \u2014 checkpoint not archived",
+      "train_val_sharpe": 1.6152,
+      "train_test_pos_folds": 6,
+      "oos_psr": null
     }
   ]
 }
