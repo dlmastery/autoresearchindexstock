@@ -1375,3 +1375,42 @@ User: *update the charter claude.md to focus on hit rate as the sole metric for 
 **Days Traded column mandate:** any table that surfaces hit-rate MUST also surface `n_traded_days` immediately to the right. A 60% hit rate over 5 traded days is binomial noise (95% CI: 15%-95%); 60% over 80 traded days is signal (95% CI: 49%-71%). Without `Days Traded` visible, the Hit% column is misleading.
 
 **Build stamp on dashboard updates** must change every time these rules are added, removed, or amended -- enforces browser-cache invalidation.
+
+### Directive 66 (2026-05-08) -- Per-experiment OOS CSVs MUST carry 16-column schema + equity_curve in JSON
+
+User: *missing all the columns that regular one has - this is for oos and ensemble + the graphs are missing in individual rows*
+
+**MANDATORY (effective 2026-05-08):**
+
+1. Every per-experiment OOS CSV must carry the canonical 16-column schema (Directive 64): `date, position, pred_direction, traded, actual_ret_1d, bh_log_ret, strategy_pnl, correct, equity_dollars, buy_hold_dollars, excess_dollars, cumret_pct, bh_cumret_pct, excess_cumret_pct, drawdown_pct, underwater`. Plus prediction columns + legacy aliases (`cumulative_pnl, cumulative_buy_hold`) for backwards-compat = 17-22 columns total.
+2. Compounded equity is required: `equity_dollars = $1000 * exp(cumsum(strategy_pnl))`. Linear cumsum is NOT acceptable as the equity proxy.
+3. Every per-experiment metrics dict in `oos_top30_table.json` MUST include `equity_curve` with keys: `dates`, `strategy_dollars`, `buy_hold_dollars`, `strategy_pct`, `buy_hold_pct`. The `_pct` arrays are required because `sparklineSVG()` reads them; missing them = `renderOOSTop30()` throws and the table never inserts into the DOM.
+4. Row dict must include `train_val_sharpe`, `train_test_pos_folds`, and `oos_psr` so all dashboard table columns render. PSR uses Bailey-López de Prado 2012 (skew/kurt-corrected).
+5. **Mamba checkpoint loading**: detect `mamba_d_state`, `mamba_expand`, and `mamba_variant` from state_dict shapes (`.A_log`, `.in_proj.weight`, presence of `trend_mlp.*` keys for dmamba). The training-time config dict often omits these, so state_dict introspection is mandatory.
+
+**Implementation reference:** `run_oos_top30_qqq.py` is the QQQ-specific port. Uses 2-year download window (2024-01-01 to 2026-04-30) so SMA-200 features have proper warmup.
+
+### Directive 67 (2026-05-09) -- Every clickable table row produces inline detail card with strategy / BH / ensemble equity chart
+
+User: *when i click on smart trading strategy i need to see an inline card / the chart is also missing for strategy vs buy and hold - kind of two lines in chart / add equity chart with buy and hold/ensemble - for both qqq and spy dashboards when i click a row in the table*
+
+**MANDATORY:** every row in the OOS Top-30, OOS Deep Ensemble, and Smart Trading Strategies tables MUST be clickable. Click-action MUST open or update an inline detail card with all of:
+
+1. **Headline cards** — lead with **🎯 Hit Rate ★** (gold-bordered, large font, Directive 65) followed by `n_traded_days`, then `$Final/$1k`, `$Excess vs BH`, `Sharpe`, `Excess Sharpe`, `Sortino`, `Return %`, `PSR`, `Max DD`, `Exposure`.
+2. **3-line equity chart (SVG)** rendered inline:
+   - **Strategy** (purple/green, thicker stroke) — the row's own equity curve.
+   - **Buy & Hold** (grey, thinner stroke) — same OOS window, no model.
+   - **Ensemble champion** (gold, medium stroke) — picked via `getEnsembleChampion()` (highest `hit_rate_pct`, filtered to `n_traded_days >= 10`). Drawn only if dates overlap the row's dates.
+3. **CSV download button** linking to the row's per-day CSV (Directive 64 16-column schema).
+4. **Cross-link mini-table** — `buildSmartVariantsHTML(signal_source, contextLabel)` shows other overlays/hedging on the same signal source.
+5. **Close button** (✕) to dismiss the inline card.
+
+**JS contract** (must exist on every dashboard):
+- `loadSmartDetails(name)` — Smart Strategies panel → renders into `#oos-smart-detail` div above the table.
+- `loadOOSDetailsForRow(expNum)` — OOS Top-30 panel → renders into `#oos-section` panel above.
+- `loadEnsembleDetails(strategyName)` — OOS Deep Ensemble panel → renders into `#oos-section`.
+- `getEnsembleChampion()` helper returns the highest-hit-rate ensemble's record or `null`.
+
+**Why 3 lines?** Strategy alone says whether the model worked; BH says whether doing nothing would have been better; ensemble champion says whether the single-model is competitive against the deep-ensemble baseline (Lakshminarayanan 2017). All three are the minimum honest comparison set per Directive 65.
+
+**Build-stamp bump on every dashboard JS edit** is mandatory for browser cache invalidation. Format: `(build YYYYMMDD-HHMMSS + descriptive-tag)`.
