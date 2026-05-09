@@ -1,4 +1,4 @@
-"""QQQ OOS Top-30 inference — adapted from SPY run_oos_top30.py.
+﻿"""QQQ OOS Top-30 inference â€” adapted from SPY run_oos_top30.py.
 
 For each top-30-by-composite QQQ experiment with an archived checkpoint:
 1) Load checkpoint (auto-detect mamba d_state/expand from state_dict shapes)
@@ -278,6 +278,8 @@ def run_oos_for_checkpoint(ckpt_path: Path, raw: dict, exp_num: int,
         "strategy_dollars": [round(float(v), 2) for v in df["equity_dollars"].tolist()],
         "buy_hold_dollars": [round(float(v), 2) for v in df["buy_hold_dollars"].tolist()],
     }
+    metrics["equity_curve"]["strategy_pct"] = [round((v / START_CAPITAL - 1) * 100, 4) for v in metrics["equity_curve"]["strategy_dollars"]]
+    metrics["equity_curve"]["buy_hold_pct"] = [round((v / START_CAPITAL - 1) * 100, 4) for v in metrics["equity_curve"]["buy_hold_dollars"]]
     return metrics
 
 
@@ -310,9 +312,9 @@ def main():
             "checkpoint_status": "available" if ckpt_path else "missing",
         }
         if ckpt_path is None:
-            row["oos_status"] = "skipped — checkpoint not archived"
+            row["oos_status"] = "skipped â€” checkpoint not archived"
         else:
-            log.info("[rank %d] exp%s — running OOS", rank, exp_num)
+            log.info("[rank %d] exp%s â€” running OOS", rank, exp_num)
             try:
                 oos = run_oos_for_checkpoint(ckpt_path, raw, exp_num, args.oos_start, args.oos_end)
                 row.update({f"oos_{k}": v for k, v in oos.items() if k != "experiment_num"})
@@ -338,3 +340,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
