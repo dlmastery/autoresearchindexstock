@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>AutoResearch QQQ Dashboard (build 20260509-080000 + 3line-chart-with-ensemble)</title>
+<title>AutoResearch QQQ Dashboard (build 20260509-090000 + mojibake-repaired)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }
@@ -57,7 +57,7 @@
 </head>
 <body>
 <h1>AutoResearch &mdash; QQQ (Nasdaq-100 ETF) Dashboard</h1>
-<div class="subtitle">QQQ (Nasdaq-100 ETF) â€” successor to the FX (EUR/USD) autoresearch project (preserved at <code>_reference_autoresearch/autoresearch/</code>). Three causally-anchored feature streams: daily yfinance + Asian/European pre-market block (N225/HSI/KS11/AXJO + FTSE/DAX/CAC/STOXX50E lagged 1d) + Barchart.com hourly intraday (34 tickers &times; 12 features at <code>us_open</code> anchor). Optimisation target: <b style="color:#58a6ff">A â€” fwd_ret_1d</b>. Plotted side-by-side: A (1d return), B (5d return), D (vol-adjusted 1d). 7-fold walk-forward 2007 â†’ 2025-12 (no 2026 data). Buy-and-hold baseline tracked alongside strategy Sharpe. &mdash; <span id="last-update">loading...</span>
+<div class="subtitle">QQQ (Nasdaq-100 ETF) — successor to the FX (EUR/USD) autoresearch project (preserved at <code>_reference_autoresearch/autoresearch/</code>). Three causally-anchored feature streams: daily yfinance + Asian/European pre-market block (N225/HSI/KS11/AXJO + FTSE/DAX/CAC/STOXX50E lagged 1d) + Barchart.com hourly intraday (34 tickers &times; 12 features at <code>us_open</code> anchor). Optimisation target: <b style="color:#58a6ff">A — fwd_ret_1d</b>. Plotted side-by-side: A (1d return), B (5d return), D (vol-adjusted 1d). 7-fold walk-forward 2007 → 2025-12 (no 2026 data). Buy-and-hold baseline tracked alongside strategy Sharpe. &mdash; <span id="last-update">loading...</span>
   &nbsp;|&nbsp; <a href="autoresearch_report.md" style="color:#58a6ff">Full Report</a>
   &nbsp;|&nbsp; <a href="experiment_summary.md" style="color:#58a6ff">Summary</a>
 </div>
@@ -85,70 +85,70 @@
 </div>
 
 <details style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px;margin-bottom:14px">
-  <summary style="color:#58a6ff;cursor:pointer;font-weight:600;font-size:0.95em;letter-spacing:0.3px">ðŸ“– Metrics Glossary â€” what every column / number means (click to expand)</summary>
+  <summary style="color:#58a6ff;cursor:pointer;font-weight:600;font-size:0.95em;letter-spacing:0.3px">📖 Metrics Glossary — what every column / number means (click to expand)</summary>
   <div style="margin-top:14px;font-size:0.85em;line-height:1.55;color:#c9d1d9">
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px">
 
       <div>
-        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">ðŸ“Š Headline metrics</div>
+        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">📊 Headline metrics</div>
         <ul style="list-style:none;padding-left:0;margin-top:6px">
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Composite</b> â€” KEEP/DISCARD decision metric. Formula: <code style="background:#0d1117;padding:1px 4px;border-radius:3px">min(test_sharpe, val_sharpe) âˆ’ 0.05 Ã— n_negative_folds</code>. Punishes models that look great on test but fail on val (or vice-versa) AND models with regime-specific failures. Higher = better.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Test Sharpe</b> â€” annualised <a href="https://en.wikipedia.org/wiki/Sharpe_ratio" target="_blank" style="color:#58a6ff">Sharpe ratio</a> on the held-out test fold (union of 7 regime windows: GFC, EU debt, taper, China-oil, vol-mageddon, COVID, AI rally). <code>âˆš252 Ã— mean(daily_returns) / std(daily_returns)</code>. Sharpe > 1 = strong; > 2 = exceptional; QQQ buy-and-hold â‰ˆ 1.22.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Val Sharpe</b> â€” Sharpe on validation set (used for early-stopping + composite). Strong divergence from test Sharpe = overfitting.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Train Sharpe</b> â€” Sharpe on training data. Diagnostic only â€” train sharpe much greater than test sharpe = severe overfit.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">$Equity</b> â€” final portfolio value if you started with $1,000 and traded the strategy across all 7 test folds. $3,144 in exp 52 = $1k â†’ $3.1k = +214%.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Composite</b> — KEEP/DISCARD decision metric. Formula: <code style="background:#0d1117;padding:1px 4px;border-radius:3px">min(test_sharpe, val_sharpe) − 0.05 × n_negative_folds</code>. Punishes models that look great on test but fail on val (or vice-versa) AND models with regime-specific failures. Higher = better.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Test Sharpe</b> — annualised <a href="https://en.wikipedia.org/wiki/Sharpe_ratio" target="_blank" style="color:#58a6ff">Sharpe ratio</a> on the held-out test fold (union of 7 regime windows: GFC, EU debt, taper, China-oil, vol-mageddon, COVID, AI rally). <code>√252 × mean(daily_returns) / std(daily_returns)</code>. Sharpe > 1 = strong; > 2 = exceptional; QQQ buy-and-hold ≈ 1.22.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Val Sharpe</b> — Sharpe on validation set (used for early-stopping + composite). Strong divergence from test Sharpe = overfitting.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Train Sharpe</b> — Sharpe on training data. Diagnostic only — train sharpe much greater than test sharpe = severe overfit.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">$Equity</b> — final portfolio value if you started with $1,000 and traded the strategy across all 7 test folds. $3,144 in exp 52 = $1k → $3.1k = +214%.</li>
         </ul>
       </div>
 
       <div>
-        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">ðŸŽ¯ Direction-prediction (classification)</div>
+        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">🎯 Direction-prediction (classification)</div>
         <ul style="list-style:none;padding-left:0;margin-top:6px">
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Hit%</b> â€” directional accuracy: percent of trade-days where <code>sign(prediction) = sign(actual_return)</code>. 50% = coin-flip; 52-55% in finance is genuinely tradeable.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Prec / Rec</b> â€” Precision / Recall on the UP-direction class. Precision = "of all UP predictions, how many were right." Recall = "of all actual UP days, how many did we catch."</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">F1 / F2</b> â€” F-scores. F1 = harmonic mean of precision and recall. F2 weights recall 2Ã— more than precision (penalises missed UP-days harder; useful in trending markets).</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">MCC</b> â€” <a href="https://en.wikipedia.org/wiki/Phi_coefficient" target="_blank" style="color:#58a6ff">Matthews Correlation Coefficient</a>, a balanced accuracy metric robust to class imbalance. Range âˆ’1 to +1; 0 = random; > 0.1 = real signal in finance.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Acc</b> â€” overall accuracy = (TP + TN) / total. Same as hit% but explicit.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Hit%</b> — directional accuracy: percent of trade-days where <code>sign(prediction) = sign(actual_return)</code>. 50% = coin-flip; 52-55% in finance is genuinely tradeable.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Prec / Rec</b> — Precision / Recall on the UP-direction class. Precision = "of all UP predictions, how many were right." Recall = "of all actual UP days, how many did we catch."</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">F1 / F2</b> — F-scores. F1 = harmonic mean of precision and recall. F2 weights recall 2× more than precision (penalises missed UP-days harder; useful in trending markets).</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">MCC</b> — <a href="https://en.wikipedia.org/wiki/Phi_coefficient" target="_blank" style="color:#58a6ff">Matthews Correlation Coefficient</a>, a balanced accuracy metric robust to class imbalance. Range −1 to +1; 0 = random; > 0.1 = real signal in finance.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Acc</b> — overall accuracy = (TP + TN) / total. Same as hit% but explicit.</li>
         </ul>
       </div>
 
       <div>
-        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">ðŸ“ Statistical reliability</div>
+        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">📐 Statistical reliability</div>
         <ul style="list-style:none;padding-left:0;margin-top:6px">
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">PSR</b> â€” <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1821643" target="_blank" style="color:#58a6ff">Probabilistic Sharpe Ratio</a> (Bailey & LÃ³pez de Prado 2012). Probability that the OBSERVED Sharpe is greater than 0 given the sample size, skewness, and kurtosis. PSR &gt; 0.95 = "very confident the Sharpe is positive, not noise." PSR = 1.000 means we are statistically certain. Critical because in-sample Sharpes can be inflated by skew/kurtosis or short windows.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">IC</b> â€” Information Coefficient = Pearson correlation between predicted return and actual return. Range âˆ’1 to +1. > 0.05 = real signal in equity prediction; > 0.10 = strong (Grinold-Kahn rule of thumb).</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">excess_sharpe</b> â€” Strategy Sharpe MINUS buy-and-hold Sharpe over the same window. >0 = strategy beats holding the index. exp 52 +0.10 means +0.10 Sharpe over QQQ buy-and-hold (1.22 â†’ 1.32).</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">PSR</b> — <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1821643" target="_blank" style="color:#58a6ff">Probabilistic Sharpe Ratio</a> (Bailey & López de Prado 2012). Probability that the OBSERVED Sharpe is greater than 0 given the sample size, skewness, and kurtosis. PSR &gt; 0.95 = "very confident the Sharpe is positive, not noise." PSR = 1.000 means we are statistically certain. Critical because in-sample Sharpes can be inflated by skew/kurtosis or short windows.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">IC</b> — Information Coefficient = Pearson correlation between predicted return and actual return. Range −1 to +1. > 0.05 = real signal in equity prediction; > 0.10 = strong (Grinold-Kahn rule of thumb).</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">excess_sharpe</b> — Strategy Sharpe MINUS buy-and-hold Sharpe over the same window. >0 = strategy beats holding the index. exp 52 +0.10 means +0.10 Sharpe over QQQ buy-and-hold (1.22 → 1.32).</li>
         </ul>
       </div>
 
       <div>
-        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">ðŸ¤– Uncertainty heads (Kendall-Gal 2017)</div>
+        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">🤖 Uncertainty heads (Kendall-Gal 2017)</div>
         <ul style="list-style:none;padding-left:0;margin-top:6px">
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Conf</b> â€” Confidence = <code>1 âˆ’ epistemic_uncertainty</code>. The model's "I know the answer" signal. High conf + correct = good; high conf + wrong = dangerous overconfidence.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Ale</b> â€” Aleatoric uncertainty (data noise estimate). Predicted log-variance from the het-loss head, exp-transformed. High aleatoric on a regime = "this period is genuinely noisy / unpredictable" (e.g. crisis windows). Optimal range 0.05-0.15.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">epistemic</b> â€” Model's "what I don't know yet" signal (typically MC-Dropout variance). High epistemic on a regime = "I haven't seen enough data of this type" â€” useful for regime-shift detection.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Conf</b> — Confidence = <code>1 − epistemic_uncertainty</code>. The model's "I know the answer" signal. High conf + correct = good; high conf + wrong = dangerous overconfidence.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Ale</b> — Aleatoric uncertainty (data noise estimate). Predicted log-variance from the het-loss head, exp-transformed. High aleatoric on a regime = "this period is genuinely noisy / unpredictable" (e.g. crisis windows). Optimal range 0.05-0.15.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">epistemic</b> — Model's "what I don't know yet" signal (typically MC-Dropout variance). High epistemic on a regime = "I haven't seen enough data of this type" — useful for regime-shift detection.</li>
         </ul>
       </div>
 
       <div>
-        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">ðŸ§ª Experiment tracking</div>
+        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">🧪 Experiment tracking</div>
         <ul style="list-style:none;padding-left:0;margin-top:6px">
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">T+/V+</b> â€” count of positive folds in TEST / VALIDATION. <code>7/7</code> on test = perfect regime coverage; <code>3/7</code> = model fails on 4 of 7 regimes. Critical for ensemble and risk control.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Status</b> â€” KEEP (composite improved) / DISCARD (composite regressed) / CRASH (training failed).</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Time</b> â€” wall-clock training time. ~30 min typical for Mamba 100-epoch run on RTX 4090 Laptop.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">T+/V+</b> — count of positive folds in TEST / VALIDATION. <code>7/7</code> on test = perfect regime coverage; <code>3/7</code> = model fails on 4 of 7 regimes. Critical for ensemble and risk control.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Status</b> — KEEP (composite improved) / DISCARD (composite regressed) / CRASH (training failed).</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Time</b> — wall-clock training time. ~30 min typical for Mamba 100-epoch run on RTX 4090 Laptop.</li>
         </ul>
       </div>
 
       <div>
-        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">ðŸŽ¯ Targets (A / B / D)</div>
+        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">🎯 Targets (A / B / D)</div>
         <ul style="list-style:none;padding-left:0;margin-top:6px">
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">A â€” fwd_ret_1d</b> (PRIMARY) â€” 1-day forward log-return. Drives KEEP/DISCARD. The trade is realised on this return.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">B â€” fwd_ret_5d</b> â€” 5-day forward return (auxiliary head, jointly trained). Tracked because longer horizons are sometimes more stable.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">D â€” vol-adjusted 1d</b> â€” <code>fwd_ret_1d / rolling_vol_20</code>. Orthogonalises trend from skill â€” high D-Sharpe = real edge, not just trend-following. The TRADE is always on raw 1d return; D's prediction only sets DIRECTION.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">A — fwd_ret_1d</b> (PRIMARY) — 1-day forward log-return. Drives KEEP/DISCARD. The trade is realised on this return.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">B — fwd_ret_5d</b> — 5-day forward return (auxiliary head, jointly trained). Tracked because longer horizons are sometimes more stable.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">D — vol-adjusted 1d</b> — <code>fwd_ret_1d / rolling_vol_20</code>. Orthogonalises trend from skill — high D-Sharpe = real edge, not just trend-following. The TRADE is always on raw 1d return; D's prediction only sets DIRECTION.</li>
         </ul>
       </div>
 
       <div style="grid-column:1/-1">
-        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">ðŸ“ 7-Fold walk-forward regime windows</div>
+        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">📁 7-Fold walk-forward regime windows</div>
         <ul style="list-style:none;padding-left:0;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px">
           <li><b style="color:#f85149">F1</b> GFC peak crash (Lehman + Mar-2009 bottom)</li>
           <li><b style="color:#d29922">F2</b> 2011 US-downgrade + EU debt crisis</li>
@@ -162,110 +162,110 @@
       </div>
 
       <div style="grid-column:1/-1">
-        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">ðŸŽ›ï¸ Decision rules (CLAUDE.md research-strict)</div>
+        <div style="color:#3fb950;font-weight:600;font-size:0.95em;margin-bottom:4px">🎛️ Decision rules (CLAUDE.md research-strict)</div>
         <ul style="list-style:none;padding-left:0;margin-top:6px;font-size:0.85em">
-          <li style="margin-bottom:6px"><b style="color:#58a6ff">KEEP</b> â€” composite &gt; previous global champion AND all 7 test folds positive.</li>
-          <li style="margin-bottom:6px"><b style="color:#58a6ff">NEAR-MISS</b> â€” composite within 0.12 of champion (between 1.20 and 1.32 currently). Worth multi-seed lock.</li>
-          <li style="margin-bottom:6px"><b style="color:#58a6ff">DISCARD</b> â€” otherwise. Composite + per-fold both regressed.</li>
-          <li style="margin-bottom:6px"><b style="color:#58a6ff">Multi-seed lock</b> â€” single-seed lifts require â‰¥3 seeds with median &gt; baseline before declaring champion. dmamba seed=42 has a "lucky basin" â€” both seq=90 (+0.96) and bs=16 (+1.51) at single-seed COLLAPSED to 3-seed median +0.14 / -0.24. Multi-seed median is the credible metric.</li>
+          <li style="margin-bottom:6px"><b style="color:#58a6ff">KEEP</b> — composite &gt; previous global champion AND all 7 test folds positive.</li>
+          <li style="margin-bottom:6px"><b style="color:#58a6ff">NEAR-MISS</b> — composite within 0.12 of champion (between 1.20 and 1.32 currently). Worth multi-seed lock.</li>
+          <li style="margin-bottom:6px"><b style="color:#58a6ff">DISCARD</b> — otherwise. Composite + per-fold both regressed.</li>
+          <li style="margin-bottom:6px"><b style="color:#58a6ff">Multi-seed lock</b> — single-seed lifts require ≥3 seeds with median &gt; baseline before declaring champion. dmamba seed=42 has a "lucky basin" — both seq=90 (+0.96) and bs=16 (+1.51) at single-seed COLLAPSED to 3-seed median +0.14 / -0.24. Multi-seed median is the credible metric.</li>
         </ul>
       </div>
 
       <div style="grid-column:1/-1;border-top:2px solid #58a6ff;padding-top:14px;margin-top:8px">
-        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px">ðŸ›  Trading Strategies â€” Smart Overlays (Tier S)</div>
+        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px">🛠 Trading Strategies — Smart Overlays (Tier S)</div>
         <ul style="list-style:none;padding-left:0">
-          <li style="margin-bottom:8px"><b style="color:#3fb950">raw</b> â€” sign(signal), 1-unit position, daily rebalance. The vanilla baseline. <em>Pros:</em> simple. <em>Cons:</em> high turnover, pays bid-ask + spread on every flip; vulnerable to whipsaw. Reference: Sharpe 1966 J. Business <em>'Mutual fund performance'</em>.</li>
-          <li style="margin-bottom:8px"><b style="color:#3fb950">hold_until_flip</b> â€” Hold the position until the signal direction changes. Cuts turnover by ~50% if the signal is autocorrelated day-to-day, saves ~2-4% per year on transaction costs. <em>When it wins:</em> momentum signals that persist multi-day. <em>When it loses:</em> mean-reverting signals that flip more usefully than the rule allows. Reference: Moskowitz, Ooi & Pedersen 2012 JFE <em>'Time series momentum'</em> (arXiv:1201.5333).</li>
-          <li style="margin-bottom:8px"><b style="color:#3fb950">dead_zone</b> â€” Skip days when |signal| &lt; median(|signal|). Trades only when the model is more confident than its typical day. Lifts hit-rate from ~52% to ~58-62% on traded days. <em>Tradeoff:</em> ~30% fewer trades; fewer compounding opportunities. Reference: Lim, Zohren & Roberts 2019 J. Financial Data Sci. <em>'Enhancing Time Series Momentum'</em> (arXiv:1906.04025) Â§4.2.</li>
-          <li style="margin-bottom:8px"><b style="color:#3fb950">vol_regime_gate_15</b> â€” Trade only when QQQ's realized 60-day vol &gt; 15% (annualized). The intuition: alpha concentrates in volatile regimes (GFC, EU debt, COVID, vol-mageddon). In calm bull regimes (2017-2019, 2024-2025), the model is signal-poor and bleeds to costs. Empirical proof: QQQ's existing +0.368 ensemble champion uses exactly this gate (rvol60d &gt; 15%); the gate adds +0.234 Sharpe. Reference: Bollerslev, Tauchen & Zhou 2009 RFS <em>'Expected Stock Returns and Variance Risk Premia'</em>.</li>
-          <li style="margin-bottom:8px"><b style="color:#3fb950">sma200_real</b> â€” Only LONG when QQQ closes above its 200-day SMA (real prices, not a proxy). SHORT signals always pass through. Skips bullish trades during corrective regimes; the 200d SMA is a coarse uptrend gauge. Reference: Faber 2007 J. Wealth Management <em>'A Quantitative Approach to Tactical Asset Allocation'</em> (DOI 10.3905/jwm.2007.690942).</li>
-          <li style="margin-bottom:8px"><b style="color:#3fb950">quarter_kelly</b> â€” Position size = 0.25 Ã— SharpeÂ² (capped at 1.0 of capital). Theoretically optimal log-utility growth. Quarter-Kelly (vs full Kelly) reduces ruin risk under estimation error. <em>When it wins:</em> high-Sharpe strategies (full Kelly proportional to SharpeÂ²) get amplified. <em>When it loses:</em> negative-Sharpe â†’ 0 position. Reference: Kelly 1956 Bell Sys Tech J <em>'A New Interpretation of Information Rate'</em>; Thorp 1969 <em>'Optimal Gambling Systems for Favorable Games'</em>.</li>
-          <li style="margin-bottom:8px"><b style="color:#3fb950">vol_target_15pct</b> â€” Scale position by min(2x, 15% / realized_vol_20). Maintains constant ex-ante portfolio volatility regardless of regime. Juices returns in calm regimes (more leverage), dampens in volatile (less). Capped at 2x leverage to avoid blow-up. Reference: Lim, Zohren & Roberts 2019 (arXiv:1906.04025) Â§3.1; Moreira & Muir 2017 J. Finance <em>'Volatility-Managed Portfolios'</em>.</li>
-          <li style="margin-bottom:8px"><b style="color:#3fb950">confidence_weighted</b> â€” Continuous position size = signal/max(|signal|), bounded in [-1, +1]. High-conviction days get full size; weak signals get scaled-down position. Implicit dead-zone via the magnitude scaling. Reference: LÃ³pez de Prado 2018 <em>'Advances in Financial ML'</em> Â§10 conviction-weighted sizing.</li>
+          <li style="margin-bottom:8px"><b style="color:#3fb950">raw</b> — sign(signal), 1-unit position, daily rebalance. The vanilla baseline. <em>Pros:</em> simple. <em>Cons:</em> high turnover, pays bid-ask + spread on every flip; vulnerable to whipsaw. Reference: Sharpe 1966 J. Business <em>'Mutual fund performance'</em>.</li>
+          <li style="margin-bottom:8px"><b style="color:#3fb950">hold_until_flip</b> — Hold the position until the signal direction changes. Cuts turnover by ~50% if the signal is autocorrelated day-to-day, saves ~2-4% per year on transaction costs. <em>When it wins:</em> momentum signals that persist multi-day. <em>When it loses:</em> mean-reverting signals that flip more usefully than the rule allows. Reference: Moskowitz, Ooi & Pedersen 2012 JFE <em>'Time series momentum'</em> (arXiv:1201.5333).</li>
+          <li style="margin-bottom:8px"><b style="color:#3fb950">dead_zone</b> — Skip days when |signal| &lt; median(|signal|). Trades only when the model is more confident than its typical day. Lifts hit-rate from ~52% to ~58-62% on traded days. <em>Tradeoff:</em> ~30% fewer trades; fewer compounding opportunities. Reference: Lim, Zohren & Roberts 2019 J. Financial Data Sci. <em>'Enhancing Time Series Momentum'</em> (arXiv:1906.04025) §4.2.</li>
+          <li style="margin-bottom:8px"><b style="color:#3fb950">vol_regime_gate_15</b> — Trade only when QQQ's realized 60-day vol &gt; 15% (annualized). The intuition: alpha concentrates in volatile regimes (GFC, EU debt, COVID, vol-mageddon). In calm bull regimes (2017-2019, 2024-2025), the model is signal-poor and bleeds to costs. Empirical proof: QQQ's existing +0.368 ensemble champion uses exactly this gate (rvol60d &gt; 15%); the gate adds +0.234 Sharpe. Reference: Bollerslev, Tauchen & Zhou 2009 RFS <em>'Expected Stock Returns and Variance Risk Premia'</em>.</li>
+          <li style="margin-bottom:8px"><b style="color:#3fb950">sma200_real</b> — Only LONG when QQQ closes above its 200-day SMA (real prices, not a proxy). SHORT signals always pass through. Skips bullish trades during corrective regimes; the 200d SMA is a coarse uptrend gauge. Reference: Faber 2007 J. Wealth Management <em>'A Quantitative Approach to Tactical Asset Allocation'</em> (DOI 10.3905/jwm.2007.690942).</li>
+          <li style="margin-bottom:8px"><b style="color:#3fb950">quarter_kelly</b> — Position size = 0.25 × Sharpe² (capped at 1.0 of capital). Theoretically optimal log-utility growth. Quarter-Kelly (vs full Kelly) reduces ruin risk under estimation error. <em>When it wins:</em> high-Sharpe strategies (full Kelly proportional to Sharpe²) get amplified. <em>When it loses:</em> negative-Sharpe → 0 position. Reference: Kelly 1956 Bell Sys Tech J <em>'A New Interpretation of Information Rate'</em>; Thorp 1969 <em>'Optimal Gambling Systems for Favorable Games'</em>.</li>
+          <li style="margin-bottom:8px"><b style="color:#3fb950">vol_target_15pct</b> — Scale position by min(2x, 15% / realized_vol_20). Maintains constant ex-ante portfolio volatility regardless of regime. Juices returns in calm regimes (more leverage), dampens in volatile (less). Capped at 2x leverage to avoid blow-up. Reference: Lim, Zohren & Roberts 2019 (arXiv:1906.04025) §3.1; Moreira & Muir 2017 J. Finance <em>'Volatility-Managed Portfolios'</em>.</li>
+          <li style="margin-bottom:8px"><b style="color:#3fb950">confidence_weighted</b> — Continuous position size = signal/max(|signal|), bounded in [-1, +1]. High-conviction days get full size; weak signals get scaled-down position. Implicit dead-zone via the magnitude scaling. Reference: López de Prado 2018 <em>'Advances in Financial ML'</em> §10 conviction-weighted sizing.</li>
         </ul>
 
-        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">ðŸ›¡ Trading Strategies â€” Hedging (Tier H, Options + Stock)</div>
+        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">🛡 Trading Strategies — Hedging (Tier H, Options + Stock)</div>
         <ul style="list-style:none;padding-left:0">
-          <li style="margin-bottom:8px"><b style="color:#fbbf24">covered_call</b> â€” On bullish signal: long QQQ + sell a 30-day, 5%-OTM call. Collects the call premium as income; caps upside at +5%. <em>When it wins:</em> flat-to-mildly-bullish regimes â€” premium income is pure profit. <em>When it loses:</em> strong rally above the strike (you forfeit gains above 5%). Daily P&amp;L = QQQ return + (BS_call_price / 30 / spot). Reference: Whaley 2002 J. Derivatives <em>'Risk and Return of the CBOE BuyWrite Monthly Index'</em>; CBOE BXM index methodology.</li>
-          <li style="margin-bottom:8px"><b style="color:#fbbf24">protective_put</b> â€” On bullish signal: long QQQ + buy a 30-day, 5%-OTM put as crash insurance. Caps downside at ~-5% per period; pays insurance premium. <em>When it wins:</em> tail-risk events when the put pays off (e.g., COVID crash, Vol-mageddon). <em>When it loses:</em> calm regimes â€” the put expires worthless and you've burned the premium. Daily P&amp;L = max(SPY_return, -5%/30) - (BS_put_price / 30 / spot). Reference: Bookstaber & Clarke 1985 <em>'Problems in Evaluating the Performance of Portfolios with Options'</em>; Israelov & Klein 2016 <em>'Risk and Return of Equity Index Collar Strategies'</em>.</li>
-          <li style="margin-bottom:8px"><b style="color:#fbbf24">collar</b> â€” Long QQQ + protective put + covered call (stack of the two above). Returns are bounded in [-5%, +5%] per period. Net premium can be near-zero (call premium funds the put). <em>When it wins:</em> high-vol environments where the put pays off and the call premium is rich. <em>When it loses:</em> trending markets â€” capped on both sides. Reference: Israelov & Klein 2016 J. Investment Mgmt; Whaley 2002.</li>
-          <li style="margin-bottom:8px"><b style="color:#fbbf24">cash_secured_put</b> â€” On bullish signal: sell a 30-day, 5%-OTM cash-secured put. Collect the premium; if QQQ drops &gt; 5%, you're assigned (buy the dip). <em>When it wins:</em> sideways to mildly bearish â€” premium is profit. <em>When it loses:</em> sharp drawdowns &gt; 5% â€” assignment buys at high relative cost. Daily P&amp;L = (BS_put_price / 30 / spot) + min(0, SPY_return + 5%). Reference: McMillan 2002 <em>'Options as a Strategic Investment'</em> Â§15; CBOE PUT index.</li>
-          <li style="margin-bottom:8px"><b style="color:#fbbf24">vertical_call_spread</b> â€” On bullish signal: long ATM call + short 5%-OTM call. Defined risk (cost = net debit), defined reward (max payout = 5% strike width). ~3x leverage on the move within the strikes. <em>When it wins:</em> moderate bullish moves of 2-5%. <em>When it loses:</em> small moves (theta decay) or huge moves above upper strike (capped). Reference: Hull 2018 <em>'Options, Futures, and Other Derivatives'</em> Â§11.3.</li>
-          <li style="margin-bottom:8px"><b style="color:#fbbf24">synthetic_long</b> â€” Long ATM call + short ATM put = synthetic long stock at zero net premium (put-call parity). Captures full QQQ upside and downside, plus dividend carry (~1.8% annual). <em>When it wins:</em> when long stock would, but with leverage from low capital outlay. <em>When it loses:</em> when long stock would. Reference: Stoll 1969 J. Finance <em>'The Relationship Between Put and Call Option Prices'</em>; put-call parity.</li>
+          <li style="margin-bottom:8px"><b style="color:#fbbf24">covered_call</b> — On bullish signal: long QQQ + sell a 30-day, 5%-OTM call. Collects the call premium as income; caps upside at +5%. <em>When it wins:</em> flat-to-mildly-bullish regimes — premium income is pure profit. <em>When it loses:</em> strong rally above the strike (you forfeit gains above 5%). Daily P&amp;L = QQQ return + (BS_call_price / 30 / spot). Reference: Whaley 2002 J. Derivatives <em>'Risk and Return of the CBOE BuyWrite Monthly Index'</em>; CBOE BXM index methodology.</li>
+          <li style="margin-bottom:8px"><b style="color:#fbbf24">protective_put</b> — On bullish signal: long QQQ + buy a 30-day, 5%-OTM put as crash insurance. Caps downside at ~-5% per period; pays insurance premium. <em>When it wins:</em> tail-risk events when the put pays off (e.g., COVID crash, Vol-mageddon). <em>When it loses:</em> calm regimes — the put expires worthless and you've burned the premium. Daily P&amp;L = max(SPY_return, -5%/30) - (BS_put_price / 30 / spot). Reference: Bookstaber & Clarke 1985 <em>'Problems in Evaluating the Performance of Portfolios with Options'</em>; Israelov & Klein 2016 <em>'Risk and Return of Equity Index Collar Strategies'</em>.</li>
+          <li style="margin-bottom:8px"><b style="color:#fbbf24">collar</b> — Long QQQ + protective put + covered call (stack of the two above). Returns are bounded in [-5%, +5%] per period. Net premium can be near-zero (call premium funds the put). <em>When it wins:</em> high-vol environments where the put pays off and the call premium is rich. <em>When it loses:</em> trending markets — capped on both sides. Reference: Israelov & Klein 2016 J. Investment Mgmt; Whaley 2002.</li>
+          <li style="margin-bottom:8px"><b style="color:#fbbf24">cash_secured_put</b> — On bullish signal: sell a 30-day, 5%-OTM cash-secured put. Collect the premium; if QQQ drops &gt; 5%, you're assigned (buy the dip). <em>When it wins:</em> sideways to mildly bearish — premium is profit. <em>When it loses:</em> sharp drawdowns &gt; 5% — assignment buys at high relative cost. Daily P&amp;L = (BS_put_price / 30 / spot) + min(0, SPY_return + 5%). Reference: McMillan 2002 <em>'Options as a Strategic Investment'</em> §15; CBOE PUT index.</li>
+          <li style="margin-bottom:8px"><b style="color:#fbbf24">vertical_call_spread</b> — On bullish signal: long ATM call + short 5%-OTM call. Defined risk (cost = net debit), defined reward (max payout = 5% strike width). ~3x leverage on the move within the strikes. <em>When it wins:</em> moderate bullish moves of 2-5%. <em>When it loses:</em> small moves (theta decay) or huge moves above upper strike (capped). Reference: Hull 2018 <em>'Options, Futures, and Other Derivatives'</em> §11.3.</li>
+          <li style="margin-bottom:8px"><b style="color:#fbbf24">synthetic_long</b> — Long ATM call + short ATM put = synthetic long stock at zero net premium (put-call parity). Captures full QQQ upside and downside, plus dividend carry (~1.8% annual). <em>When it wins:</em> when long stock would, but with leverage from low capital outlay. <em>When it loses:</em> when long stock would. Reference: Stoll 1969 J. Finance <em>'The Relationship Between Put and Call Option Prices'</em>; put-call parity.</li>
         </ul>
 
-        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">ðŸ“ Position Sizing â€” How Big to Bet</div>
+        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">📐 Position Sizing — How Big to Bet</div>
         <ul style="list-style:none;padding-left:0">
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Full Kelly</b> â€” `f* = Î¼ / ÏƒÂ²` for log-utility. Optimal compounded growth IF you know Î¼ and Ïƒ exactly. <em>Real life:</em> always overestimates. Use fractional Kelly.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Quarter Kelly</b> â€” 25% of full Kelly. Standard professional practice (Thorp). Trades 50% of optimal growth for 75% reduction in drawdown variance.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Volatility targeting</b> â€” Position = target_vol / realized_vol. Maintains constant ex-ante portfolio volatility. Increases leverage in calm regimes, deleverages in volatile ones. Capped at 2x to avoid blow-up.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Conviction-weighted</b> â€” Position proportional to |signal|. Large bets when model is confident, small when uncertain.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Equal-weight</b> â€” Same position regardless of confidence. Robust to forecast error but leaves alpha on the table.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Risk parity</b> â€” Allocate inverse-variance across multiple strategies in an ensemble. Each contributes equal risk to the portfolio. Reference: Roncalli 2014 <em>'Introduction to Risk Parity and Budgeting'</em>.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Full Kelly</b> — `f* = Î¼ / Ïƒ²` for log-utility. Optimal compounded growth IF you know Î¼ and Ïƒ exactly. <em>Real life:</em> always overestimates. Use fractional Kelly.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Quarter Kelly</b> — 25% of full Kelly. Standard professional practice (Thorp). Trades 50% of optimal growth for 75% reduction in drawdown variance.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Volatility targeting</b> — Position = target_vol / realized_vol. Maintains constant ex-ante portfolio volatility. Increases leverage in calm regimes, deleverages in volatile ones. Capped at 2x to avoid blow-up.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Conviction-weighted</b> — Position proportional to |signal|. Large bets when model is confident, small when uncertain.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Equal-weight</b> — Same position regardless of confidence. Robust to forecast error but leaves alpha on the table.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Risk parity</b> — Allocate inverse-variance across multiple strategies in an ensemble. Each contributes equal risk to the portfolio. Reference: Roncalli 2014 <em>'Introduction to Risk Parity and Budgeting'</em>.</li>
         </ul>
 
-        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">ðŸŽ¯ Ensemble Aggregation â€” Combining Models</div>
+        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">🎯 Ensemble Aggregation — Combining Models</div>
         <ul style="list-style:none;padding-left:0">
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">mean</b> â€” Unweighted average of member predictions. Simple, robust, but gives equal voice to weak members. Best when members have similar quality.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">vote</b> â€” Sum of member directions, sign(sum) = direction. Robust to outlier predictions. Loses magnitude information. Top-K vote (only top members vote) is a common production strategy. Reference: Bates & Granger 1969 <em>'The Combination of Forecasts'</em>.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">weighted (by-X)</b> â€” Weight each member by metric X (e.g. by-Sharpe, by-return, by-PSR). Better-than-equal but selection bias risk if X is computed on the same window. Use cross-validation when possible.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">vote_geq_K</b> â€” Only trade when â‰¥K of N members agree. High-confidence filter. Lifts hit-rate, lowers exposure. Tradeoff: fewer trades.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">family_only</b> â€” Use only members of one architecture family (e.g., all-MLP). Diagnostic â€” does the family carry signal alone?</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">best1_by_X</b> â€” Use a single member, the best by metric X. Baseline for comparing whether ensembling actually helps.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">mean</b> — Unweighted average of member predictions. Simple, robust, but gives equal voice to weak members. Best when members have similar quality.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">vote</b> — Sum of member directions, sign(sum) = direction. Robust to outlier predictions. Loses magnitude information. Top-K vote (only top members vote) is a common production strategy. Reference: Bates & Granger 1969 <em>'The Combination of Forecasts'</em>.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">weighted (by-X)</b> — Weight each member by metric X (e.g. by-Sharpe, by-return, by-PSR). Better-than-equal but selection bias risk if X is computed on the same window. Use cross-validation when possible.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">vote_geq_K</b> — Only trade when ≥K of N members agree. High-confidence filter. Lifts hit-rate, lowers exposure. Tradeoff: fewer trades.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">family_only</b> — Use only members of one architecture family (e.g., all-MLP). Diagnostic — does the family carry signal alone?</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">best1_by_X</b> — Use a single member, the best by metric X. Baseline for comparing whether ensembling actually helps.</li>
         </ul>
 
-        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">ðŸ”¢ Selection Criteria â€” How to Pick Members</div>
+        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">🔢 Selection Criteria — How to Pick Members</div>
         <ul style="list-style:none;padding-left:0">
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_oos_sharpe</b> â€” Highest individual OOS annualised Sharpe. Standard quant-finance ranking.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_oos_return</b> â€” Highest total $ return. Direct dollar-maximization. May favor leveraged or high-vol strategies.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_excess</b> â€” Highest Sharpe minus buy-and-hold Sharpe. Skill above the market.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_hit</b> â€” Highest directional hit-rate. Calibration quality. Useful when transaction costs dominate.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_psr</b> â€” Highest Probabilistic Sharpe Ratio. Statistical confidence Sharpe is &gt; 0.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_min_dd</b> â€” Smallest maximum drawdown. Risk-controlled selection. Conservative.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_compound</b> â€” Highest geometric (compounded) return. Aligns with the actual maximization objective for log-utility investors.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_sortino</b> â€” Highest Sortino (downside-only Sharpe). Penalizes downside risk only; better than Sharpe when returns are non-normal.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_recency_30d</b> â€” Highest rolling 30-day Sharpe at end of OOS. Adapts to regime shifts; biased toward whichever member is hot recently.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_train_composite</b> â€” Highest train-time composite. Pre-OOS ranking; the natural way to pick before seeing OOS data.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_oos_sharpe</b> — Highest individual OOS annualised Sharpe. Standard quant-finance ranking.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_oos_return</b> — Highest total $ return. Direct dollar-maximization. May favor leveraged or high-vol strategies.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_excess</b> — Highest Sharpe minus buy-and-hold Sharpe. Skill above the market.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_hit</b> — Highest directional hit-rate. Calibration quality. Useful when transaction costs dominate.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_psr</b> — Highest Probabilistic Sharpe Ratio. Statistical confidence Sharpe is &gt; 0.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_min_dd</b> — Smallest maximum drawdown. Risk-controlled selection. Conservative.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_compound</b> — Highest geometric (compounded) return. Aligns with the actual maximization objective for log-utility investors.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_sortino</b> — Highest Sortino (downside-only Sharpe). Penalizes downside risk only; better than Sharpe when returns are non-normal.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_recency_30d</b> — Highest rolling 30-day Sharpe at end of OOS. Adapts to regime shifts; biased toward whichever member is hot recently.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">by_train_composite</b> — Highest train-time composite. Pre-OOS ranking; the natural way to pick before seeing OOS data.</li>
         </ul>
 
-        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">ðŸ“Š Risk &amp; Quality Metrics</div>
+        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">📊 Risk &amp; Quality Metrics</div>
         <ul style="list-style:none;padding-left:0">
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Sortino Ratio</b> â€” Like Sharpe but only counts downside volatility in the denominator. Better when returns have negative skew (most equity strategies). Sortino &gt; Sharpe is normal â€” they diverge as skew increases. Reference: Sortino & Price 1994 J. of Investing.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Max Drawdown</b> â€” Largest peak-to-trough decline in equity, in %. Dollar-realised pain. Real strategies often have 1.5-2x backtest max DD live (overfit + execution). Halve your risk tolerance vs backtest.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Calmar Ratio</b> â€” Annualised return / |max drawdown|. Geometric performance per unit of pain. Calmar &gt; 1 is good; &gt; 3 is exceptional.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Ulcer Index</b> â€” RMS of drawdowns over time. Penalizes long, deep drawdowns more than brief ones. Reference: Martin 1989 <em>'The Investor's Guide to Fidelity Funds'</em>.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">PSR (Probabilistic Sharpe Ratio)</b> â€” Probability the OBSERVED Sharpe is &gt; 0 given sample size, skew, and kurtosis. PSR &gt; 0.95 = statistically certain. Critical because in-sample Sharpes can be inflated by skew/kurtosis or short windows. Reference: Bailey & LÃ³pez de Prado 2012 SSRN.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Deflated Sharpe Ratio (DSR)</b> â€” Adjusts PSR for the number of trials. If you tested 1000 strategies, the best one will have inflated Sharpe by chance â€” DSR corrects for this. Reference: Bailey & LÃ³pez de Prado 2014 J. of Portfolio Mgmt.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Information Ratio</b> â€” Excess return / tracking error vs benchmark. Skill-above-benchmark normalized.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">Treynor Ratio</b> â€” Excess return / beta. Risk-adjusted return per unit of systematic risk.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">VaR-95</b> â€” Loss not exceeded 95% of days. Standard regulatory risk measure.</li>
-          <li style="margin-bottom:8px"><b style="color:#58a6ff">CVaR-95</b> â€” Average loss on the worst 5% of days. Captures tail risk better than VaR. Coherent risk measure (Artzner et al. 1999).</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Sortino Ratio</b> — Like Sharpe but only counts downside volatility in the denominator. Better when returns have negative skew (most equity strategies). Sortino &gt; Sharpe is normal — they diverge as skew increases. Reference: Sortino & Price 1994 J. of Investing.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Max Drawdown</b> — Largest peak-to-trough decline in equity, in %. Dollar-realised pain. Real strategies often have 1.5-2x backtest max DD live (overfit + execution). Halve your risk tolerance vs backtest.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Calmar Ratio</b> — Annualised return / |max drawdown|. Geometric performance per unit of pain. Calmar &gt; 1 is good; &gt; 3 is exceptional.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Ulcer Index</b> — RMS of drawdowns over time. Penalizes long, deep drawdowns more than brief ones. Reference: Martin 1989 <em>'The Investor's Guide to Fidelity Funds'</em>.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">PSR (Probabilistic Sharpe Ratio)</b> — Probability the OBSERVED Sharpe is &gt; 0 given sample size, skew, and kurtosis. PSR &gt; 0.95 = statistically certain. Critical because in-sample Sharpes can be inflated by skew/kurtosis or short windows. Reference: Bailey & López de Prado 2012 SSRN.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Deflated Sharpe Ratio (DSR)</b> — Adjusts PSR for the number of trials. If you tested 1000 strategies, the best one will have inflated Sharpe by chance — DSR corrects for this. Reference: Bailey & López de Prado 2014 J. of Portfolio Mgmt.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Information Ratio</b> — Excess return / tracking error vs benchmark. Skill-above-benchmark normalized.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">Treynor Ratio</b> — Excess return / beta. Risk-adjusted return per unit of systematic risk.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">VaR-95</b> — Loss not exceeded 95% of days. Standard regulatory risk measure.</li>
+          <li style="margin-bottom:8px"><b style="color:#58a6ff">CVaR-95</b> — Average loss on the worst 5% of days. Captures tail risk better than VaR. Coherent risk measure (Artzner et al. 1999).</li>
         </ul>
 
-        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">âš–ï¸ Strategies NOT YET implemented (roadmap)</div>
+        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">⚖️ Strategies NOT YET implemented (roadmap)</div>
         <ul style="list-style:none;padding-left:0">
-          <li style="margin-bottom:6px"><b>5d-signal-on-1d-trade</b> â€” Use the auxiliary 5-day prediction (B target) to set today's direction, but realize on 1-day return. 5d signals are smoother. (QQQ project found B_sh +1.77 vs A_sh -0.24 on iTransformer.)</li>
-          <li style="margin-bottom:6px"><b>Sector rotation overlay</b> â€” Use ensemble signal to allocate among XLK/XLF/XLV/... instead of QQQ only. Reference: Asness-Moskowitz-Pedersen 2013 JF.</li>
-          <li style="margin-bottom:6px"><b>Long-short pairs (market-neutral)</b> â€” Long QQQ when bullish, short hedged pair (e.g., -beta * QQQ). Removes market direction. Reference: Gatev-Goetzmann-Rouwenhorst 2006 RFS.</li>
-          <li style="margin-bottom:6px"><b>Iron condor</b> â€” Sell OTM call + buy further OTM call + sell OTM put + buy further OTM put. Defined-risk range trade. Profitable when QQQ stays in range.</li>
-          <li style="margin-bottom:6px"><b>Calendar spread</b> â€” Sell short-dated + buy long-dated same-strike. Captures vol term structure.</li>
-          <li style="margin-bottom:6px"><b>Risk reversal (bullish)</b> â€” Sell put + buy call. Synthetic leveraged long with no premium outlay.</li>
-          <li style="margin-bottom:6px"><b>Volatility regime models</b> â€” Different ensemble member weights in high-vol vs low-vol regimes. Conditional regime switching.</li>
-          <li style="margin-bottom:6px"><b>Stop-loss + trailing stop overlays</b> â€” Cap intraday losses; let winners run with a trailing stop.</li>
-          <li style="margin-bottom:6px"><b>Online ensemble re-weighting (bandit)</b> â€” Thompson sampling / UCB to adaptively pick which ensemble member to follow each day.</li>
-          <li style="margin-bottom:6px"><b>RL execution timing</b> â€” RL agent decides intraday entry timing instead of fixed 9:30 ET. Reference: Nevmyvaka-Feng-Kearns 2006 ICML.</li>
-          <li style="margin-bottom:6px"><b>HRP (Hierarchical Risk Parity)</b> â€” Lopez de Prado weights using prediction-correlation matrix.</li>
+          <li style="margin-bottom:6px"><b>5d-signal-on-1d-trade</b> — Use the auxiliary 5-day prediction (B target) to set today's direction, but realize on 1-day return. 5d signals are smoother. (QQQ project found B_sh +1.77 vs A_sh -0.24 on iTransformer.)</li>
+          <li style="margin-bottom:6px"><b>Sector rotation overlay</b> — Use ensemble signal to allocate among XLK/XLF/XLV/... instead of QQQ only. Reference: Asness-Moskowitz-Pedersen 2013 JF.</li>
+          <li style="margin-bottom:6px"><b>Long-short pairs (market-neutral)</b> — Long QQQ when bullish, short hedged pair (e.g., -beta * QQQ). Removes market direction. Reference: Gatev-Goetzmann-Rouwenhorst 2006 RFS.</li>
+          <li style="margin-bottom:6px"><b>Iron condor</b> — Sell OTM call + buy further OTM call + sell OTM put + buy further OTM put. Defined-risk range trade. Profitable when QQQ stays in range.</li>
+          <li style="margin-bottom:6px"><b>Calendar spread</b> — Sell short-dated + buy long-dated same-strike. Captures vol term structure.</li>
+          <li style="margin-bottom:6px"><b>Risk reversal (bullish)</b> — Sell put + buy call. Synthetic leveraged long with no premium outlay.</li>
+          <li style="margin-bottom:6px"><b>Volatility regime models</b> — Different ensemble member weights in high-vol vs low-vol regimes. Conditional regime switching.</li>
+          <li style="margin-bottom:6px"><b>Stop-loss + trailing stop overlays</b> — Cap intraday losses; let winners run with a trailing stop.</li>
+          <li style="margin-bottom:6px"><b>Online ensemble re-weighting (bandit)</b> — Thompson sampling / UCB to adaptively pick which ensemble member to follow each day.</li>
+          <li style="margin-bottom:6px"><b>RL execution timing</b> — RL agent decides intraday entry timing instead of fixed 9:30 ET. Reference: Nevmyvaka-Feng-Kearns 2006 ICML.</li>
+          <li style="margin-bottom:6px"><b>HRP (Hierarchical Risk Parity)</b> — Lopez de Prado weights using prediction-correlation matrix.</li>
         </ul>
 
-        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">âš ï¸ Important Caveats â€” Read Before Trading</div>
+        <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px;margin-top:14px">⚠️ Important Caveats — Read Before Trading</div>
         <ul style="list-style:none;padding-left:0">
-          <li style="margin-bottom:8px"><b style="color:#f85149">Small-sample Sharpe inflation</b> â€” Our OOS window is ~103 days. Sharpe std error â‰ˆ 1/âˆš(103/252) â‰ˆ 1.56. A "true" Sharpe of +1.0 can show as +5.0 by chance ~1% of the time. Treat any single-window Sharpe with skepticism â€” multi-window or multi-year confirmation needed.</li>
-          <li style="margin-bottom:8px"><b style="color:#f85149">Selection bias</b> â€” Selecting top-K members by metric X on the same window we evaluate the ensemble produces look-ahead bias. Real OOS Sharpe is typically 30-50% lower. Use chronological CV.</li>
-          <li style="margin-bottom:8px"><b style="color:#f85149">Transaction costs not modelled</b> â€” All strategies assume zero costs. Real QQQ round-trip is ~1-2 bps; a strategy that flips daily ~60% of days bleeds ~3-5% per year just to costs. Subtract from Sharpe.</li>
-          <li style="margin-bottom:8px"><b style="color:#f85149">Theoretical option pricing</b> â€” Hedging strategies use Black-Scholes with VIX as IV. Real chain prices include skew, bid-ask spread, and event premium. Realised P&amp;L will differ.</li>
-          <li style="margin-bottom:8px"><b style="color:#f85149">No stress on extreme regimes</b> â€” Backtest covers OOS forward OOS. Hyperinflation, war shocks, central-bank-digital-currency events have NEVER been seen by the model.</li>
-          <li style="margin-bottom:8px"><b style="color:#f85149">Single-asset</b> â€” Strategies are QQQ-only. No portfolio diversification. Highly correlated with broad market.</li>
-          <li style="margin-bottom:8px"><b style="color:#f85149">Backtest-vs-live decay</b> â€” Realised live Sharpe is typically 30-50% of backtest Sharpe due to: regime drift, execution slippage, model staleness, behavioural biases. Plan for it.</li>
+          <li style="margin-bottom:8px"><b style="color:#f85149">Small-sample Sharpe inflation</b> — Our OOS window is ~103 days. Sharpe std error ≈ 1/√(103/252) ≈ 1.56. A "true" Sharpe of +1.0 can show as +5.0 by chance ~1% of the time. Treat any single-window Sharpe with skepticism — multi-window or multi-year confirmation needed.</li>
+          <li style="margin-bottom:8px"><b style="color:#f85149">Selection bias</b> — Selecting top-K members by metric X on the same window we evaluate the ensemble produces look-ahead bias. Real OOS Sharpe is typically 30-50% lower. Use chronological CV.</li>
+          <li style="margin-bottom:8px"><b style="color:#f85149">Transaction costs not modelled</b> — All strategies assume zero costs. Real QQQ round-trip is ~1-2 bps; a strategy that flips daily ~60% of days bleeds ~3-5% per year just to costs. Subtract from Sharpe.</li>
+          <li style="margin-bottom:8px"><b style="color:#f85149">Theoretical option pricing</b> — Hedging strategies use Black-Scholes with VIX as IV. Real chain prices include skew, bid-ask spread, and event premium. Realised P&amp;L will differ.</li>
+          <li style="margin-bottom:8px"><b style="color:#f85149">No stress on extreme regimes</b> — Backtest covers OOS forward OOS. Hyperinflation, war shocks, central-bank-digital-currency events have NEVER been seen by the model.</li>
+          <li style="margin-bottom:8px"><b style="color:#f85149">Single-asset</b> — Strategies are QQQ-only. No portfolio diversification. Highly correlated with broad market.</li>
+          <li style="margin-bottom:8px"><b style="color:#f85149">Backtest-vs-live decay</b> — Realised live Sharpe is typically 30-50% of backtest Sharpe due to: regime drift, execution slippage, model staleness, behavioural biases. Plan for it.</li>
         </ul>
       </div>
     </div>
@@ -275,7 +275,7 @@
 <div class="section-title">Experiment Log <span style="color:#484f58;font-size:0.7em;font-weight:400">(click row for per-window breakdown, click header to sort)</span></div>
 <div id="backbone-tabs" style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap"></div>
 <div id="ensemble-trade-links" style="margin:6px 0;display:none"></div>
-<div style="color:#8b949e;font-size:0.85em;margin:6px 0 4px 0" id="exp-count-hint">Scroll inside the table below to browse every experiment â€” <span id="exp-visible-count">?</span> shown. Click <strong style="color:#58a6ff">&#128202; CSV</strong> in the rightmost column to download that experiment&#39;s daily win/loss spreadsheet.</div>
+<div style="color:#8b949e;font-size:0.85em;margin:6px 0 4px 0" id="exp-count-hint">Scroll inside the table below to browse every experiment — <span id="exp-visible-count">?</span> shown. Click <strong style="color:#58a6ff">&#128202; CSV</strong> in the rightmost column to download that experiment&#39;s daily win/loss spreadsheet.</div>
 <div id="exp-table-scroll" style="max-height:75vh;overflow-y:auto;border:1px solid #30363d;border-radius:6px;position:relative">
 <table id="exp-table" style="margin-bottom:0">
   <thead>
@@ -316,7 +316,7 @@
   </div>
   <div class="detail-config" id="detail-config"></div>
   <div id="detail-reasoning" style="background:#0d1117;border-left:3px solid #58a6ff;border-radius:4px;padding:12px;margin-bottom:12px;font-size:0.85em;color:#c9d1d9;line-height:1.5;display:none">
-    <div style="font-weight:600;color:#58a6ff;margin-bottom:6px;font-size:0.85em;letter-spacing:0.5px">DIAGNOSIS Â· CITATIONS Â· HYPOTHESIS Â· PREDICTION Â· VERDICT</div>
+    <div style="font-weight:600;color:#58a6ff;margin-bottom:6px;font-size:0.85em;letter-spacing:0.5px">DIAGNOSIS · CITATIONS · HYPOTHESIS · PREDICTION · VERDICT</div>
     <div id="detail-reasoning-body"></div>
   </div>
   <div style="margin-bottom:10px">
@@ -326,26 +326,26 @@
     <span style="color:#484f58;font-size:0.75em;margin-left:8px" id="tab-summary"></span>
   </div>
   <!-- Target selector: switch the equity curve + per-fold table between
-       targets A (1d return â€” PRIMARY), B (5d return), and D (vol-adjusted 1d).
+       targets A (1d return — PRIMARY), B (5d return), and D (vol-adjusted 1d).
        Per CLAUDE.md the optimisation is on A, but B and D are tracked + plotted. -->
   <div style="margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
     <span style="color:#8b949e;font-size:0.78em;letter-spacing:0.5px">TARGET:</span>
-    <button class="close-btn" id="target-A" onclick="switchTarget('A')" style="background:#1a2332;color:#58a6ff" title="Primary: 1-day forward return (the KEEP/DISCARD driver)">A â€” 1d return</button>
-    <button class="close-btn" id="target-B" onclick="switchTarget('B')" title="Auxiliary: 5-day forward return">B â€” 5d return</button>
-    <button class="close-btn" id="target-D" onclick="switchTarget('D')" title="Vol-adjusted 1d return (orthogonalises trend from skill)">D â€” vol-adj 1d</button>
+    <button class="close-btn" id="target-A" onclick="switchTarget('A')" style="background:#1a2332;color:#58a6ff" title="Primary: 1-day forward return (the KEEP/DISCARD driver)">A — 1d return</button>
+    <button class="close-btn" id="target-B" onclick="switchTarget('B')" title="Auxiliary: 5-day forward return">B — 5d return</button>
+    <button class="close-btn" id="target-D" onclick="switchTarget('D')" title="Vol-adjusted 1d return (orthogonalises trend from skill)">D — vol-adj 1d</button>
     <span id="target-summary" style="color:#484f58;font-size:0.75em;margin-left:8px"></span>
   </div>
   <!-- Equity curve: strategy returns vs initial investment baseline, across folds -->
   <div id="detail-chart-wrap" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:12px;margin-bottom:12px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <div style="font-weight:600;color:#58a6ff;font-size:0.85em;letter-spacing:0.5px">EQUITY CURVE â€” Returns vs Investment across folds</div>
+      <div style="font-weight:600;color:#58a6ff;font-size:0.85em;letter-spacing:0.5px">EQUITY CURVE — Returns vs Investment across folds</div>
       <div style="font-size:0.75em;color:#8b949e" id="chart-legend">
-        <span style="color:#3fb950">â€” Strategy</span> &nbsp;
-        <span style="color:#8b949e">â€” $1000 flat investment</span>
+        <span style="color:#3fb950">— Strategy</span> &nbsp;
+        <span style="color:#8b949e">— $1000 flat investment</span>
         &nbsp;&nbsp;
         <a id="chart-excel-link" href="autoresearch_equity.xlsx" download
            style="background:#238636;color:#fff;text-decoration:none;padding:3px 8px;border-radius:4px;font-weight:600">
-          ðŸ“¥ Excel (all experiments + charts)
+          📥 Excel (all experiments + charts)
         </a>
       </div>
     </div>
@@ -380,15 +380,15 @@
     <tr><th>Fold</th><th>Regime</th><th>Train (expanding)</th><th>Val Window</th><th>Test Window</th></tr>
   </thead>
   <tbody>
-    <tr><td>fold_1</td><td>GFC peak crash (Lehman + Mar-2009 bottom)</td><td>2004-01 â†’ 2008-03</td><td>2008-04 â†’ 2008-09</td><td>2008-10 â†’ 2009-03</td></tr>
-    <tr><td>fold_2</td><td>2011 US-downgrade + EU debt</td><td>2004-01 â†’ 2011-03</td><td>2011-04 â†’ 2011-08</td><td>2011-09 â†’ 2012-03</td></tr>
-    <tr><td>fold_3</td><td>Taper tantrum + 2014 H1</td><td>2004-01 â†’ 2013-09</td><td>2013-10 â†’ 2013-12</td><td>2014-01 â†’ 2014-09</td></tr>
-    <tr><td>fold_4</td><td>China devaluation + oil crash</td><td>2004-01 â†’ 2015-03</td><td>2015-04 â†’ 2015-08</td><td>2015-09 â†’ 2016-04</td></tr>
-    <tr><td>fold_5</td><td>2018 Vol-mageddon + Q4 sell-off</td><td>2004-01 â†’ 2018-04</td><td>2018-05 â†’ 2018-07</td><td>2018-08 â†’ 2019-04</td></tr>
-    <tr><td>fold_6</td><td>COVID crash + V-recovery</td><td>2004-01 â†’ 2019-09</td><td>2019-10 â†’ 2020-01</td><td>2020-02 â†’ 2020-12</td></tr>
-    <tr><td>fold_7</td><td>Inflation bear, AI rally, 2025</td><td>2004-01 â†’ 2023-09</td><td>2023-10 â†’ 2024-03</td><td>2024-04 â†’ 2025-12</td></tr>
-    <tr style="background:#161b22;font-weight:600"><td colspan="5" style="text-align:center;color:#58a6ff">SUPER-FOLD: train pools all out-of-window dates 2004-01 â†’ 2025-12 with hole-punching for ALL 7 val + test windows + 10-day label buffer + 90-day purge + 21-day embargo</td></tr>
-    <tr style="background:#0d1117;color:#3fb950;font-weight:600"><td colspan="5" style="text-align:center;padding:8px">Zero overlap verified: trainâ†”val = 0 | trainâ†”test = 0 | valâ†”test = 0 (LÃ³pez de Prado 2018 Â§7 walk-forward + purge + embargo)</td></tr>
+    <tr><td>fold_1</td><td>GFC peak crash (Lehman + Mar-2009 bottom)</td><td>2004-01 → 2008-03</td><td>2008-04 → 2008-09</td><td>2008-10 → 2009-03</td></tr>
+    <tr><td>fold_2</td><td>2011 US-downgrade + EU debt</td><td>2004-01 → 2011-03</td><td>2011-04 → 2011-08</td><td>2011-09 → 2012-03</td></tr>
+    <tr><td>fold_3</td><td>Taper tantrum + 2014 H1</td><td>2004-01 → 2013-09</td><td>2013-10 → 2013-12</td><td>2014-01 → 2014-09</td></tr>
+    <tr><td>fold_4</td><td>China devaluation + oil crash</td><td>2004-01 → 2015-03</td><td>2015-04 → 2015-08</td><td>2015-09 → 2016-04</td></tr>
+    <tr><td>fold_5</td><td>2018 Vol-mageddon + Q4 sell-off</td><td>2004-01 → 2018-04</td><td>2018-05 → 2018-07</td><td>2018-08 → 2019-04</td></tr>
+    <tr><td>fold_6</td><td>COVID crash + V-recovery</td><td>2004-01 → 2019-09</td><td>2019-10 → 2020-01</td><td>2020-02 → 2020-12</td></tr>
+    <tr><td>fold_7</td><td>Inflation bear, AI rally, 2025</td><td>2004-01 → 2023-09</td><td>2023-10 → 2024-03</td><td>2024-04 → 2025-12</td></tr>
+    <tr style="background:#161b22;font-weight:600"><td colspan="5" style="text-align:center;color:#58a6ff">SUPER-FOLD: train pools all out-of-window dates 2004-01 → 2025-12 with hole-punching for ALL 7 val + test windows + 10-day label buffer + 90-day purge + 21-day embargo</td></tr>
+    <tr style="background:#0d1117;color:#3fb950;font-weight:600"><td colspan="5" style="text-align:center;padding:8px">Zero overlap verified: train↔val = 0 | train↔test = 0 | val↔test = 0 (López de Prado 2018 §7 walk-forward + purge + embargo)</td></tr>
   </tbody>
 </table>
 
@@ -398,19 +398,19 @@
      oos_summary_*.json + oos_top30_table.json files). Until then the
      JS keeps both panels hidden via display:none. The source asset-era
      "Prod-Mode Split" hardcoded narrative section was removed
-     2026-05-03 because it described source asset's OOS window (2025-10 â†’
+     2026-05-03 because it described source asset's OOS window (2025-10 →
      2026-04) which is irrelevant to the QQQ project's first runs.
      When QQQ OOS inference is wired, write a QQQ-specific narrative
      section here.
      ==================================================================== -->
 <div style="margin:40px 0 12px 0;padding:8px 0;border-top:3px solid #3fb950">
-  <h2 style="color:#3fb950;font-size:1.4em;text-align:center;margin:0">â”â”â”â”â”â”â”â”â”â” OUT-OF-SAMPLE LIVE-DATA INFERENCE â”â”â”â”â”â”â”â”â”â”</h2>
-  <div style="text-align:center;color:#8b949e;font-size:0.85em;margin-top:4px">QQQ out-of-sample inference panels will appear here once <code>run_oos_inference.py</code> generates <code>oos_summary_*.json</code>. No QQQ OOS runs yet â€” placeholder hidden.</div>
+  <h2 style="color:#3fb950;font-size:1.4em;text-align:center;margin:0">━━━━━━━━━━ OUT-OF-SAMPLE LIVE-DATA INFERENCE ━━━━━━━━━━</h2>
+  <div style="text-align:center;color:#8b949e;font-size:0.85em;margin-top:4px">QQQ out-of-sample inference panels will appear here once <code>run_oos_inference.py</code> generates <code>oos_summary_*.json</code>. No QQQ OOS runs yet — placeholder hidden.</div>
 </div>
 
-<!-- Deep Ensemble panel â€” Lakshminarayanan 2017 (ported from source asset dashboard 2026-05-04) -->
+<!-- Deep Ensemble panel — Lakshminarayanan 2017 (ported from source asset dashboard 2026-05-04) -->
 <div id="oos-ensemble-section" style="background:#1a0d28;border:2px solid #fbbf24;border-radius:8px;padding:18px;margin:12px 0;display:none">
-  <h3 style="color:#fbbf24;font-size:1.15em;margin-bottom:6px">ðŸŽ¯ OOS Deep Ensemble â€” Lakshminarayanan 2017</h3>
+  <h3 style="color:#fbbf24;font-size:1.15em;margin-bottom:6px">🎯 OOS Deep Ensemble — Lakshminarayanan 2017</h3>
   <div style="color:#8b949e;font-size:0.85em;margin-bottom:10px">Average / vote across the prod-retrain BH-beaters. Ensembling reduces variance per Lakshminarayanan, Pritzel &amp; Blundell 2017 NeurIPS arXiv:1612.01474. <b>Click a row</b> to load that strategy's details into the OOS Live-Data Inference panel above. Reads <code>oos_ensemble_summary.json</code> + <code>oos_ensemble_&lt;strategy&gt;.csv</code>.</div>
   <div id="oos-ensemble-summary" style="color:#8b949e;font-size:0.85em;margin-bottom:10px"></div>
   <div style="overflow-x:auto;max-height:560px;overflow-y:auto;border:1px solid #30363d;border-radius:6px">
@@ -422,22 +422,22 @@
           <th data-esort="sizing_mode" style="cursor:pointer" title="Position-sizing mode: raw / kelly / confidence-weighted / vol-target">Sizing</th>
           <th data-esort="overlay" style="cursor:pointer" title="Risk overlay: stop-loss / drawdown-gate / SMA filter / none">Overlay</th>
           <th data-esort="final_dollars_on_1000" style="cursor:pointer" title="Compounded final $ on $1000 starting capital">$Final/$1k</th>
-          <th data-esort="excess_dollars" style="cursor:pointer" title="$Final âˆ’ BH $Final (dollars beaten over Buy-Hold)">$Excess</th>
+          <th data-esort="excess_dollars" style="cursor:pointer" title="$Final − BH $Final (dollars beaten over Buy-Hold)">$Excess</th>
           <th data-esort="strategy_annual_sharpe" style="cursor:pointer" title="OOS strategy Sharpe (annualised)">Sharpe</th>
           <th data-esort="buy_hold_annual_sharpe" style="cursor:pointer">BH Shp</th>
-          <th data-esort="excess_sharpe" style="cursor:pointer" title="Strategy âˆ’ BH Sharpe">Ex Shp</th>
+          <th data-esort="excess_sharpe" style="cursor:pointer" title="Strategy − BH Sharpe">Ex Shp</th>
           <th data-esort="annual_sortino" style="cursor:pointer" title="Sortino ratio (downside-only Sharpe)">Sortino</th>
           <th data-esort="compound_return_pct" style="cursor:pointer" title="Compounded total return % (= exp(sum_log_returns)-1)">Ret%</th>
-          <th data-esort="hit_rate_pct" style="cursor:pointer;color:#fbbf24" title="DEFAULT SORT â€” direction-prediction accuracy on traded days. CLAUDE.md Directive 65 (2026-05-06): hit rate is the SOLE winner-identification metric.">Hit% â˜…</th>
-          <th data-esort="n_traded_days" style="cursor:pointer" title="Number of days the strategy actually placed a trade (position != 0). Hit% is computed only over these days â€” 60% hit on 5 days is noise, 60% on 80 days is signal.">Days Traded</th>
+          <th data-esort="hit_rate_pct" style="cursor:pointer;color:#fbbf24" title="DEFAULT SORT — direction-prediction accuracy on traded days. CLAUDE.md Directive 65 (2026-05-06): hit rate is the SOLE winner-identification metric.">Hit% ★</th>
+          <th data-esort="n_traded_days" style="cursor:pointer" title="Number of days the strategy actually placed a trade (position != 0). Hit% is computed only over these days — 60% hit on 5 days is noise, 60% on 80 days is signal.">Days Traded</th>
           <th data-esort="exposure_pct" style="cursor:pointer" title="% of days with non-zero position">Expos%</th>
-          <th data-esort="psr" style="cursor:pointer" title="Probabilistic Sharpe Ratio (Bailey-LÃ³pez de Prado 2012)">PSR</th>
+          <th data-esort="psr" style="cursor:pointer" title="Probabilistic Sharpe Ratio (Bailey-López de Prado 2012)">PSR</th>
           <th data-esort="max_drawdown_pct" style="cursor:pointer" title="Maximum drawdown of compounded equity curve">MaxDD%</th>
           <th>Equity</th>
           <th>CSV</th>
         </tr>
       </thead>
-      <tbody id="oos-ensemble-tbody"><tr><td colspan="17" style="color:#8b949e">No <code>oos_ensemble_summary.json</code> yet â€” run <code>run_oos_ensemble.py</code> after <code>run_oos_top30.py</code> finds BH-beaters.</td></tr></tbody>
+      <tbody id="oos-ensemble-tbody"><tr><td colspan="17" style="color:#8b949e">No <code>oos_ensemble_summary.json</code> yet — run <code>run_oos_ensemble.py</code> after <code>run_oos_top30.py</code> finds BH-beaters.</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -450,7 +450,7 @@ const _ensembleLabels = {
   'mamba_only_8': 'Mamba-family only',
   'lstm_only_3': 'LSTM-family only',
   'mlp_only': 'MLP-family only',
-  'vote_geq_9': 'High-conf filter (â‰¥9 members agree)',
+  'vote_geq_9': 'High-conf filter (≥9 members agree)',
   'top5_mean': 'Top-5 mean prediction',
   'top3_mean': 'Top-3 mean prediction',
   'all13_vote': 'All members vote (full ensemble majority vote)',
@@ -458,10 +458,10 @@ const _ensembleLabels = {
   'all13_weighted': 'All members weighted by individual excess Sharpe',
 };
 function _ensembleSparkline(eq, _unused) {
-  if (!eq) return '<span style="color:#484f58;font-size:0.75em">â€”</span>';
+  if (!eq) return '<span style="color:#484f58;font-size:0.75em">—</span>';
   // Support both new schema (strategy_dollars) and old schema (strategy_pct)
   const v = eq.strategy_dollars || eq.strategy_pct;
-  if (!v || !v.length) return '<span style="color:#484f58;font-size:0.75em">â€”</span>';
+  if (!v || !v.length) return '<span style="color:#484f58;font-size:0.75em">—</span>';
   const W = 80, H = 22;
   const lo = Math.min(...v), hi = Math.max(...v);
   const range = hi - lo || 1;
@@ -478,8 +478,8 @@ async function loadEnsembleSummary() {
     _ensembleData = await r.json();
     document.getElementById('oos-ensemble-section').style.display = '';
     document.getElementById('oos-ensemble-summary').innerHTML =
-      `<b>${_ensembleData.n_members}</b> BH-beater members Â· <b>${_ensembleData.n_common_dates}</b> common OOS dates Â· ` +
-      `${_ensembleData.oos_window?.start} â†’ ${_ensembleData.oos_window?.end} Â· ` +
+      `<b>${_ensembleData.n_members}</b> BH-beater members · <b>${_ensembleData.n_common_dates}</b> common OOS dates · ` +
+      `${_ensembleData.oos_window?.start} → ${_ensembleData.oos_window?.end} · ` +
       `${Object.keys(_ensembleData.strategies || {}).length} strategies tested.`;
     drawEnsembleTable();
   } catch(e) { console.error('ensemble load failed', e); }
@@ -487,8 +487,8 @@ async function loadEnsembleSummary() {
 function drawEnsembleTable() {
   if (!_ensembleData || !_ensembleData.strategies) return;
   const sharpeColor = (v) => v == null || isNaN(v) ? '#8b949e' : (v > 1.5 ? '#3fb950' : v > 0 ? '#58a6ff' : '#f85149');
-  const fmt = (v, d=3) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(d);
-  const fmtPct = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
+  const fmt = (v, d=3) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(d);
+  const fmtPct = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
   const rows = Object.entries(_ensembleData.strategies).map(([k, s]) => ({strategy: k, ...s}));
   const sk = _ensembleSort.key, sdir = _ensembleSort.dir;
   rows.sort((a, b) => {
@@ -512,7 +512,7 @@ function drawEnsembleTable() {
     if (th.dataset.esort === sk) {
       const arrow = document.createElement('span');
       arrow.className = 'esort-arrow';
-      arrow.textContent = sdir === 'asc' ? ' â–²' : ' â–¼';
+      arrow.textContent = sdir === 'asc' ? ' ▲' : ' ▼';
       arrow.style.fontSize = '0.7em';
       th.appendChild(arrow);
     }
@@ -527,21 +527,21 @@ function drawEnsembleTable() {
     row.title = `Click to load ${r.strategy} details into the OOS Live-Data Inference panel above`;
     row.onclick = () => loadEnsembleDetails(r.strategy);
     const csvLink = r.csv ?
-      `<a href="${r.csv}" download onclick="event.stopPropagation()" style="background:#fbbf24;color:#0d1117;text-decoration:none;padding:2px 8px;border-radius:3px;font-size:0.78em;font-weight:600">ðŸ“Š CSV</a>` :
-      '<span style="color:#484f58">â€”</span>';
+      `<a href="${r.csv}" download onclick="event.stopPropagation()" style="background:#fbbf24;color:#0d1117;text-decoration:none;padding:2px 8px;border-radius:3px;font-size:0.78em;font-weight:600">📊 CSV</a>` :
+      '<span style="color:#484f58">—</span>';
     // Compute fallback final dollars if not in JSON (legacy data)
     const finalD = r.final_dollars_on_1000 != null ? r.final_dollars_on_1000
                   : (r.strategy_total_return_pct != null ? 1000 * Math.exp(r.strategy_total_return_pct/100) : null);
     const excessD = r.excess_dollars != null ? r.excess_dollars
                    : (r.final_dollars_on_1000 != null && r.final_dollars_bh != null ? r.final_dollars_on_1000 - r.final_dollars_bh : null);
-    const fmtD = (v) => v == null || isNaN(v) ? 'â€”' : '$' + Number(v).toFixed(2);
-    const fmtDsigned = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '$+' : '$') + Number(v).toFixed(2);
+    const fmtD = (v) => v == null || isNaN(v) ? '—' : '$' + Number(v).toFixed(2);
+    const fmtDsigned = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '$+' : '$') + Number(v).toFixed(2);
     const dColor = (v) => v == null || isNaN(v) ? '#8b949e' : (v > 1100 ? '#3fb950' : v > 1000 ? '#58a6ff' : '#f85149');
     row.innerHTML = `
       <td>${i+1}</td>
-      <td style="font-weight:600;color:${isBest ? '#fbbf24' : '#e6edf3'};font-size:0.82em">${r.strategy}${isBest ? ' â­' : ''}</td>
-      <td style="color:#8b949e;font-size:0.75em">${r.sizing_mode||'â€”'}</td>
-      <td style="color:#8b949e;font-size:0.75em">${r.overlay||'â€”'}</td>
+      <td style="font-weight:600;color:${isBest ? '#fbbf24' : '#e6edf3'};font-size:0.82em">${r.strategy}${isBest ? ' ⭐' : ''}</td>
+      <td style="color:#8b949e;font-size:0.75em">${r.sizing_mode||'—'}</td>
+      <td style="color:#8b949e;font-size:0.75em">${r.overlay||'—'}</td>
       <td style="color:${dColor(finalD)};font-weight:700;font-size:0.95em">${fmtD(finalD)}</td>
       <td style="color:${sharpeColor(excessD ? excessD/100 : 0)};font-weight:600">${fmtDsigned(excessD)}</td>
       <td style="color:${sharpeColor(r.strategy_annual_sharpe)};font-weight:600">${fmt(r.strategy_annual_sharpe)}</td>
@@ -549,10 +549,10 @@ function drawEnsembleTable() {
       <td style="color:${sharpeColor(r.excess_sharpe)};font-weight:600">${fmt(r.excess_sharpe)}</td>
       <td>${fmt(r.annual_sortino)}</td>
       <td style="color:${sharpeColor(r.compound_return_pct ? r.compound_return_pct/10 : (r.strategy_total_return_pct ? r.strategy_total_return_pct/10 : 0))}">${fmtPct(r.compound_return_pct != null ? r.compound_return_pct : r.strategy_total_return_pct)}</td>
-      <td style="color:#fbbf24;font-weight:700;font-size:0.95em">${r.hit_rate_pct == null ? 'â€”' : Number(r.hit_rate_pct).toFixed(1) + '%'}</td>
-      <td style="color:#8b949e;font-size:0.85em" title="Days with non-zero position">${r.n_traded_days == null ? 'â€”' : r.n_traded_days}</td>
+      <td style="color:#fbbf24;font-weight:700;font-size:0.95em">${r.hit_rate_pct == null ? '—' : Number(r.hit_rate_pct).toFixed(1) + '%'}</td>
+      <td style="color:#8b949e;font-size:0.85em" title="Days with non-zero position">${r.n_traded_days == null ? '—' : r.n_traded_days}</td>
       <td>${r.exposure_pct == null ? '100%' : Number(r.exposure_pct).toFixed(0) + '%'}</td>
-      <td>${r.psr == null ? 'â€”' : Number(r.psr).toFixed(3)}</td>
+      <td>${r.psr == null ? '—' : Number(r.psr).toFixed(3)}</td>
       <td style="color:#f85149;font-weight:600">${fmtPct(r.max_drawdown_pct)}</td>
       <td>${_ensembleSparkline(r.equity_curve, true)}</td>
       <td>${csvLink}</td>
@@ -575,10 +575,10 @@ function loadEnsembleDetails(strategyName) {
   const sec = document.getElementById('oos-section');
   if (sec) { sec.style.display = ''; sec.scrollIntoView({behavior:'smooth', block:'start'}); }
   const sharpeColor = (v) => v == null || isNaN(v) ? '#8b949e' : (v > 1.5 ? '#3fb950' : v > 0 ? '#58a6ff' : '#f85149');
-  const fmt = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(2);
-  const fmt4 = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(4);
-  const titleEl = document.getElementById('oos-title'); if (titleEl) titleEl.textContent = `ðŸŽ¯ OOS Deep Ensemble â€” strategy "${strategyName}"`;
-  const subEl = document.getElementById('oos-subtitle'); if (subEl) subEl.textContent = `${_ensembleLabels[strategyName] || ''} â€” ${s.n_predictions} predictions, ${s.n_with_actuals} with realised actuals. ${_ensembleData.n_members} members Â· ${_ensembleData.n_common_dates} common dates.`;
+  const fmt = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2);
+  const fmt4 = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(4);
+  const titleEl = document.getElementById('oos-title'); if (titleEl) titleEl.textContent = `🎯 OOS Deep Ensemble — strategy "${strategyName}"`;
+  const subEl = document.getElementById('oos-subtitle'); if (subEl) subEl.textContent = `${_ensembleLabels[strategyName] || ''} — ${s.n_predictions} predictions, ${s.n_with_actuals} with realised actuals. ${_ensembleData.n_members} members · ${_ensembleData.n_common_dates} common dates.`;
   const cardsEl = document.getElementById('oos-cards'); if (cardsEl) cardsEl.innerHTML = `
     <div class="card"><div class="label">Strategy Sharpe</div><div class="value" style="color:${sharpeColor(s.strategy_annual_sharpe)}">${fmt4(s.strategy_annual_sharpe)}</div></div>
     <div class="card"><div class="label">Buy-Hold Sharpe</div><div class="value" style="color:${sharpeColor(s.buy_hold_annual_sharpe)}">${fmt4(s.buy_hold_annual_sharpe)}</div></div>
@@ -586,15 +586,15 @@ function loadEnsembleDetails(strategyName) {
     <div class="card"><div class="label">Strategy Return</div><div class="value" style="color:${sharpeColor(s.strategy_total_return_pct)}">${fmt(s.strategy_total_return_pct)}%</div></div>
     <div class="card"><div class="label">Buy-Hold Return</div><div class="value" style="color:${sharpeColor(s.buy_hold_total_return_pct)}">${fmt(s.buy_hold_total_return_pct)}%</div></div>
     <div class="card"><div class="label">Excess Return</div><div class="value" style="color:${sharpeColor(s.excess_return_pct)}">${fmt(s.excess_return_pct)}%</div></div>
-    <div class="card"><div class="label">Hit Rate</div><div class="value">${s.hit_rate_pct == null ? 'â€”' : Number(s.hit_rate_pct).toFixed(1)+'%'}</div></div>
-    <div class="card"><div class="label">PSR</div><div class="value">${s.psr == null ? 'â€”' : Number(s.psr).toFixed(3)}</div></div>
+    <div class="card"><div class="label">Hit Rate</div><div class="value">${s.hit_rate_pct == null ? '—' : Number(s.hit_rate_pct).toFixed(1)+'%'}</div></div>
+    <div class="card"><div class="label">PSR</div><div class="value">${s.psr == null ? '—' : Number(s.psr).toFixed(3)}</div></div>
     <div class="card"><div class="label">Max Drawdown</div><div class="value" style="color:#f85149">${fmt(s.max_drawdown_pct)}%</div></div>`;
   const winEl = document.getElementById('oos-winner'); if (winEl) {
     const membersHtml = (_ensembleData.members || []).map(m =>
       `<div style="font-size:0.82em">exp ${m.experiment_num} ${m.backbone} seed=${m.seed} indv-Sharpe ${m.individual_oos_sharpe?.toFixed(2)} excess ${m.individual_excess_sharpe?.toFixed(2)} weight ${m.ensemble_weight?.toFixed(3)}</div>`).join('');
     winEl.innerHTML = `<div style="font-weight:600;color:#fbbf24;margin-bottom:6px">Ensemble Strategy: ${strategyName}</div><div><b>Description:</b> ${_ensembleLabels[strategyName] || ''}</div><div><b>Method:</b> Lakshminarayanan, Pritzel &amp; Blundell 2017 NeurIPS arXiv:1612.01474</div><div><b>Members (${_ensembleData.n_members}):</b></div><div style="max-height:140px;overflow-y:auto;background:#0d1117;border:1px solid #30363d;border-radius:4px;padding:6px;margin-top:4px">${membersHtml}</div>`;
   }
-  const methEl = document.getElementById('oos-methodology'); if (methEl) methEl.innerHTML = `<div style="font-weight:600;color:#fbbf24;margin-bottom:6px">Ensemble Methodology</div><div><b>OOS window:</b> ${_ensembleData.oos_window?.start} â†’ ${_ensembleData.oos_window?.end}</div><div><b>Predictions:</b> ${s.n_predictions} (${s.n_with_actuals} with realised actuals)</div><div><b>Aggregation:</b> ${strategyName.includes('vote') ? 'majority vote' : strategyName.includes('weighted') ? 'weighted by individual excess Sharpe' : 'unweighted mean'}</div><div><b>Inference only:</b> read pre-computed predictions from <code>oos_exp&lt;N&gt;_prod.csv</code></div><div style="margin-top:6px"><a href="${s.csv}" download style="background:#fbbf24;color:#0d1117;text-decoration:none;padding:4px 10px;border-radius:4px;font-weight:600">ðŸ“¥ Download ${strategyName}.csv</a></div>`;
+  const methEl = document.getElementById('oos-methodology'); if (methEl) methEl.innerHTML = `<div style="font-weight:600;color:#fbbf24;margin-bottom:6px">Ensemble Methodology</div><div><b>OOS window:</b> ${_ensembleData.oos_window?.start} → ${_ensembleData.oos_window?.end}</div><div><b>Predictions:</b> ${s.n_predictions} (${s.n_with_actuals} with realised actuals)</div><div><b>Aggregation:</b> ${strategyName.includes('vote') ? 'majority vote' : strategyName.includes('weighted') ? 'weighted by individual excess Sharpe' : 'unweighted mean'}</div><div><b>Inference only:</b> read pre-computed predictions from <code>oos_exp&lt;N&gt;_prod.csv</code></div><div style="margin-top:6px"><a href="${s.csv}" download style="background:#fbbf24;color:#0d1117;text-decoration:none;padding:4px 10px;border-radius:4px;font-weight:600">📥 Download ${strategyName}.csv</a></div>`;
   const eq = s.equity_curve;
   const chartEl = document.getElementById('oos-chart');
   if (chartEl && eq && eq.dates && eq.dates.length > 0) {
@@ -606,7 +606,7 @@ function loadEnsembleDetails(strategyName) {
     const x = (i) => M.l + (i / (eq.dates.length - 1)) * innerW;
     const y = (v) => M.t + innerH - ((v - (yMin - yPad)) / ((yMax + yPad) - (yMin - yPad))) * innerH;
     const path = (vals, color) => `<polyline fill="none" stroke="${color}" stroke-width="2" points="${vals.map((v,i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}"/>`;
-    chartEl.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;max-width:100%"><line x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.t + innerH}" stroke="#30363d"/><line x1="${M.l}" y1="${M.t + innerH}" x2="${M.l + innerW}" y2="${M.t + innerH}" stroke="#30363d"/><line x1="${M.l}" y1="${y(0)}" x2="${M.l + innerW}" y2="${y(0)}" stroke="#484f58" stroke-dasharray="2,3"/><text x="${M.l}" y="${M.t + innerH + 18}" fill="#8b949e" font-size="11">${eq.dates[0]}</text><text x="${M.l + innerW}" y="${M.t + innerH + 18}" fill="#8b949e" font-size="11" text-anchor="end">${eq.dates[eq.dates.length - 1]}</text>${path(eq.buy_hold_pct, '#8b949e')}${path(eq.strategy_pct, '#fbbf24')}<text x="${M.l + 10}" y="${M.t + 14}" fill="#fbbf24" font-size="12" font-weight="600">â€” Ensemble (${strategyName})</text><text x="${M.l + 200}" y="${M.t + 14}" fill="#8b949e" font-size="12">â€” Buy &amp; Hold</text></svg>`
+    chartEl.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;max-width:100%"><line x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.t + innerH}" stroke="#30363d"/><line x1="${M.l}" y1="${M.t + innerH}" x2="${M.l + innerW}" y2="${M.t + innerH}" stroke="#30363d"/><line x1="${M.l}" y1="${y(0)}" x2="${M.l + innerW}" y2="${y(0)}" stroke="#484f58" stroke-dasharray="2,3"/><text x="${M.l}" y="${M.t + innerH + 18}" fill="#8b949e" font-size="11">${eq.dates[0]}</text><text x="${M.l + innerW}" y="${M.t + innerH + 18}" fill="#8b949e" font-size="11" text-anchor="end">${eq.dates[eq.dates.length - 1]}</text>${path(eq.buy_hold_pct, '#8b949e')}${path(eq.strategy_pct, '#fbbf24')}<text x="${M.l + 10}" y="${M.t + 14}" fill="#fbbf24" font-size="12" font-weight="600">— Ensemble (${strategyName})</text><text x="${M.l + 200}" y="${M.t + 14}" fill="#8b949e" font-size="12">— Buy &amp; Hold</text></svg>`
       + (window.buildTradingDetailsHTML ? window.buildTradingDetailsHTML({...s, strategy: strategyName, n_members: _ensembleData.n_members}, 'ensemble') : '')
       + (window.buildSmartVariantsHTML ? window.buildSmartVariantsHTML('ensemble_' + strategyName, 'Ensemble Strategy') : '');
   }
@@ -615,11 +615,11 @@ loadEnsembleSummary();
 setInterval(loadEnsembleSummary, 60000);
 </script>
 
-<!-- Smart Trading Strategies panel â€” overlays + options-stock hedging on individual + ensemble OOS -->
+<!-- Smart Trading Strategies panel — overlays + options-stock hedging on individual + ensemble OOS -->
 <div id="oos-smart-section" style="background:#1a0d1f;border:2px solid #c779dd;border-radius:8px;padding:18px;margin:12px 0;display:none">
-  <h3 style="color:#c779dd;font-size:1.15em;margin-bottom:6px">ðŸ›¡ Smart Trading Strategies â€” Overlays &amp; Options-Stock Hedging</h3>
+  <h3 style="color:#c779dd;font-size:1.15em;margin-bottom:6px">🛡 Smart Trading Strategies — Overlays &amp; Options-Stock Hedging</h3>
   <div style="color:#8b949e;font-size:0.85em;margin-bottom:10px">
-    Smart execution overlays (hold-until-flip / dead-zone / vol-regime gate / SMA-200 / Kelly / vol-target / confidence-weighted) AND options-stock hedging strategies (covered-call / protective-put / collar / cash-secured-put / vertical-call-spread / synthetic-long) applied to individual OOS-completed models AND ensemble strategies. Uses <b>REAL QQQ closing prices + REAL VIX</b> from yfinance â€” no fake price series. Options pricing via Black-Scholes (theoretical; no historical chain data freely available â€” see Whaley 2002).
+    Smart execution overlays (hold-until-flip / dead-zone / vol-regime gate / SMA-200 / Kelly / vol-target / confidence-weighted) AND options-stock hedging strategies (covered-call / protective-put / collar / cash-secured-put / vertical-call-spread / synthetic-long) applied to individual OOS-completed models AND ensemble strategies. Uses <b>REAL QQQ closing prices + REAL VIX</b> from yfinance — no fake price series. Options pricing via Black-Scholes (theoretical; no historical chain data freely available — see Whaley 2002).
   </div>
   <div id="oos-smart-summary" style="color:#8b949e;font-size:0.85em;margin-bottom:10px"></div>
   <div id="oos-smart-detail" style="display:none;background:#0d1117;border:1px solid #c779dd;border-radius:6px;padding:14px;margin-bottom:14px"></div>
@@ -632,12 +632,12 @@ setInterval(loadEnsembleSummary, 60000);
           <th data-ssort="overlay_or_hedging" style="cursor:pointer">Strategy</th>
           <th data-ssort="category" style="cursor:pointer" title="S = Smart overlay (no options); H = Hedging (options + stock)">Cat</th>
           <th data-ssort="final_dollars_on_1000" style="cursor:pointer" title="Compounded $ on $1000">$Final/$1k</th>
-          <th data-ssort="excess_dollars" style="cursor:pointer" title="$Final âˆ’ BH $Final">$Excess</th>
+          <th data-ssort="excess_dollars" style="cursor:pointer" title="$Final − BH $Final">$Excess</th>
           <th data-ssort="annual_sharpe" style="cursor:pointer">Sharpe</th>
           <th data-ssort="excess_sharpe" style="cursor:pointer">Excess Shp</th>
           <th data-ssort="annual_sortino" style="cursor:pointer">Sortino</th>
           <th data-ssort="compound_return_pct" style="cursor:pointer">Ret%</th>
-          <th data-ssort="hit_rate_pct" style="cursor:pointer;color:#fbbf24" title="DEFAULT SORT â€” direction-prediction accuracy on traded days. CLAUDE.md Directive 65 (2026-05-06): hit rate is the SOLE winner metric.">Hit% â˜…</th>
+          <th data-ssort="hit_rate_pct" style="cursor:pointer;color:#fbbf24" title="DEFAULT SORT — direction-prediction accuracy on traded days. CLAUDE.md Directive 65 (2026-05-06): hit rate is the SOLE winner metric.">Hit% ★</th>
           <th data-ssort="n_traded_days" style="cursor:pointer" title="Number of days the strategy actually placed a trade. Hit% over 5 trade days is noise; over 80 trade days is signal.">Days Traded</th>
           <th data-ssort="exposure_pct" style="cursor:pointer">Exp%</th>
           <th data-ssort="psr" style="cursor:pointer">PSR</th>
@@ -646,11 +646,11 @@ setInterval(loadEnsembleSummary, 60000);
           <th title="Per-strategy daily P&amp;L CSV download">CSV</th>
         </tr>
       </thead>
-      <tbody id="oos-smart-tbody"><tr><td colspan="17" style="color:#8b949e;padding:14px">No <code>oos_smart_strategies_summary.json</code> yet â€” run <code>python -m autoresearchspy._build_spy_smart_strategies</code> after running OOS top-30.</td></tr></tbody>
+      <tbody id="oos-smart-tbody"><tr><td colspan="17" style="color:#8b949e;padding:14px">No <code>oos_smart_strategies_summary.json</code> yet — run <code>python -m autoresearchspy._build_spy_smart_strategies</code> after running OOS top-30.</td></tr></tbody>
     </table>
   </div>
   <div style="color:#8b949e;font-size:0.78em;margin-top:8px">
-    <b>Click a column header to sort.</b> Default sort is <b style="color:#fbbf24">Hit% â˜…</b> descending â€” per CLAUDE.md Directive 65 (2026-05-06), hit rate is the SOLE winner metric (robust to small-sample Sharpe inflation; isolates pure directional skill). <b>Days Traded</b> contextualises hit rate: 60% on 5 days is noise, 60% on 80 days is signal. <b>Cat S</b> = Smart overlay (no options) | <b>Cat H</b> = Hedging (options + stock with theoretical Black-Scholes pricing using real VIX as IV proxy).
+    <b>Click a column header to sort.</b> Default sort is <b style="color:#fbbf24">Hit% ★</b> descending — per CLAUDE.md Directive 65 (2026-05-06), hit rate is the SOLE winner metric (robust to small-sample Sharpe inflation; isolates pure directional skill). <b>Days Traded</b> contextualises hit rate: 60% on 5 days is noise, 60% on 80 days is signal. <b>Cat S</b> = Smart overlay (no options) | <b>Cat H</b> = Hedging (options + stock with theoretical Black-Scholes pricing using real VIX as IV proxy).
     Strategies marked with overlay names like <code>protective_put</code>, <code>covered_call</code>, etc. are applied per-day to the underlying signal source (individual model or ensemble).
   </div>
 </div>
@@ -668,19 +668,19 @@ async function loadSmartStrategies() {
     if (typeof window._fillOOSHitCard === 'function') window._fillOOSHitCard();
     document.getElementById('oos-smart-section').style.display = '';
     document.getElementById('oos-smart-summary').innerHTML =
-      `<b>${_smartData.n_strategies}</b> strategies (${_smartData.individual_models_count} individual models Ã— ${Object.keys(_smartData.overlay_legend || {}).length} overlays + ${_smartData.ensemble_strategies_count} ensembles) Â· ` +
-      `OOS ${_smartData.oos_window?.start} â†’ ${_smartData.oos_window?.end} Â· ` +
-      `Real data: ${_smartData.real_data_sources?.qqq_prices?.split('â€”')[0] || 'QQQ+VXN yfinance'}`;
+      `<b>${_smartData.n_strategies}</b> strategies (${_smartData.individual_models_count} individual models × ${Object.keys(_smartData.overlay_legend || {}).length} overlays + ${_smartData.ensemble_strategies_count} ensembles) · ` +
+      `OOS ${_smartData.oos_window?.start} → ${_smartData.oos_window?.end} · ` +
+      `Real data: ${_smartData.real_data_sources?.qqq_prices?.split('—')[0] || 'QQQ+VXN yfinance'}`;
     drawSmartTable();
   } catch (e) { console.error('smart strategies load failed', e); }
 }
 function drawSmartTable() {
   if (!_smartData || !_smartData.strategies) return;
   const sharpeColor = (v) => v == null || isNaN(v) ? '#8b949e' : (v > 1.5 ? '#3fb950' : v > 0 ? '#58a6ff' : '#f85149');
-  const fmt = (v, d=3) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(d);
-  const fmtPct = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
-  const fmtD = (v) => v == null || isNaN(v) ? 'â€”' : '$' + Number(v).toFixed(2);
-  const fmtDsigned = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '$+' : '$') + Number(v).toFixed(2);
+  const fmt = (v, d=3) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(d);
+  const fmtPct = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
+  const fmtD = (v) => v == null || isNaN(v) ? '—' : '$' + Number(v).toFixed(2);
+  const fmtDsigned = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '$+' : '$') + Number(v).toFixed(2);
   const dColor = (v) => v == null || isNaN(v) ? '#8b949e' : (v > 1100 ? '#3fb950' : v > 1000 ? '#58a6ff' : '#f85149');
 
   const rows = Object.values(_smartData.strategies).map(r => ({
@@ -709,7 +709,7 @@ function drawSmartTable() {
     if (th.dataset.ssort === sk) {
       const arrow = document.createElement('span');
       arrow.className = 'ssort-arrow';
-      arrow.textContent = sdir === 'asc' ? ' â–²' : ' â–¼';
+      arrow.textContent = sdir === 'asc' ? ' ▲' : ' ▼';
       arrow.style.fontSize = '0.7em';
       th.appendChild(arrow);
     }
@@ -727,7 +727,7 @@ function drawSmartTable() {
     tr.innerHTML = `
       <td>${i + 1}</td>
       <td style="font-size:0.8em;color:#e6edf3">${r.signal_source_short}</td>
-      <td style="font-size:0.8em;color:#c779dd">${r.overlay_or_hedging}${isBest ? ' â­' : ''}</td>
+      <td style="font-size:0.8em;color:#c779dd">${r.overlay_or_hedging}${isBest ? ' ⭐' : ''}</td>
       <td style="text-align:center;color:${r.category === 'H' ? '#fbbf24' : '#58a6ff'};font-weight:600">${r.category || '?'}</td>
       <td style="color:${dColor(r.final_dollars_on_1000)};font-weight:700;font-size:0.95em">${fmtD(r.final_dollars_on_1000)}</td>
       <td style="color:${(r.excess_dollars||0)>0?'#3fb950':'#f85149'};font-weight:600">${fmtDsigned(r.excess_dollars)}</td>
@@ -735,13 +735,13 @@ function drawSmartTable() {
       <td style="color:${sharpeColor(r.excess_sharpe)}">${fmt(r.excess_sharpe)}</td>
       <td>${fmt(r.annual_sortino)}</td>
       <td style="color:${sharpeColor((r.compound_return_pct||0)/10)}">${fmtPct(r.compound_return_pct)}</td>
-      <td style="color:#fbbf24;font-weight:700;font-size:0.95em">${r.hit_rate_pct == null ? 'â€”' : Number(r.hit_rate_pct).toFixed(1) + '%'}</td>
-      <td style="color:#8b949e;font-size:0.85em" title="Days with non-zero position">${r.n_traded_days == null ? 'â€”' : r.n_traded_days}</td>
-      <td>${r.exposure_pct == null ? 'â€”' : Number(r.exposure_pct).toFixed(0) + '%'}</td>
-      <td>${r.psr == null ? 'â€”' : Number(r.psr).toFixed(3)}</td>
+      <td style="color:#fbbf24;font-weight:700;font-size:0.95em">${r.hit_rate_pct == null ? '—' : Number(r.hit_rate_pct).toFixed(1) + '%'}</td>
+      <td style="color:#8b949e;font-size:0.85em" title="Days with non-zero position">${r.n_traded_days == null ? '—' : r.n_traded_days}</td>
+      <td>${r.exposure_pct == null ? '—' : Number(r.exposure_pct).toFixed(0) + '%'}</td>
+      <td>${r.psr == null ? '—' : Number(r.psr).toFixed(3)}</td>
       <td style="color:#f85149;font-weight:600">${fmtPct(r.max_drawdown_pct)}</td>
       <td>${_ensembleSparkline(r.equity_curve, true)}</td>
-      <td>${r.csv ? `<a href="${r.csv}" download onclick="event.stopPropagation()" style="background:#c779dd;color:#0d1117;text-decoration:none;padding:2px 8px;border-radius:3px;font-size:0.78em;font-weight:600">ðŸ“Š CSV</a>` : '<span style="color:#484f58">â€”</span>'}</td>
+      <td>${r.csv ? `<a href="${r.csv}" download onclick="event.stopPropagation()" style="background:#c779dd;color:#0d1117;text-decoration:none;padding:2px 8px;border-radius:3px;font-size:0.78em;font-weight:600">📊 CSV</a>` : '<span style="color:#484f58">—</span>'}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -767,7 +767,7 @@ function getEnsembleChampion() {
   return all.reduce((a, c) => (a.hit_rate_pct > c.hit_rate_pct ? a : c));
 }
 
-// Inline detail card for smart-strategy click (CLAUDE.md Directive 65 â€” show hit rate prominently)
+// Inline detail card for smart-strategy click (CLAUDE.md Directive 65 — show hit rate prominently)
 function loadSmartDetails(name) {
   if (!_smartData || !_smartData.strategies || !_smartData.strategies[name]) return;
   const s = _smartData.strategies[name];
@@ -775,18 +775,18 @@ function loadSmartDetails(name) {
   if (!detailEl) return;
   const sharpeColor = (v) => v == null || isNaN(v) ? '#8b949e' : (v > 1.5 ? '#3fb950' : v > 0 ? '#58a6ff' : '#f85149');
   const dColor = (v) => v == null || isNaN(v) ? '#8b949e' : (v > 1100 ? '#3fb950' : v > 1000 ? '#58a6ff' : '#f85149');
-  const fmt = (v, d=3) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(d);
-  const fmtPct = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
-  const fmtD = (v) => v == null || isNaN(v) ? 'â€”' : '$' + Number(v).toFixed(2);
-  const fmtDsigned = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '$+' : '$') + Number(v).toFixed(2);
+  const fmt = (v, d=3) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(d);
+  const fmtPct = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
+  const fmtD = (v) => v == null || isNaN(v) ? '—' : '$' + Number(v).toFixed(2);
+  const fmtDsigned = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '$+' : '$') + Number(v).toFixed(2);
 
-  // Cards row â€” lead with Hit Rate (Directive 65) + n_traded_days context
+  // Cards row — lead with Hit Rate (Directive 65) + n_traded_days context
   const overlay = (name.split('__').slice(1).join('__') || '(raw)');
   const cards = `
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px">
       <div class="card" style="border:2px solid #fbbf24;background:linear-gradient(135deg,#1a1a0a,#161b22)">
-        <div class="label" style="color:#fbbf24;font-weight:700">ðŸŽ¯ Hit Rate â˜…</div>
-        <div class="value" style="color:#fbbf24;font-size:1.4em;font-weight:700">${s.hit_rate_pct == null ? 'â€”' : Number(s.hit_rate_pct).toFixed(2)+'%'}</div>
+        <div class="label" style="color:#fbbf24;font-weight:700">🎯 Hit Rate ★</div>
+        <div class="value" style="color:#fbbf24;font-size:1.4em;font-weight:700">${s.hit_rate_pct == null ? '—' : Number(s.hit_rate_pct).toFixed(2)+'%'}</div>
         <div style="color:#8b949e;font-size:0.7em">${s.n_traded_days||0} trade-days</div>
       </div>
       <div class="card"><div class="label">$Final/$1k</div><div class="value" style="color:${dColor(s.final_dollars_on_1000)};font-weight:700">${fmtD(s.final_dollars_on_1000)}</div></div>
@@ -795,9 +795,9 @@ function loadSmartDetails(name) {
       <div class="card"><div class="label">Excess Sharpe</div><div class="value" style="color:${sharpeColor(s.excess_sharpe)}">${fmt(s.excess_sharpe)}</div></div>
       <div class="card"><div class="label">Sortino</div><div class="value">${fmt(s.annual_sortino)}</div></div>
       <div class="card"><div class="label">Return %</div><div class="value">${fmtPct(s.compound_return_pct)}</div></div>
-      <div class="card"><div class="label">PSR</div><div class="value">${s.psr == null ? 'â€”' : Number(s.psr).toFixed(3)}</div></div>
+      <div class="card"><div class="label">PSR</div><div class="value">${s.psr == null ? '—' : Number(s.psr).toFixed(3)}</div></div>
       <div class="card"><div class="label">Max DD</div><div class="value" style="color:#f85149">${fmtPct(s.max_drawdown_pct)}</div></div>
-      <div class="card"><div class="label">Exposure</div><div class="value">${s.exposure_pct == null ? 'â€”' : Number(s.exposure_pct).toFixed(0)+'%'}</div></div>
+      <div class="card"><div class="label">Exposure</div><div class="value">${s.exposure_pct == null ? '—' : Number(s.exposure_pct).toFixed(0)+'%'}</div></div>
     </div>`;
 
   // Header + close button
@@ -805,9 +805,9 @@ function loadSmartDetails(name) {
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div>
         <div style="font-weight:700;color:#c779dd;font-size:1.05em">${name}</div>
-        <div style="color:#8b949e;font-size:0.85em">Source: <b>${s.signal_source}</b> Â· Overlay/Hedge: <b>${overlay}</b> Â· Category <b>${s.category||'?'}</b> Â· ${s.description||''}</div>
+        <div style="color:#8b949e;font-size:0.85em">Source: <b>${s.signal_source}</b> · Overlay/Hedge: <b>${overlay}</b> · Category <b>${s.category||'?'}</b> · ${s.description||''}</div>
       </div>
-      <button onclick="document.getElementById('oos-smart-detail').style.display='none'" style="background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:4px;padding:4px 12px;cursor:pointer">âœ• Close</button>
+      <button onclick="document.getElementById('oos-smart-detail').style.display='none'" style="background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:4px;padding:4px 12px;cursor:pointer">✕ Close</button>
     </div>`;
 
   // Equity-curve 2-line chart (strategy vs buy-and-hold)
@@ -816,7 +816,7 @@ function loadSmartDetails(name) {
   if (eq && eq.dates && eq.dates.length > 0) {
     const sd = eq.strategy_dollars || [];
     const bh = eq.buy_hold_dollars || [];
-    // Optional ensemble benchmark line (3rd line) â€” aligned to strategy's dates
+    // Optional ensemble benchmark line (3rd line) — aligned to strategy's dates
     const ensCh = getEnsembleChampion();
     let ensSeries = null, ensName = null;
     if (ensCh && ensCh.equity_curve && ensCh.name !== name) {
@@ -850,14 +850,14 @@ function loadSmartDetails(name) {
       ${path(bh, '#8b949e', 1.5)}
       ${ensSeries ? path(ensSeries, '#fbbf24', 1.8) : ''}
       ${path(sd, '#c779dd', 2.2)}
-      <text x="${M.l+10}" y="${M.t-8}" fill="#c779dd" font-size="12" font-weight="600">â€” Strategy ($${(sd[sd.length-1]||1000).toFixed(2)})</text>
-      <text x="${M.l+240}" y="${M.t-8}" fill="#8b949e" font-size="12">â€” Buy &amp; Hold ($${(bh[bh.length-1]||1000).toFixed(2)})</text>
-      ${ensSeries ? `<text x="${M.l+440}" y="${M.t-8}" fill="#fbbf24" font-size="12">â€” Ensemble champion (${ensName.length>30?ensName.slice(0,28)+'â€¦':ensName}, $${ensLast.toFixed(2)})</text>` : ''}
+      <text x="${M.l+10}" y="${M.t-8}" fill="#c779dd" font-size="12" font-weight="600">— Strategy ($${(sd[sd.length-1]||1000).toFixed(2)})</text>
+      <text x="${M.l+240}" y="${M.t-8}" fill="#8b949e" font-size="12">— Buy &amp; Hold ($${(bh[bh.length-1]||1000).toFixed(2)})</text>
+      ${ensSeries ? `<text x="${M.l+440}" y="${M.t-8}" fill="#fbbf24" font-size="12">— Ensemble champion (${ensName.length>30?ensName.slice(0,28)+'…':ensName}, $${ensLast.toFixed(2)})</text>` : ''}
     </svg>`;
   }
 
   // CSV download + sibling-variants table (cross-link to other overlays of same signal source)
-  const csvBtn = s.csv ? `<a href="${s.csv}" download style="background:#c779dd;color:#0d1117;text-decoration:none;padding:6px 14px;border-radius:4px;font-weight:600">ðŸ“¥ Download ${name}.csv (16-col schema)</a>` : '';
+  const csvBtn = s.csv ? `<a href="${s.csv}" download style="background:#c779dd;color:#0d1117;text-decoration:none;padding:6px 14px;border-radius:4px;font-weight:600">📥 Download ${name}.csv (16-col schema)</a>` : '';
   const variantsHTML = (window.buildSmartVariantsHTML ? window.buildSmartVariantsHTML(s.signal_source, 'Other overlays on same signal source') : '');
 
   detailEl.innerHTML = header + cards + chartHTML
@@ -874,7 +874,7 @@ setInterval(loadSmartStrategies, 60000);
 
 <div id="oos-section" style="display:none;background:#0d2818;border:2px solid #3fb950;border-radius:8px;padding:18px;margin:12px 0;">
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-    <h2 id="oos-title" style="color:#3fb950;font-size:1.2em">ðŸ›°ï¸ OOS Live-Data Inference (current best_model.pt)</h2>
+    <h2 id="oos-title" style="color:#3fb950;font-size:1.2em">🛰️ OOS Live-Data Inference (current best_model.pt)</h2>
     <span style="color:#8b949e;font-size:0.78em">Auto-refreshes every 30s</span>
   </div>
   <div id="oos-subtitle" style="color:#8b949e;font-size:0.88em;margin:6px 0 16px 0"></div>
@@ -883,13 +883,13 @@ setInterval(loadSmartStrategies, 60000);
     <div id="oos-winner" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px"></div>
     <div id="oos-methodology" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px"></div>
   </div>
-  <div style="font-weight:600;color:#58a6ff;font-size:0.9em;margin-bottom:6px">Equity Curve â€” Strategy vs Buy-and-Hold over the OOS window (winner used for prediction)</div>
+  <div style="font-weight:600;color:#58a6ff;font-size:0.9em;margin-bottom:6px">Equity Curve — Strategy vs Buy-and-Hold over the OOS window (winner used for prediction)</div>
   <div id="oos-chart" style="overflow-x:auto"></div>
 </div>
 
-<!-- Top-30 OOS table â€” separate sub-panel under the OOS umbrella -->
+<!-- Top-30 OOS table — separate sub-panel under the OOS umbrella -->
 <div id="oos-top30-section" style="display:none;background:#0d2818;border:2px solid #3fb950;border-radius:8px;padding:18px;margin:12px 0">
-  <h3 style="color:#3fb950;font-size:1.1em;margin-bottom:6px">ðŸ“‹ OOS Top-30 â€” Per-Winner Inference Results</h3>
+  <h3 style="color:#3fb950;font-size:1.1em;margin-bottom:6px">📋 OOS Top-30 — Per-Winner Inference Results</h3>
   <div id="oos-top30-summary" style="color:#8b949e;font-size:0.85em;margin-bottom:10px"></div>
   <div style="overflow-x:auto;max-height:560px;overflow-y:auto;border:1px solid #30363d;border-radius:6px">
     <table id="oos-top30-table" style="margin-bottom:0;width:100%;font-size:0.82em">
@@ -908,9 +908,9 @@ setInterval(loadSmartStrategies, 60000);
           <th data-osort="oos_strategy_total_return_pct" style="cursor:pointer" title="OOS strategy total return %">OOS Ret%</th>
           <th data-osort="oos_buy_hold_total_return_pct" style="cursor:pointer" title="OOS buy-and-hold total return %">OOS BH-Ret%</th>
           <th data-osort="oos_hit_rate_pct" style="cursor:pointer" title="OOS direction-prediction hit rate">OOS Hit%</th>
-          <th data-osort="oos_psr" style="cursor:pointer" title="Probabilistic Sharpe Ratio (Bailey-LÃ³pez de Prado 2012)">OOS PSR</th>
+          <th data-osort="oos_psr" style="cursor:pointer" title="Probabilistic Sharpe Ratio (Bailey-López de Prado 2012)">OOS PSR</th>
           <th data-osort="oos_max_drawdown_pct" style="cursor:pointer" title="Maximum drawdown of strategy equity curve">OOS MaxDD</th>
-          <th title="Equity curve sparkline â€” click row for full details up top">Equity</th>
+          <th title="Equity curve sparkline — click row for full details up top">Equity</th>
           <th title="Per-experiment OOS predictions CSV">CSV</th>
         </tr>
       </thead>
@@ -1008,7 +1008,7 @@ function renderEnsembleLinks() {
       + 'style="color:#58a6ff;text-decoration:none;font-weight:600;'
       + 'background:#0d1117;border:1px solid #30363d;border-radius:4px;'
       + 'padding:3px 8px;margin-right:6px;font-size:0.8em" '
-      + 'title="' + (e.label || e.name) + ' â€” Sharpe ' + (e.sharpe||'?') + ', ' + (e.rows||'?') + ' daily rows">'
+      + 'title="' + (e.label || e.name) + ' — Sharpe ' + (e.sharpe||'?') + ', ' + (e.rows||'?') + ' daily rows">'
       + '&#128202; ' + (e.label || e.name) + ' CSV (Sharpe '
       + (e.sharpe != null ? (e.sharpe >= 0 ? '+' : '') + Number(e.sharpe).toFixed(4) : '?')
       + ')</a>').join('');
@@ -1210,7 +1210,7 @@ const FOLD_DATES = {
 // Quote-aware split: regime field can contain commas (e.g. fold_7
 // "Inflation bear, AI rally and 2025") and gets emitted by Python csv as
 // double-quoted. Naive .split(',') corrupts column indices for all
-// subsequent fields â†’ broken equity curve at fold 7. Fixed via
+// subsequent fields → broken equity curve at fold 7. Fixed via
 // minimal RFC-4180 splitter handling double-quoted fields with escaped
 // inner quotes ("").
 function splitCSVLine(line) {
@@ -1340,8 +1340,8 @@ async function renderEquityChart(windows, tab, expEntry, rowIdx) {
   }
 
   // Clamp non-positive equity to a small positive floor so log scale stays valid.
-  // QQQ daily strategy with -1.0 cumulative_return â†’ equity=0; without floor
-  // Math.log(0) = -Infinity â†’ frac = NaN â†’ blank chart.
+  // QQQ daily strategy with -1.0 cumulative_return → equity=0; without floor
+  // Math.log(0) = -Infinity → frac = NaN → blank chart.
   const eqFloor = Math.max(1.0, startCapital * 0.01);
   const safePoints = points.map(v => (v && isFinite(v) && v > 0) ? v : eqFloor);
   const maxE = Math.max(...safePoints, startCapital * 1.05);
@@ -1408,7 +1408,7 @@ async function renderEquityChart(windows, tab, expEntry, rowIdx) {
   const stratPts = points.map((v, i) => `${toX(i).toFixed(1)},${toY(v).toFixed(1)}`).join(' ');
   svgHtml += `<polyline points="${stratPts}" fill="none" stroke="#3fb950" stroke-width="2"/>`;
 
-  // Mark fold-END points only (not every daily point â€” keeps chart readable)
+  // Mark fold-END points only (not every daily point — keeps chart readable)
   if (daily) {
     foldMeta.forEach(fm => {
       const i = Math.min(fm.endIdx, n - 1);
@@ -1434,7 +1434,7 @@ async function renderEquityChart(windows, tab, expEntry, rowIdx) {
   // Header label (tab + mode + scale)
   const modeLbl = daily ? 'DAILY (from trade log)' : 'STEPPED (per-fold)';
   const scaleLbl = useLog ? 'log-scale' : 'linear';
-  svgHtml += `<text x="${padL}" y="12" fill="#58a6ff" font-size="10" font-weight="600">${tab.toUpperCase()} Â· ${modeLbl} Â· ${scaleLbl} Y</text>`;
+  svgHtml += `<text x="${padL}" y="12" fill="#58a6ff" font-size="10" font-weight="600">${tab.toUpperCase()} · ${modeLbl} · ${scaleLbl} Y</text>`;
 
   svg.innerHTML = svgHtml;
 
@@ -1529,7 +1529,7 @@ function updateBestWindows() {
     `IC=${fmtSign(agg.ic,3)}  Hit=${agg.hit != null ? fmt(agg.hit,1)+'%' : '--'}`;
 }
 
-// Sortable columns â€” persists across refresh cycles
+// Sortable columns — persists across refresh cycles
 let sortKey = null, sortAsc = false;
 function applySortToEntries(entries) {
   if (!sortKey) return entries.slice().reverse(); // default: newest first
@@ -1551,9 +1551,9 @@ document.getElementById('exp-table').addEventListener('click', e => {
   else { sortKey = key; sortAsc = false; }
   // Update header indicators
   document.querySelectorAll('#exp-table th[data-sort]').forEach(h => {
-    h.textContent = h.textContent.replace(/ [â–²â–¼]/g, '');
+    h.textContent = h.textContent.replace(/ [▲▼]/g, '');
     if (h.dataset.sort === sortKey) {
-      h.textContent += sortAsc ? ' â–²' : ' â–¼';
+      h.textContent += sortAsc ? ' ▲' : ' ▼';
     }
   });
   renderExpTable();
@@ -1587,11 +1587,11 @@ function renderExpTable() {
   const cnt = document.getElementById('exp-visible-count');
   if (cnt) cnt.textContent = activeBackbone === 'all'
     ? `${filteredEntries.length} experiments (all backbones)`
-    : `${filteredEntries.length} ${activeBackbone} experiments (of ${allEntries.length} total â€” click ALL to see every backbone)`;
+    : `${filteredEntries.length} ${activeBackbone} experiments (of ${allEntries.length} total — click ALL to see every backbone)`;
   if (sorted.length === 0) {
     tbody.innerHTML = `<tr><td colspan="23" style="padding:24px;text-align:center;color:#8b949e">
       No experiments to display. allEntries.length=${allEntries.length}, activeBackbone=${activeBackbone}.
-      If allEntries=0 the JSONL fetch failed â€” check browser DevTools console.
+      If allEntries=0 the JSONL fetch failed — check browser DevTools console.
     </td></tr>`;
     return;
   }
@@ -1701,7 +1701,7 @@ async function refresh() {
     tradeLogsManifest = new Set();
     ensembleTradeLogs = [];
     renderEnsembleLinks();
-    console.warn('[AutoResearch dashboard] trade_logs/manifest.json not found â€” Trades column will show -- for all rows');
+    console.warn('[AutoResearch dashboard] trade_logs/manifest.json not found — Trades column will show -- for all rows');
   }
   try {
     const _ = null; // block marker for compatibility
@@ -1732,14 +1732,14 @@ async function refresh() {
     }
   }
 
-  // Summary cards â€” fixed 2026-05-05: previously showed champion's Sharpe (by composite)
+  // Summary cards — fixed 2026-05-05: previously showed champion's Sharpe (by composite)
   // as "Best Sharpe", which was confusing because many experiments had higher raw Sharpe.
   // Now we explicitly show BOTH: (a) the champion (selected by composite per CLAUDE.md) and
   // (b) the maximum across all experiments by raw test Sharpe / PSR / equity.
   const keeps = allEntries.filter(e => e.status === 'KEEP');
   const discards = allEntries.filter(e => e.status === 'DISCARD');
   const crashes = allEntries.filter(e => e.status === 'CRASH');
-  // Champion (by composite) â€” what CLAUDE.md calls the global best
+  // Champion (by composite) — what CLAUDE.md calls the global best
   const championSharpe = best ? best.sharpe : 0;
   const championComposite = best ? best.composite : 0;
   const championExpNum = best ? best.experiment_num : '?';
@@ -1755,50 +1755,50 @@ async function refresh() {
   const maxPSR = bestPsrEntry ? bestPsrEntry.psr : 0;
   const maxEquity = bestEquityEntry ? bestEquityEntry.equity : 1000;
 
-  // 2026-05-05 fix â€” apples-to-apples cards: clearly separate IN-SAMPLE 1410-day test fold
+  // 2026-05-05 fix — apples-to-apples cards: clearly separate IN-SAMPLE 1410-day test fold
   // (2008-2025, ~17 years) from OUT-OF-SAMPLE OOS forward window (~5 months).
   // Per-time annualized returns are very different: ensembles win on annualized basis.
-  // 2026-05-06 â€” CLAUDE.md Directive 65: Hit Rate is the SOLE winner-identification metric.
-  // Hit-rate champion (in-sample) â€” by `hit` field on experiment_log.jsonl
+  // 2026-05-06 — CLAUDE.md Directive 65: Hit Rate is the SOLE winner-identification metric.
+  // Hit-rate champion (in-sample) — by `hit` field on experiment_log.jsonl
   const validHit = allEntries.filter(e => e.hit != null && !isNaN(e.hit));
   const bestHitEntry = validHit.length ? validHit.reduce((a, b) => (a.hit > b.hit ? a : b)) : null;
   const bestHitVal = bestHitEntry ? bestHitEntry.hit : 0;
   const championAnnPct = best && best.equity ? ((Math.pow(best.equity/1000, 252/1410) - 1) * 100) : 0;
   document.getElementById('summary-cards').innerHTML = `
-    <div class="card" id="hit-rate-champion-card" style="border:2px solid #fbbf24;background:linear-gradient(135deg,#1a1a0a,#161b22)" title="HIT RATE CHAMPION â€” sole winner-identification metric per CLAUDE.md Directive 65 (2026-05-06). Highest in-sample direction-prediction accuracy across all 166 experiments. Hit rate isolates pure directional skill (the only thing the model is trained to predict) and is robust to small-sample Sharpe inflation.">
-      <div class="label" style="color:#fbbf24;font-weight:700;font-size:0.85em">ðŸŽ¯ HIT RATE CHAMPION â˜… (in-sample, all exps)</div>
-      <div class="value" style="color:#fbbf24;font-size:1.5em;font-weight:700">${bestHitEntry ? bestHitVal.toFixed(2) + '%' : 'â€”'}</div>
-      <div style="color:#8b949e;font-size:0.7em;margin-top:2px">${bestHitEntry ? `Exp ${bestHitEntry.experiment_num} ${bestHitEntry.backbone} (${bestHitEntry.status})` : 'â€”'}</div>
+    <div class="card" id="hit-rate-champion-card" style="border:2px solid #fbbf24;background:linear-gradient(135deg,#1a1a0a,#161b22)" title="HIT RATE CHAMPION — sole winner-identification metric per CLAUDE.md Directive 65 (2026-05-06). Highest in-sample direction-prediction accuracy across all 166 experiments. Hit rate isolates pure directional skill (the only thing the model is trained to predict) and is robust to small-sample Sharpe inflation.">
+      <div class="label" style="color:#fbbf24;font-weight:700;font-size:0.85em">🎯 HIT RATE CHAMPION ★ (in-sample, all exps)</div>
+      <div class="value" style="color:#fbbf24;font-size:1.5em;font-weight:700">${bestHitEntry ? bestHitVal.toFixed(2) + '%' : '—'}</div>
+      <div style="color:#8b949e;font-size:0.7em;margin-top:2px">${bestHitEntry ? `Exp ${bestHitEntry.experiment_num} ${bestHitEntry.backbone} (${bestHitEntry.status})` : '—'}</div>
     </div>
-    <div class="card" id="oos-hit-card" style="border:2px solid #fbbf24" title="OOS Forward Hit-Rate Champion â€” best direction-prediction accuracy on the 103-day forward window (OOS forward). This is the SOLE deployment metric per CLAUDE.md Directive 65. Days Traded shown so you can judge whether the rate is statistically meaningful.">
-      <div class="label" style="color:#fbbf24;font-weight:700;font-size:0.85em">ðŸŽ¯ OOS HIT RATE CHAMPION â˜… (OOS, live OOS)</div>
-      <div class="value" id="oos-hit-card-value" style="color:#fbbf24;font-size:1.5em;font-weight:700">loadingâ€¦</div>
-      <div style="color:#8b949e;font-size:0.7em;margin-top:2px" id="oos-hit-card-detail">â€”</div>
+    <div class="card" id="oos-hit-card" style="border:2px solid #fbbf24" title="OOS Forward Hit-Rate Champion — best direction-prediction accuracy on the 103-day forward window (OOS forward). This is the SOLE deployment metric per CLAUDE.md Directive 65. Days Traded shown so you can judge whether the rate is statistically meaningful.">
+      <div class="label" style="color:#fbbf24;font-weight:700;font-size:0.85em">🎯 OOS HIT RATE CHAMPION ★ (OOS, live OOS)</div>
+      <div class="value" id="oos-hit-card-value" style="color:#fbbf24;font-size:1.5em;font-weight:700">loading…</div>
+      <div style="color:#8b949e;font-size:0.7em;margin-top:2px" id="oos-hit-card-detail">—</div>
     </div>
     <div class="card" title="Robust champion selected by COMPOSITE = min(test_sh, val_sh) - 0.05*n_negative_folds per CLAUDE.md. Composite is now SECONDARY to Hit Rate (Directive 65) but still tracked for backwards-compatibility.">
-      <div class="label" style="color:#58a6ff;font-weight:600">ðŸ† Composite Champion (Exp ${championExpNum} ${championBackbone})</div>
+      <div class="label" style="color:#58a6ff;font-weight:600">🏆 Composite Champion (Exp ${championExpNum} ${championBackbone})</div>
       <div class="value ${cls(championComposite)}">${fmtSign(championComposite)}</div>
       <div style="color:#8b949e;font-size:0.7em;margin-top:2px">SECONDARY metric (was primary pre-Directive 65)</div>
     </div>
     <div class="card" title="Composite champion's compounded $ on $1000 over the in-sample test fold test fold (2008-2025, ~17 years).">
       <div class="label" style="color:#58a6ff">Champion $Equity (test-fold in-sample, ~17y)</div>
       <div class="value ${(best?best.equity:0)>1000?'positive':'negative'}">$${fmt(best?best.equity:1000,0)}</div>
-      <div style="color:#8b949e;font-size:0.7em;margin-top:2px">â‰ˆ ${championAnnPct.toFixed(1)}%/yr annualized</div>
+      <div style="color:#8b949e;font-size:0.7em;margin-top:2px">≈ ${championAnnPct.toFixed(1)}%/yr annualized</div>
     </div>
-    <div class="card" title="Highest in-sample equity across ALL experiments on the 1410-day test fold (2008-2025). May include DISCARDED experiments. NOT a forward-looking estimate â€” same 17-year window as champion.">
+    <div class="card" title="Highest in-sample equity across ALL experiments on the 1410-day test fold (2008-2025). May include DISCARDED experiments. NOT a forward-looking estimate — same 17-year window as champion.">
       <div class="label">In-Sample Max $Equity (test-fold, all exps)</div>
       <div class="value ${maxEquity>1000?'positive':'negative'}">$${fmt(maxEquity,0)}</div>
-      <div style="color:#8b949e;font-size:0.7em;margin-top:2px">Exp ${bestEquityEntry?bestEquityEntry.experiment_num:'?'} ${bestEquityEntry?bestEquityEntry.backbone:'?'} (${bestEquityEntry?bestEquityEntry.status:'?'}) â‰ˆ ${(((maxEquity/1000)**(252/1410)-1)*100).toFixed(1)}%/yr</div>
+      <div style="color:#8b949e;font-size:0.7em;margin-top:2px">Exp ${bestEquityEntry?bestEquityEntry.experiment_num:'?'} ${bestEquityEntry?bestEquityEntry.backbone:'?'} (${bestEquityEntry?bestEquityEntry.status:'?'}) ≈ ${(((maxEquity/1000)**(252/1410)-1)*100).toFixed(1)}%/yr</div>
     </div>
-    <div class="card" title="In-sample max test Sharpe (1410-day test fold). Includes DISCARDED experiments â€” high test Sharpe with negative val Sharpe is the typical case. Not the same as the composite champion's Sharpe.">
+    <div class="card" title="In-sample max test Sharpe (1410-day test fold). Includes DISCARDED experiments — high test Sharpe with negative val Sharpe is the typical case. Not the same as the composite champion's Sharpe.">
       <div class="label">In-Sample Max Test Sharpe</div>
       <div class="value ${cls(maxSharpe)}">${fmtSign(maxSharpe)}</div>
       <div style="color:#8b949e;font-size:0.7em;margin-top:2px">Exp ${maxSharpeEntry?maxSharpeEntry.experiment_num:'?'} ${maxSharpeEntry?maxSharpeEntry.backbone:'?'} (${maxSharpeEntry?maxSharpeEntry.status:'?'})</div>
     </div>
     <div class="card" id="oos-best-card" style="border:2px solid #c779dd" title="Best smart-strategy on $1000 over the 103-day forward OOS window (OOS forward, ~5 months). Includes ensemble + hedging strategies on real QQQ+VIX data. UPDATED LIVE from oos_smart_strategies_summary.json.">
-      <div class="label" style="color:#c779dd;font-weight:600">â­ OOS Forward Best $ (OOS, live OOS)</div>
-      <div class="value" id="oos-best-card-value" style="color:#c779dd;font-size:1.4em">loadingâ€¦</div>
-      <div style="color:#8b949e;font-size:0.7em;margin-top:2px" id="oos-best-card-detail">â€”</div>
+      <div class="label" style="color:#c779dd;font-weight:600">⭐ OOS Forward Best $ (OOS, live OOS)</div>
+      <div class="value" id="oos-best-card-value" style="color:#c779dd;font-size:1.4em">loading…</div>
+      <div style="color:#8b949e;font-size:0.7em;margin-top:2px" id="oos-best-card-detail">—</div>
     </div>
     <div class="card" title="Highest PSR across all in-sample experiments. PSR > 0.95 = statistically certain Sharpe > 0.">
       <div class="label">In-Sample Max PSR</div>
@@ -1823,13 +1823,13 @@ async function refresh() {
     if (d) {
       const overlay = b.name.split('__').slice(1).join('__') || '(raw)';
       const annPct = (Math.pow(b.final_dollars_on_1000/1000, 252/103) - 1) * 100;
-      d.innerHTML = `${b.signal_source.replace('individual_','exp ').replace('ensemble_','ens ')} â†’ ${overlay}<br>Sharpe ${b.annual_sharpe.toFixed(2)} Â· ${annPct.toFixed(0)}%/yr annualized`;
+      d.innerHTML = `${b.signal_source.replace('individual_','exp ').replace('ensemble_','ens ')} → ${overlay}<br>Sharpe ${b.annual_sharpe.toFixed(2)} · ${annPct.toFixed(0)}%/yr annualized`;
     }
     return true;
   }
   if (!_fillOOSCard()) setTimeout(_fillOOSCard, 2000);
 
-  // OOS Hit-Rate Champion card â€” CLAUDE.md Directive 65 (sole winner metric)
+  // OOS Hit-Rate Champion card — CLAUDE.md Directive 65 (sole winner metric)
   function _fillOOSHitCard() {
     if (!window._smartData || !window._smartData.strategies) return false;
     const all = Object.values(window._smartData.strategies)
@@ -1841,7 +1841,7 @@ async function refresh() {
     if (v) v.textContent = b.hit_rate_pct.toFixed(2) + '%';
     if (d) {
       const overlay = b.name.split('__').slice(1).join('__') || '(raw)';
-      d.innerHTML = `${b.signal_source.replace('individual_','exp ').replace('ensemble_','ens ')} â†’ ${overlay}<br>${b.n_traded_days} trade-days Â· $${b.final_dollars_on_1000.toFixed(2)} on $1k Â· Sharpe ${b.annual_sharpe.toFixed(2)}`;
+      d.innerHTML = `${b.signal_source.replace('individual_','exp ').replace('ensemble_','ens ')} → ${overlay}<br>${b.n_traded_days} trade-days · $${b.final_dollars_on_1000.toFixed(2)} on $1k · Sharpe ${b.annual_sharpe.toFixed(2)}`;
     }
     return true;
   }
@@ -1867,7 +1867,7 @@ async function refresh() {
     // JSONL field is per_window_val (NOT val_per_window). Bug fix 2026-05-05.
     const tw = (winner.per_window || []).filter(w => !w.skipped);
     const vw = (winner.per_window_val || []).filter(w => !w.skipped);
-    // Prefer the runner's pre-computed counts if available â€” they match the composite formula
+    // Prefer the runner's pre-computed counts if available — they match the composite formula
     const tp = winner.test_pos_folds != null ? winner.test_pos_folds : tw.filter(w => w.sharpe > 0).length;
     const vp = winner.val_pos_folds != null ? winner.val_pos_folds : vw.filter(w => w.sharpe > 0).length;
     const tn = tw.length || 7;  // QQQ has 7 super-folds
@@ -1876,7 +1876,7 @@ async function refresh() {
     const equityFmt = winner.equity != null ? '$' + fmt(winner.equity, 0) : 'n/a';
     // Uncertainty: Kendall-Gal heads disabled for QQQ currently (per CLAUDE.md TODO)
     const uncertainNote = (winner.confidence_mean == null && winner.aleatoric_mean == null && winner.epistemic_mean == null)
-      ? '(Kendall-Gal MC-Dropout uncertainty: disabled for QQQ runner â€” see CLAUDE.md "uncertainty heads" TODO)'
+      ? '(Kendall-Gal MC-Dropout uncertainty: disabled for QQQ runner — see CLAUDE.md "uncertainty heads" TODO)'
       : `Confidence: ${winner.confidence_mean != null ? fmt(winner.confidence_mean, 3) : 'n/a'}    Aleatoric: ${winner.aleatoric_mean != null ? winner.aleatoric_mean.toExponential(2) : 'n/a'}    Epistemic: ${winner.epistemic_mean != null ? winner.epistemic_mean.toExponential(2) : 'n/a'}`;
     document.getElementById('winner-title').innerHTML =
       `Exp ${winner.experiment_num || '?'}: <span style="color:#3fb950">${winner.description || ''}</span>`;
@@ -1885,7 +1885,7 @@ async function refresh() {
       `PSR: ${fmt(winner.psr)}    Equity: ${equityFmt}    Test: ${tp}/${tn} pos folds    Val: ${vp}/${vn} pos folds\n` +
       `Excess Sharpe: ${fmtSign(winner.excess_sharpe)} (vs BH ${fmtSign(winner.bh_sharpe)})    Hit-rate: ${fmt(winner.hit, 2)}%    IC: ${fmt(winner.ic, 4)}    Sortino: ${fmt(winner.A_sortino || winner.sortino, 3)}\n` +
       `Backbone: ${winner.backbone}    Status: ${winner.status}    Elapsed: ${fmt(winner.elapsed_sec, 0)}s\n` +
-      `Config â€” lr: ${c.lr}    batch_size: ${c.batch_size}    seq_len: ${c.seq_len}    wd: ${c.weight_decay}    patience: ${c.patience}    epochs: ${c.epochs}\n` +
+      `Config — lr: ${c.lr}    batch_size: ${c.batch_size}    seq_len: ${c.seq_len}    wd: ${c.weight_decay}    patience: ${c.patience}    epochs: ${c.epochs}\n` +
       uncertainNote;
   }
 
@@ -1910,7 +1910,7 @@ refresh();
 setInterval(refresh, REFRESH_MS);
 
 // ============================================================
-// OOS (out-of-sample) inference panel â€” appears at the bottom
+// OOS (out-of-sample) inference panel — appears at the bottom
 // of the dashboard. Loads oos_summary_*.json and renders the
 // latest live-data backtest of the current best_model.pt.
 // Only the most-recent file is rendered. Refresh on every poll.
@@ -1946,9 +1946,9 @@ function renderOOS(d, source) {
   const sign = (v) => (v >= 0 ? '+' : '') + v.toFixed(2);
 
   document.getElementById('oos-title').textContent =
-    `ðŸ›°ï¸ OOS Live-Data Inference â€” ${tr.predict_start} to ${tr.predict_end}`;
+    `🛰️ OOS Live-Data Inference — ${tr.predict_start} to ${tr.predict_end}`;
   document.getElementById('oos-subtitle').textContent =
-    `Pure inference on the current best_model.pt â€” no retraining, no peeking. ${d.n_predictions} predictions, ${d.n_with_actuals} with realised actuals. (Source: ${source})`;
+    `Pure inference on the current best_model.pt — no retraining, no peeking. ${d.n_predictions} predictions, ${d.n_with_actuals} with realised actuals. (Source: ${source})`;
 
   document.getElementById('oos-cards').innerHTML = `
     <div class="card"><div class="label">Strategy Sharpe</div><div class="value" style="color:${sharpeColor(m.strategy_annual_sharpe)}">${sign(m.strategy_annual_sharpe)}</div></div>
@@ -1963,10 +1963,10 @@ function renderOOS(d, source) {
 
   document.getElementById('oos-winner').innerHTML = `
     <div style="font-weight:600;color:#58a6ff;margin-bottom:6px">Winner Used</div>
-    <div>Experiment ${win.experiment_num} â€” ${win.description}</div>
+    <div>Experiment ${win.experiment_num} — ${win.description}</div>
     <div style="color:#8b949e;font-family:monospace;margin-top:4px">${win.config}</div>
     <div style="margin-top:6px"><b>Train composite:</b> ${win.train_composite}</div>
-    <div style="color:#d29922;margin-top:4px"><b>âš  Caveat:</b> ${win.caveat || 'none'}</div>
+    <div style="color:#d29922;margin-top:4px"><b>⚠ Caveat:</b> ${win.caveat || 'none'}</div>
   `;
 
   document.getElementById('oos-methodology').innerHTML = `
@@ -1974,10 +1974,10 @@ function renderOOS(d, source) {
     <div><b>Training data cap:</b> ${meth.training_data_cap}</div>
     <div><b>OOS window:</b> ${meth.oos_window}</div>
     <div><b>Note:</b> ${meth.note}</div>
-    <div><b>Features:</b> ${meth.features} (training-set StandardScaler applied â€” no peeking)</div>
+    <div><b>Features:</b> ${meth.features} (training-set StandardScaler applied — no peeking)</div>
     <div><b>Pipeline:</b> ${meth.predict_pipeline}</div>
     <div style="margin-top:6px">
-      <a href="${d.csv_link}" download style="background:#238636;color:#fff;text-decoration:none;padding:4px 10px;border-radius:4px;font-weight:600">ðŸ“¥ Download predictions CSV</a>
+      <a href="${d.csv_link}" download style="background:#238636;color:#fff;text-decoration:none;padding:4px 10px;border-radius:4px;font-weight:600">📥 Download predictions CSV</a>
     </div>
   `;
 
@@ -2005,8 +2005,8 @@ function renderOOS(d, source) {
         ${yAxis}${xAxis}${yTick0}${yLabels}${xLabel0}${xLabelEnd}
         ${path(eq.buy_hold_cumulative_pct, '#8b949e')}
         ${path(eq.strategy_cumulative_pct, '#3fb950')}
-        <text x="${M.l + 10}" y="${M.t + 14}" fill="#3fb950" font-size="12" font-weight="600">â€” Strategy</text>
-        <text x="${M.l + 90}" y="${M.t + 14}" fill="#8b949e" font-size="12">â€” Buy &amp; Hold</text>
+        <text x="${M.l + 10}" y="${M.t + 14}" fill="#3fb950" font-size="12" font-weight="600">— Strategy</text>
+        <text x="${M.l + 90}" y="${M.t + 14}" fill="#8b949e" font-size="12">— Buy &amp; Hold</text>
       </svg>`;
   }
 }
@@ -2015,7 +2015,7 @@ loadOOS();
 setInterval(loadOOS, 30000);
 
 // ============================================================
-// OOS Top-30 table â€” loads oos_top30_table.json and renders one
+// OOS Top-30 table — loads oos_top30_table.json and renders one
 // row per top-30 experiment with full OOS metrics + equity sparkline
 // + CSV download per row.
 // ============================================================
@@ -2052,7 +2052,7 @@ function renderOOSTop30(data) {
   window._oosTop30 = data;
 
   document.getElementById('oos-top30-summary').innerHTML =
-    `OOS window: <b>${data.oos_window.start} â†’ ${data.oos_window.end}</b> | ` +
+    `OOS window: <b>${data.oos_window.start} → ${data.oos_window.end}</b> | ` +
     `Top-30 by train composite | ` +
     `<b style="color:#3fb950">${data.n_completed}</b> with archived checkpoints (OOS run) | ` +
     `<b style="color:#d29922">${data.n_total_top30 - data.n_completed}</b> missing checkpoint (would require retrain) | ` +
@@ -2081,8 +2081,8 @@ function drawOOSTop30Body() {
   const data = window._oosTop30;
   if (!data) return;
   const sharpeColor = (v) => v == null || isNaN(v) ? '#8b949e' : (v > 1.0 ? '#3fb950' : v > 0 ? '#58a6ff' : '#f85149');
-  const fmt = (v, d=4) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(d);
-  const fmtPct = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
+  const fmt = (v, d=4) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(d);
+  const fmtPct = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
 
   // Sort
   const k = _oosTop30Sort.key, dir = _oosTop30Sort.dir;
@@ -2106,7 +2106,7 @@ function drawOOSTop30Body() {
     if (th.dataset.osort === k) {
       const arrow = document.createElement('span');
       arrow.className = 'sort-arrow';
-      arrow.textContent = dir === 'asc' ? ' â–²' : ' â–¼';
+      arrow.textContent = dir === 'asc' ? ' ▲' : ' ▼';
       arrow.style.fontSize = '0.7em';
       th.appendChild(arrow);
     }
@@ -2117,14 +2117,14 @@ function drawOOSTop30Body() {
   rows.forEach(r => {
     const row = document.createElement('tr');
     const status = r.checkpoint_status === 'available' ?
-      `<span style="color:#3fb950">âœ“ run</span>` :
-      `<span style="color:#d29922" title="Checkpoint not archived; retrain to enable">âš  missing</span>`;
+      `<span style="color:#3fb950">✓ run</span>` :
+      `<span style="color:#d29922" title="Checkpoint not archived; retrain to enable">⚠ missing</span>`;
     const statusClass = r.oos_status === 'completed' ? 'keep' : (r.checkpoint_status === 'missing' ? '' : 'discard');
     if (statusClass) row.className = statusClass;
-    const sparkHTML = r.oos_equity_curve ? sparklineSVG(r.oos_equity_curve) : '<span style="color:#484f58;font-size:0.75em">â€”</span>';
+    const sparkHTML = r.oos_equity_curve ? sparklineSVG(r.oos_equity_curve) : '<span style="color:#484f58;font-size:0.75em">—</span>';
     const csvLink = r.oos_csv ?
-      `<a href="${r.oos_csv}" download onclick="event.stopPropagation()" style="background:#238636;color:#fff;text-decoration:none;padding:2px 8px;border-radius:3px;font-size:0.78em">ðŸ“Š CSV</a>` :
-      '<span style="color:#484f58">â€”</span>';
+      `<a href="${r.oos_csv}" download onclick="event.stopPropagation()" style="background:#238636;color:#fff;text-decoration:none;padding:2px 8px;border-radius:3px;font-size:0.78em">📊 CSV</a>` :
+      '<span style="color:#484f58">—</span>';
 
     row.style.cursor = 'pointer';
     row.title = "Click to load this experiment's details into the OOS Live-Data Inference panel above (inline, like QQQ dashboard).";
@@ -2139,14 +2139,14 @@ function drawOOSTop30Body() {
       <td style="font-size:0.78em;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${(r.description||'').replace(/"/g,'&quot;')}">${r.description||''}</td>
       <td style="color:${sharpeColor(r.train_composite)}">${fmt(r.train_composite)}</td>
       <td>${fmt(r.train_val_sharpe)}</td>
-      <td>${r.train_test_pos_folds == null ? 'â€”' : r.train_test_pos_folds}/7</td>
+      <td>${r.train_test_pos_folds == null ? '—' : r.train_test_pos_folds}/7</td>
       <td style="color:${sharpeColor(r.oos_strategy_annual_sharpe)}"><b>${fmt(r.oos_strategy_annual_sharpe)}</b></td>
       <td>${fmt(r.oos_buy_hold_annual_sharpe)}</td>
       <td style="color:${sharpeColor(r.oos_excess_sharpe)}">${fmt(r.oos_excess_sharpe)}</td>
       <td style="color:${sharpeColor(r.oos_strategy_total_return_pct)}">${fmtPct(r.oos_strategy_total_return_pct)}</td>
       <td>${fmtPct(r.oos_buy_hold_total_return_pct)}</td>
-      <td>${r.oos_hit_rate_pct == null ? 'â€”' : r.oos_hit_rate_pct.toFixed(1) + '%'}</td>
-      <td>${r.oos_psr == null ? 'â€”' : Number(r.oos_psr).toFixed(3)}</td>
+      <td>${r.oos_hit_rate_pct == null ? '—' : r.oos_hit_rate_pct.toFixed(1) + '%'}</td>
+      <td>${r.oos_psr == null ? '—' : Number(r.oos_psr).toFixed(3)}</td>
       <td style="color:#f85149">${fmtPct(r.oos_max_drawdown_pct)}</td>
       <td>${sparkHTML}</td>
       <td>${csvLink}</td>
@@ -2171,36 +2171,36 @@ function loadOOSDetailsForRow(expNum) {
   }
 
   if (r.oos_status !== 'completed' || !r.oos_equity_curve) {
-    // No OOS data â€” show a friendly placeholder in the main panel
+    // No OOS data — show a friendly placeholder in the main panel
     document.getElementById('oos-title').textContent =
-      `ðŸ›°ï¸ OOS â€” exp ${expNum} (rank #${r.rank}) â€” NO OOS DATA`;
+      `🛰️ OOS — exp ${expNum} (rank #${r.rank}) — NO OOS DATA`;
     document.getElementById('oos-subtitle').textContent =
       `${r.description}. Status: ${r.oos_status}. Train composite: ${r.train_composite}. To enable OOS for this experiment, the model checkpoint must be retrained and saved.`;
     document.getElementById('oos-cards').innerHTML = '';
     document.getElementById('oos-winner').innerHTML =
-      `<div style="color:#d29922;font-weight:600">âš  Checkpoint missing</div>
+      `<div style="color:#d29922;font-weight:600">⚠ Checkpoint missing</div>
        <div style="margin-top:6px"><b>Experiment:</b> ${expNum}</div>
        <div><b>Description:</b> ${r.description||''}</div>
        <div><b>Backbone:</b> ${r.backbone||'?'} | <b>Seed:</b> ${r.seed||'?'}</div>
        <div><b>Train composite:</b> ${r.train_composite}</div>
        <div><b>Train val Sharpe:</b> ${r.train_val_sharpe}</div>
-       <div><b>Train +folds:</b> ${r.train_test_pos_folds||'â€”'}/7</div>`;
+       <div><b>Train +folds:</b> ${r.train_test_pos_folds||'—'}/7</div>`;
     document.getElementById('oos-methodology').innerHTML =
       `<div style="color:#8b949e">Run <code>python -m autoresearchspy.run_autoresearch ...</code> with this experiment's exact config to regenerate the checkpoint, then rerun <code>run_oos_top30.py</code> to populate this slot.</div>`;
     document.getElementById('oos-chart').innerHTML = '';
     return;
   }
 
-  // OOS data exists â€” build the same card grid as the modal (matches the
+  // OOS data exists — build the same card grid as the modal (matches the
   // main OOS Live-Data Inference panel layout).
   const sharpeColor = (v) => v == null || isNaN(v) ? '#8b949e' : (v > 1.0 ? '#3fb950' : v > 0 ? '#58a6ff' : '#f85149');
-  const fmt = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(2);
-  const fmt4 = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(4);
+  const fmt = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2);
+  const fmt4 = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(4);
 
   document.getElementById('oos-title').textContent =
-    `ðŸ›°ï¸ OOS Live-Data Inference â€” exp ${expNum} (rank #${r.rank})`;
+    `🛰️ OOS Live-Data Inference — exp ${expNum} (rank #${r.rank})`;
   document.getElementById('oos-subtitle').textContent =
-    `${r.description} â€” ${r.oos_n_predictions} predictions, ${r.oos_n_with_actuals} with realised actuals. (Selected from Top-30 table â€” click another row to switch.)`;
+    `${r.description} — ${r.oos_n_predictions} predictions, ${r.oos_n_with_actuals} with realised actuals. (Selected from Top-30 table — click another row to switch.)`;
 
   document.getElementById('oos-cards').innerHTML = `
     <div class="card"><div class="label">Strategy Sharpe</div><div class="value" style="color:${sharpeColor(r.oos_strategy_annual_sharpe)}">${fmt4(r.oos_strategy_annual_sharpe)}</div></div>
@@ -2209,8 +2209,8 @@ function loadOOSDetailsForRow(expNum) {
     <div class="card"><div class="label">Strategy Return</div><div class="value" style="color:${sharpeColor(r.oos_strategy_total_return_pct)}">${fmt(r.oos_strategy_total_return_pct)}%</div></div>
     <div class="card"><div class="label">Buy-Hold Return</div><div class="value" style="color:${sharpeColor(r.oos_buy_hold_total_return_pct)}">${fmt(r.oos_buy_hold_total_return_pct)}%</div></div>
     <div class="card"><div class="label">Excess Return</div><div class="value" style="color:${sharpeColor(r.oos_excess_return_pct)}">${fmt(r.oos_excess_return_pct)}%</div></div>
-    <div class="card"><div class="label">Hit Rate</div><div class="value">${r.oos_hit_rate_pct == null ? 'â€”' : Number(r.oos_hit_rate_pct).toFixed(1)+'%'}</div></div>
-    <div class="card"><div class="label">PSR</div><div class="value">${r.oos_psr == null ? 'â€”' : Number(r.oos_psr).toFixed(3)}</div></div>
+    <div class="card"><div class="label">Hit Rate</div><div class="value">${r.oos_hit_rate_pct == null ? '—' : Number(r.oos_hit_rate_pct).toFixed(1)+'%'}</div></div>
+    <div class="card"><div class="label">PSR</div><div class="value">${r.oos_psr == null ? '—' : Number(r.oos_psr).toFixed(3)}</div></div>
     <div class="card"><div class="label">Max Drawdown</div><div class="value" style="color:#f85149">${fmt(r.oos_max_drawdown_pct)}%</div></div>
   `;
 
@@ -2220,21 +2220,21 @@ function loadOOSDetailsForRow(expNum) {
     <div><b>Backbone:</b> ${r.backbone||'?'} | <b>Seed:</b> ${r.seed||'?'}</div>
     <div><b>Train composite:</b> ${r.train_composite}</div>
     <div><b>Train val Sharpe:</b> ${r.train_val_sharpe}</div>
-    <div><b>Train positive folds:</b> ${r.train_test_pos_folds||'â€”'}/7</div>
+    <div><b>Train positive folds:</b> ${r.train_test_pos_folds||'—'}/7</div>
     <div><b>Checkpoint source:</b> <code style="font-size:0.78em">${r.oos_checkpoint_source||'?'}</code></div>
   `;
 
   document.getElementById('oos-methodology').innerHTML = `
     <div style="font-weight:600;color:#58a6ff;margin-bottom:6px">OOS Methodology</div>
-    <div><b>OOS window:</b> ${data.oos_window.start} â†’ ${data.oos_window.end}</div>
+    <div><b>OOS window:</b> ${data.oos_window.start} → ${data.oos_window.end}</div>
     <div><b>Predictions:</b> ${r.oos_n_predictions} (${r.oos_n_with_actuals} with realised actuals)</div>
-    <div><b>Pipeline:</b> sliding 60-day feature window â†’ forward pass (no_grad) â†’ sign(mu_1d) sets trade direction</div>
+    <div><b>Pipeline:</b> sliding 60-day feature window → forward pass (no_grad) → sign(mu_1d) sets trade direction</div>
     <div><b>Scaler:</b> training-set mean+std applied (no peeking)</div>
     <div><b>Inference only:</b> no retraining; checkpoint frozen</div>
-    <div style="margin-top:6px"><a href="${r.oos_csv}" download style="background:#238636;color:#fff;text-decoration:none;padding:4px 10px;border-radius:4px;font-weight:600">ðŸ“¥ Download predictions CSV</a></div>
+    <div style="margin-top:6px"><a href="${r.oos_csv}" download style="background:#238636;color:#fff;text-decoration:none;padding:4px 10px;border-radius:4px;font-weight:600">📥 Download predictions CSV</a></div>
   `;
 
-  // Equity chart â€” strategy vs BH vs ensemble champion (3 lines)
+  // Equity chart — strategy vs BH vs ensemble champion (3 lines)
   const eq = r.oos_equity_curve;
   // Build optional ensemble benchmark line aligned to this row's dates
   const ensCh = (typeof getEnsembleChampion === 'function') ? getEnsembleChampion() : null;
@@ -2265,9 +2265,9 @@ function loadOOSDetailsForRow(expNum) {
       ${path(eq.buy_hold_pct, '#8b949e', 1.5)}
       ${ensSeriesPct ? path(ensSeriesPct, '#fbbf24', 1.8) : ''}
       ${path(eq.strategy_pct, '#3fb950', 2.2)}
-      <text x="${M.l + 10}" y="${M.t - 8}" fill="#3fb950" font-size="12" font-weight="600">â€” Strategy</text>
-      <text x="${M.l + 100}" y="${M.t - 8}" fill="#8b949e" font-size="12">â€” Buy &amp; Hold</text>
-      ${ensSeriesPct ? `<text x="${M.l + 220}" y="${M.t - 8}" fill="#fbbf24" font-size="12">â€” Ensemble champion (${ensName.length>30?ensName.slice(0,28)+'â€¦':ensName})</text>` : ''}
+      <text x="${M.l + 10}" y="${M.t - 8}" fill="#3fb950" font-size="12" font-weight="600">— Strategy</text>
+      <text x="${M.l + 100}" y="${M.t - 8}" fill="#8b949e" font-size="12">— Buy &amp; Hold</text>
+      ${ensSeriesPct ? `<text x="${M.l + 220}" y="${M.t - 8}" fill="#fbbf24" font-size="12">— Ensemble champion (${ensName.length>30?ensName.slice(0,28)+'…':ensName})</text>` : ''}
     </svg>`
       + buildTradingDetailsHTML(r, 'oos')
       + (window.buildSmartVariantsHTML ? window.buildSmartVariantsHTML('individual_exp' + expNum, 'OOS Top-30 Winner') : '');
@@ -2279,19 +2279,19 @@ function loadOOSDetailsForRow(expNum) {
 window.buildSmartVariantsHTML = function(signalSourceId, contextLabel) {
   if (!window._smartData || !window._smartData.strategies) {
     return `<div style="margin-top:14px;padding:10px;background:#1a0d1f;border:1px solid #c779dd;border-radius:6px;color:#8b949e;font-size:0.85em">
-      ðŸ’¡ Smart-strategy variants (overlays + options hedging) for this ${contextLabel} will appear here once <code>oos_smart_strategies_summary.json</code> is loaded.
+      💡 Smart-strategy variants (overlays + options hedging) for this ${contextLabel} will appear here once <code>oos_smart_strategies_summary.json</code> is loaded.
     </div>`;
   }
   const variants = Object.values(window._smartData.strategies).filter(s => s.signal_source === signalSourceId);
   if (variants.length === 0) {
     return `<div style="margin-top:14px;padding:10px;background:#1a0d1f;border:1px solid #c779dd;border-radius:6px;color:#8b949e;font-size:0.85em">
-      ðŸ’¡ No smart-strategy variants computed for ${signalSourceId}. To enable: ensure this signal source's OOS predictions CSV is in <code>autoresearch_results/</code>, then re-run <code>python -m autoresearchspy._build_spy_smart_strategies</code>.
+      💡 No smart-strategy variants computed for ${signalSourceId}. To enable: ensure this signal source's OOS predictions CSV is in <code>autoresearch_results/</code>, then re-run <code>python -m autoresearchspy._build_spy_smart_strategies</code>.
     </div>`;
   }
-  const fmtD = (v) => v == null || isNaN(v) ? 'â€”' : '$' + Number(v).toFixed(2);
-  const fmtDsigned = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '$+' : '$') + Number(v).toFixed(2);
-  const fmt = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(3);
-  const fmtPct = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
+  const fmtD = (v) => v == null || isNaN(v) ? '—' : '$' + Number(v).toFixed(2);
+  const fmtDsigned = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '$+' : '$') + Number(v).toFixed(2);
+  const fmt = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(3);
+  const fmtPct = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
   variants.sort((a, b) => (b.final_dollars_on_1000 || 0) - (a.final_dollars_on_1000 || 0));
   const bestD = variants[0].final_dollars_on_1000;
   const rows = variants.map((v, i) => {
@@ -2301,20 +2301,20 @@ window.buildSmartVariantsHTML = function(signalSourceId, contextLabel) {
     return `<tr ${isBest ? 'style="background:#2a0f2f"' : ''}>
       <td style="padding:4px 8px">${i + 1}</td>
       <td style="padding:4px 8px;color:${v.category === 'H' ? '#fbbf24' : '#58a6ff'}">${v.category}</td>
-      <td style="padding:4px 8px;color:#c779dd;font-weight:${isBest ? '700' : '400'}">${overlay}${isBest ? ' â­' : ''}</td>
+      <td style="padding:4px 8px;color:#c779dd;font-weight:${isBest ? '700' : '400'}">${overlay}${isBest ? ' ⭐' : ''}</td>
       <td style="padding:4px 8px;color:${dColor};font-weight:600;text-align:right">${fmtD(v.final_dollars_on_1000)}</td>
       <td style="padding:4px 8px;color:${(v.excess_dollars||0)>0?'#3fb950':'#f85149'};text-align:right">${fmtDsigned(v.excess_dollars)}</td>
       <td style="padding:4px 8px;text-align:right">${fmt(v.annual_sharpe)}</td>
       <td style="padding:4px 8px;text-align:right">${fmt(v.annual_sortino)}</td>
       <td style="padding:4px 8px;text-align:right">${fmtPct(v.compound_return_pct)}</td>
-      <td style="padding:4px 8px;text-align:right">${v.hit_rate_pct == null ? 'â€”' : Number(v.hit_rate_pct).toFixed(1) + '%'}</td>
-      <td style="padding:4px 8px;text-align:right">${v.exposure_pct == null ? 'â€”' : Number(v.exposure_pct).toFixed(0) + '%'}</td>
+      <td style="padding:4px 8px;text-align:right">${v.hit_rate_pct == null ? '—' : Number(v.hit_rate_pct).toFixed(1) + '%'}</td>
+      <td style="padding:4px 8px;text-align:right">${v.exposure_pct == null ? '—' : Number(v.exposure_pct).toFixed(0) + '%'}</td>
       <td style="padding:4px 8px;text-align:right;color:#f85149">${fmtPct(v.max_drawdown_pct)}</td>
     </tr>`;
   }).join('');
   return `
     <div style="margin-top:18px;padding:14px;background:#1a0d1f;border:2px solid #c779dd;border-radius:6px">
-      <div style="font-weight:700;color:#c779dd;margin-bottom:6px;font-size:1em">ðŸ›¡ Smart-Strategy Variants for this ${contextLabel} â€” ${variants.length} variants</div>
+      <div style="font-weight:700;color:#c779dd;margin-bottom:6px;font-size:1em">🛡 Smart-Strategy Variants for this ${contextLabel} — ${variants.length} variants</div>
       <div style="color:#8b949e;font-size:0.78em;margin-bottom:8px">
         All overlays (Tier S: hold-flip, dead-zone, vol-regime gate, SMA-200, Kelly, vol-target, conf-weighted) + hedging (Tier H: covered-call, protective-put, collar, cash-secured-put, vertical-spread, synthetic-long) applied to <code>${signalSourceId}</code>. Sorted by $Final descending. Real QQQ+VIX data, theoretical Black-Scholes for options.
       </div>
@@ -2356,78 +2356,78 @@ window.buildTradingDetailsHTML = function(r, kind) {
   const label = isEnsemble ? `ensemble strategy "${r.strategy}"` : `single-model exp ${r.experiment_num}`;
   const signalDesc = isEnsemble
     ? `Combine the per-day predictions from the ${r.n_members || '?'} ensemble members. The "${r.strategy}" rule decides direction:
-       <ul style="margin:6px 0 6px 20px"><li><b>vote</b> â†’ sign of sum of member directions (majority wins)</li><li><b>mean</b> â†’ average of member predictions, then sign</li><li><b>weighted</b> â†’ predictions weighted by individual OOS Sharpe</li></ul>`
+       <ul style="margin:6px 0 6px 20px"><li><b>vote</b> → sign of sum of member directions (majority wins)</li><li><b>mean</b> → average of member predictions, then sign</li><li><b>weighted</b> → predictions weighted by individual OOS Sharpe</li></ul>`
     : `Run inference on the archived ${r.backbone || '?'} checkpoint (seed=${r.seed || '?'}) for the latest 60 trading days of features. Take <code>sign(model(x).mu_1d)</code> as direction.`;
-  const sharpeBadge = sh == null ? '' : (sh > 1.0 ? '<span style="background:#0d2818;color:#3fb950;padding:1px 6px;border-radius:3px;font-size:0.78em">strong (Sh>1)</span>' : sh > 0 ? '<span style="background:#0d1f3d;color:#58a6ff;padding:1px 6px;border-radius:3px;font-size:0.78em">positive</span>' : '<span style="background:#3d0d0d;color:#f85149;padding:1px 6px;border-radius:3px;font-size:0.78em">negative â€” DO NOT deploy</span>');
+  const sharpeBadge = sh == null ? '' : (sh > 1.0 ? '<span style="background:#0d2818;color:#3fb950;padding:1px 6px;border-radius:3px;font-size:0.78em">strong (Sh>1)</span>' : sh > 0 ? '<span style="background:#0d1f3d;color:#58a6ff;padding:1px 6px;border-radius:3px;font-size:0.78em">positive</span>' : '<span style="background:#3d0d0d;color:#f85149;padding:1px 6px;border-radius:3px;font-size:0.78em">negative — DO NOT deploy</span>');
   // Quarter-Kelly suggestion based on the OOS Sharpe (heuristic only)
   const kellyPct = sh == null || sh <= 0 ? 0 : Math.min(25, Math.max(2, Math.round(sh * 5)));
-  const kellyText = sh == null || sh <= 0 ? 'âš  Negative Sharpe â€” recommend skip-trading this strategy until it goes positive on at least 6 months of forward OOS' : `Quarter-Kelly suggests ~${kellyPct}% of capital per signal day (full Kelly is unstable; use <b>quarter-Kelly</b> to reduce ruin risk per Thorp 1969)`;
+  const kellyText = sh == null || sh <= 0 ? '⚠ Negative Sharpe — recommend skip-trading this strategy until it goes positive on at least 6 months of forward OOS' : `Quarter-Kelly suggests ~${kellyPct}% of capital per signal day (full Kelly is unstable; use <b>quarter-Kelly</b> to reduce ruin risk per Thorp 1969)`;
   return `
     <details style="margin-top:14px;background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:0">
-      <summary style="cursor:pointer;padding:10px 14px;color:#fbbf24;font-weight:600;font-size:0.95em;letter-spacing:0.3px;background:#161b22;border-radius:6px 6px 0 0">ðŸ“– Trading Details â€” how to deploy ${label} ${sharpeBadge} (click to expand / collapse)</summary>
+      <summary style="cursor:pointer;padding:10px 14px;color:#fbbf24;font-weight:600;font-size:0.95em;letter-spacing:0.3px;background:#161b22;border-radius:6px 6px 0 0">📖 Trading Details — how to deploy ${label} ${sharpeBadge} (click to expand / collapse)</summary>
       <div style="padding:14px 18px;font-size:0.86em;line-height:1.6;color:#c9d1d9">
 
-        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">1ï¸âƒ£ Signal generation (daily, after 16:00 ET close)</div>
+        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">1️⃣ Signal generation (daily, after 16:00 ET close)</div>
         <div style="margin-bottom:12px">${signalDesc}</div>
 
-        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">2ï¸âƒ£ Entry rules (executed at next session OPEN, 09:30 ET)</div>
+        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">2️⃣ Entry rules (executed at next session OPEN, 09:30 ET)</div>
         <ul style="margin:0 0 12px 20px">
-          <li>If direction = <b style="color:#3fb950">+1</b> â†’ BUY <b>1 unit</b> of QQQ at the open</li>
-          <li>If direction = <b style="color:#f85149">âˆ’1</b> â†’ SHORT <b>1 unit</b> of QQQ (or buy SH/SDS inverse-ETF if shorting prohibited)</li>
-          <li>If direction = <b style="color:#8b949e">0</b> â†’ STAY FLAT (no position)</li>
+          <li>If direction = <b style="color:#3fb950">+1</b> → BUY <b>1 unit</b> of QQQ at the open</li>
+          <li>If direction = <b style="color:#f85149">−1</b> → SHORT <b>1 unit</b> of QQQ (or buy SH/SDS inverse-ETF if shorting prohibited)</li>
+          <li>If direction = <b style="color:#8b949e">0</b> → STAY FLAT (no position)</li>
         </ul>
 
-        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">3ï¸âƒ£ Position sizing (Kelly criterion guidance)</div>
+        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">3️⃣ Position sizing (Kelly criterion guidance)</div>
         <div style="margin-bottom:12px">
-          <div>Backtested OOS Sharpe: <b style="color:${sh > 1 ? '#3fb950' : sh > 0 ? '#58a6ff' : '#f85149'}">${sh == null ? 'â€”' : sh.toFixed(3)}</b> | Excess vs Buy-Hold: <b>${ex == null ? 'â€”' : ex.toFixed(3)}</b></div>
+          <div>Backtested OOS Sharpe: <b style="color:${sh > 1 ? '#3fb950' : sh > 0 ? '#58a6ff' : '#f85149'}">${sh == null ? '—' : sh.toFixed(3)}</b> | Excess vs Buy-Hold: <b>${ex == null ? '—' : ex.toFixed(3)}</b></div>
           <div style="margin-top:4px">${kellyText}</div>
-          <div style="margin-top:4px;color:#8b949e;font-size:0.85em">Reference: Thorp 1969 'Optimal Gambling Systems for Favorable Games'; LÃ³pez de Prado 2018 'Advances in Financial ML' Â§10 on conviction sizing.</div>
+          <div style="margin-top:4px;color:#8b949e;font-size:0.85em">Reference: Thorp 1969 'Optimal Gambling Systems for Favorable Games'; López de Prado 2018 'Advances in Financial ML' §10 on conviction sizing.</div>
         </div>
 
-        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">4ï¸âƒ£ Exit rules</div>
+        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">4️⃣ Exit rules</div>
         <ul style="margin:0 0 12px 20px">
           <li><b>Daily rebalance</b>: close current position at next session OPEN (09:30 ET), then re-enter with new signal</li>
-          <li>No intraday trades â€” strategy is daily-direction only</li>
-          <li><b>Stop-loss</b> (recommended overlay): exit early if intraday MTM loss exceeds âˆ’2%</li>
+          <li>No intraday trades — strategy is daily-direction only</li>
+          <li><b>Stop-loss</b> (recommended overlay): exit early if intraday MTM loss exceeds −2%</li>
         </ul>
 
-        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">5ï¸âƒ£ Risk controls (mandatory for live deployment)</div>
+        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">5️⃣ Risk controls (mandatory for live deployment)</div>
         <table style="width:100%;font-size:0.85em;border-collapse:collapse;margin-bottom:12px">
           <thead><tr style="background:#161b22"><th style="text-align:left;padding:6px;border-bottom:1px solid #30363d">Trigger</th><th style="text-align:left;padding:6px;border-bottom:1px solid #30363d">Action</th></tr></thead>
           <tbody style="font-size:0.95em">
             <tr><td style="padding:6px;border-bottom:1px solid #21262d">5 consecutive loss days</td><td style="padding:6px;border-bottom:1px solid #21262d">Pause trading 5 days; investigate regime shift</td></tr>
-            <tr><td style="padding:6px;border-bottom:1px solid #21262d">Drawdown &gt; ${Math.max(8, Math.abs(mdd || 0) * 1.2).toFixed(0)}% from peak (â‰ˆ 1.2Ã— backtested max DD ${mdd == null ? 'â€”' : mdd.toFixed(2) + '%'})</td><td style="padding:6px;border-bottom:1px solid #21262d">Halve position size; halt if continues</td></tr>
-            <tr><td style="padding:6px;border-bottom:1px solid #21262d">YTD excess vs Buy-Hold &lt; âˆ’5%</td><td style="padding:6px;border-bottom:1px solid #21262d">Halve position; full halt at âˆ’10%</td></tr>
-            <tr><td style="padding:6px;border-bottom:1px solid #21262d">VIX &gt; 40 sustained</td><td style="padding:6px;border-bottom:1px solid #21262d">Stay flat â€” model never trained on extreme regimes</td></tr>
+            <tr><td style="padding:6px;border-bottom:1px solid #21262d">Drawdown &gt; ${Math.max(8, Math.abs(mdd || 0) * 1.2).toFixed(0)}% from peak (≈ 1.2× backtested max DD ${mdd == null ? '—' : mdd.toFixed(2) + '%'})</td><td style="padding:6px;border-bottom:1px solid #21262d">Halve position size; halt if continues</td></tr>
+            <tr><td style="padding:6px;border-bottom:1px solid #21262d">YTD excess vs Buy-Hold &lt; −5%</td><td style="padding:6px;border-bottom:1px solid #21262d">Halve position; full halt at −10%</td></tr>
+            <tr><td style="padding:6px;border-bottom:1px solid #21262d">VIX &gt; 40 sustained</td><td style="padding:6px;border-bottom:1px solid #21262d">Stay flat — model never trained on extreme regimes</td></tr>
             <tr><td style="padding:6px">Live hit-rate &lt; 45% over 30 days</td><td style="padding:6px">Pause; rerun OOS, possibly retrain</td></tr>
           </tbody>
         </table>
 
-        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">6ï¸âƒ£ Expected performance (backtested OOS Dec 2025 â†’ Apr 2026)</div>
+        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">6️⃣ Expected performance (backtested OOS Dec 2025 → Apr 2026)</div>
         <ul style="margin:0 0 12px 20px">
-          <li>Annualised Sharpe: <b>${sh == null ? 'â€”' : sh.toFixed(3)}</b> &nbsp; Excess vs BH: <b>${ex == null ? 'â€”' : ex.toFixed(3)}</b></li>
-          <li>Total return: <b>${ret == null ? 'â€”' : ret.toFixed(2)}%</b> over the 5-month OOS window</li>
-          <li>Hit rate: <b>${hit == null ? 'â€”' : hit.toFixed(1)}%</b> directional accuracy</li>
-          <li>Max drawdown: <b style="color:#f85149">${mdd == null ? 'â€”' : mdd.toFixed(2)}%</b></li>
-          <li>PSR (Bailey-LÃ³pez de Prado 2012): <b>${psr == null ? 'â€”' : psr.toFixed(3)}</b> &nbsp;<span style="color:#8b949e;font-size:0.85em">(probability Sharpe is &gt; 0; > 0.95 = statistically certain)</span></li>
+          <li>Annualised Sharpe: <b>${sh == null ? '—' : sh.toFixed(3)}</b> &nbsp; Excess vs BH: <b>${ex == null ? '—' : ex.toFixed(3)}</b></li>
+          <li>Total return: <b>${ret == null ? '—' : ret.toFixed(2)}%</b> over the 5-month OOS window</li>
+          <li>Hit rate: <b>${hit == null ? '—' : hit.toFixed(1)}%</b> directional accuracy</li>
+          <li>Max drawdown: <b style="color:#f85149">${mdd == null ? '—' : mdd.toFixed(2)}%</b></li>
+          <li>PSR (Bailey-López de Prado 2012): <b>${psr == null ? '—' : psr.toFixed(3)}</b> &nbsp;<span style="color:#8b949e;font-size:0.85em">(probability Sharpe is &gt; 0; > 0.95 = statistically certain)</span></li>
         </ul>
 
-        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">7ï¸âƒ£ Caveats &amp; warnings</div>
+        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">7️⃣ Caveats &amp; warnings</div>
         <ul style="margin:0 0 12px 20px">
-          <li>OOS window is only ~103 trading days â€” Sharpe has wide CI; expect realised live Sharpe in [${sh == null ? 'â€”' : (sh - 1).toFixed(2)}, ${sh == null ? 'â€”' : (sh + 1).toFixed(2)}] under standard assumptions</li>
-          <li>Single-asset (QQQ) â€” no portfolio diversification; correlated with the broad market</li>
+          <li>OOS window is only ~103 trading days — Sharpe has wide CI; expect realised live Sharpe in [${sh == null ? '—' : (sh - 1).toFixed(2)}, ${sh == null ? '—' : (sh + 1).toFixed(2)}] under standard assumptions</li>
+          <li>Single-asset (QQQ) — no portfolio diversification; correlated with the broad market</li>
           <li>Transaction costs not modelled (assume ~1-2 bps per trade for QQQ at retail; subtract from Sharpe)</li>
-          <li>Backtest uses adjusted close prices â€” real execution at OPEN may differ by slippage</li>
+          <li>Backtest uses adjusted close prices — real execution at OPEN may differ by slippage</li>
           <li>Model trained on data through 2025; regime drift after that is unmodelled</li>
-          <li>${isEnsemble ? `Ensemble member checkpoints must remain available â€” if any one becomes unavailable, fall back to "${r.strategy.replace('all', 'top')}" subset` : `Checkpoint reproducibility: re-run <code>python -m autoresearchspy.run_autoresearch</code> with the saved config to reproduce the same predictions`}</li>
+          <li>${isEnsemble ? `Ensemble member checkpoints must remain available — if any one becomes unavailable, fall back to "${r.strategy.replace('all', 'top')}" subset` : `Checkpoint reproducibility: re-run <code>python -m autoresearchspy.run_autoresearch</code> with the saved config to reproduce the same predictions`}</li>
         </ul>
 
-        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">8ï¸âƒ£ Reference / further reading</div>
+        <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">8️⃣ Reference / further reading</div>
         <ul style="margin:0 0 6px 20px;font-size:0.85em">
-          <li>Lakshminarayanan, Pritzel &amp; Blundell 2017 NeurIPS 'Simple and Scalable Predictive Uncertainty Estimation Using Deep Ensembles' (arXiv:1612.01474) â€” ensemble framing</li>
-          <li>Bailey &amp; LÃ³pez de Prado 2012 SSRN 'The Sharpe Ratio Efficient Frontier' â€” PSR formula</li>
-          <li>Thorp 1969 'Optimal Gambling Systems for Favorable Games' â€” Kelly criterion</li>
-          <li>Faber 2007 J. Wealth Mgmt 'A Quantitative Approach to Tactical Asset Allocation' â€” regime-filter overlay</li>
+          <li>Lakshminarayanan, Pritzel &amp; Blundell 2017 NeurIPS 'Simple and Scalable Predictive Uncertainty Estimation Using Deep Ensembles' (arXiv:1612.01474) — ensemble framing</li>
+          <li>Bailey &amp; López de Prado 2012 SSRN 'The Sharpe Ratio Efficient Frontier' — PSR formula</li>
+          <li>Thorp 1969 'Optimal Gambling Systems for Favorable Games' — Kelly criterion</li>
+          <li>Faber 2007 J. Wealth Mgmt 'A Quantitative Approach to Tactical Asset Allocation' — regime-filter overlay</li>
           <li>Project docs: <a href="TRADING_STRATEGIES.md" style="color:#58a6ff">TRADING_STRATEGIES.md</a> &middot; <a href="EXPLAINABILITY_REPORT.md" style="color:#58a6ff">EXPLAINABILITY_REPORT.md</a> &middot; <a href="DEPLOYMENT.md" style="color:#58a6ff">DEPLOYMENT.md</a></li>
         </ul>
       </div>
@@ -2443,17 +2443,17 @@ window.openOOSRowModal = function(expNum) {
   // For checkpoint-missing rows, show a helpful placeholder instead of silently failing
   if (!r.oos_equity_curve || r.oos_status !== 'completed') {
     document.getElementById('oos-row-modal-title').textContent =
-      `ðŸ›°ï¸ OOS â€” exp ${expNum} (rank #${r.rank}) â€” NO OOS DATA`;
+      `🛰️ OOS — exp ${expNum} (rank #${r.rank}) — NO OOS DATA`;
     document.getElementById('oos-row-modal-body').innerHTML = `
       <div style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:18px;color:#d29922">
-        <div style="font-weight:600;margin-bottom:10px;font-size:1.05em">âš  Checkpoint missing or OOS not yet run</div>
+        <div style="font-weight:600;margin-bottom:10px;font-size:1.05em">⚠ Checkpoint missing or OOS not yet run</div>
         <div style="color:#c9d1d9;font-size:0.9em;line-height:1.6">
           <div><b>Experiment:</b> ${expNum}</div>
           <div><b>Description:</b> ${r.description || ''}</div>
           <div><b>Backbone:</b> ${r.backbone || '?'} | <b>Seed:</b> ${r.seed || '?'}</div>
           <div><b>Train composite:</b> ${r.train_composite}</div>
           <div><b>Train val Sharpe:</b> ${r.train_val_sharpe}</div>
-          <div><b>Train +folds:</b> ${r.train_test_pos_folds == null ? 'â€”' : r.train_test_pos_folds}/7</div>
+          <div><b>Train +folds:</b> ${r.train_test_pos_folds == null ? '—' : r.train_test_pos_folds}/7</div>
           <div><b>Checkpoint status:</b> <code style="background:#0d1117;padding:2px 6px;border-radius:3px">${r.checkpoint_status || 'unknown'}</code></div>
           <div><b>OOS status:</b> <code style="background:#0d1117;padding:2px 6px;border-radius:3px">${r.oos_status || 'pending'}</code></div>
         </div>
@@ -2464,11 +2464,11 @@ window.openOOSRowModal = function(expNum) {
     return;
   }
   document.getElementById('oos-row-modal-title').textContent =
-    `ðŸ›°ï¸ OOS Live-Data Inference â€” exp ${expNum} (rank #${r.rank})`;
+    `🛰️ OOS Live-Data Inference — exp ${expNum} (rank #${r.rank})`;
 
   const sharpeColor = (v) => v == null || isNaN(v) ? '#8b949e' : (v > 1.0 ? '#3fb950' : v > 0 ? '#58a6ff' : '#f85149');
-  const fmt = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(2);
-  const fmt4 = (v) => v == null || isNaN(v) ? 'â€”' : (v >= 0 ? '+' : '') + Number(v).toFixed(4);
+  const fmt = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2);
+  const fmt4 = (v) => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(4);
 
   const cards = `
     <div class="grid" style="margin-bottom:18px">
@@ -2478,8 +2478,8 @@ window.openOOSRowModal = function(expNum) {
       <div class="card"><div class="label">Strategy Return</div><div class="value" style="color:${sharpeColor(r.oos_strategy_total_return_pct)}">${fmt(r.oos_strategy_total_return_pct)}%</div></div>
       <div class="card"><div class="label">Buy-Hold Return</div><div class="value" style="color:${sharpeColor(r.oos_buy_hold_total_return_pct)}">${fmt(r.oos_buy_hold_total_return_pct)}%</div></div>
       <div class="card"><div class="label">Excess Return</div><div class="value" style="color:${sharpeColor(r.oos_excess_return_pct)}">${fmt(r.oos_excess_return_pct)}%</div></div>
-      <div class="card"><div class="label">Hit Rate</div><div class="value">${r.oos_hit_rate_pct == null ? 'â€”' : Number(r.oos_hit_rate_pct).toFixed(1)+'%'}</div></div>
-      <div class="card"><div class="label">PSR</div><div class="value" style="color:${sharpeColor(r.oos_psr ? r.oos_psr - 0.5 : 0)}">${r.oos_psr == null ? 'â€”' : Number(r.oos_psr).toFixed(3)}</div></div>
+      <div class="card"><div class="label">Hit Rate</div><div class="value">${r.oos_hit_rate_pct == null ? '—' : Number(r.oos_hit_rate_pct).toFixed(1)+'%'}</div></div>
+      <div class="card"><div class="label">PSR</div><div class="value" style="color:${sharpeColor(r.oos_psr ? r.oos_psr - 0.5 : 0)}">${r.oos_psr == null ? '—' : Number(r.oos_psr).toFixed(3)}</div></div>
       <div class="card"><div class="label">Max Drawdown</div><div class="value" style="color:#f85149">${fmt(r.oos_max_drawdown_pct)}%</div></div>
     </div>`;
 
@@ -2491,14 +2491,14 @@ window.openOOSRowModal = function(expNum) {
         <div><b>Backbone:</b> ${r.backbone} | <b>Seed:</b> ${r.seed}</div>
         <div><b>Train composite:</b> ${r.train_composite}</div>
         <div><b>Train val Sharpe:</b> ${r.train_val_sharpe}</div>
-        <div><b>Train +folds:</b> ${r.train_test_pos_folds == null ? 'â€”' : r.train_test_pos_folds}/7</div>
+        <div><b>Train +folds:</b> ${r.train_test_pos_folds == null ? '—' : r.train_test_pos_folds}/7</div>
         <div><b>Checkpoint source:</b> <code style="font-size:0.78em">${r.oos_checkpoint_source}</code></div>
       </div>
       <div style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px">
         <div style="font-weight:600;color:#58a6ff;margin-bottom:6px">OOS Methodology</div>
-        <div><b>OOS window:</b> ${data.oos_window.start} â†’ ${data.oos_window.end}</div>
+        <div><b>OOS window:</b> ${data.oos_window.start} → ${data.oos_window.end}</div>
         <div><b>Predictions:</b> ${r.oos_n_predictions} (${r.oos_n_with_actuals} with realised actuals)</div>
-        <div><b>Pipeline:</b> sliding 60-day feature window â†’ forward pass (no_grad) â†’ sign(mu_1d) sets trade direction</div>
+        <div><b>Pipeline:</b> sliding 60-day feature window → forward pass (no_grad) → sign(mu_1d) sets trade direction</div>
         <div><b>Scaler:</b> training-set mean+std applied (no peeking)</div>
         <div><b>Inference only:</b> no retraining; checkpoint frozen</div>
       </div>
@@ -2514,7 +2514,7 @@ window.openOOSRowModal = function(expNum) {
   const y = (v) => M.t + innerH - ((v - (yMin - yPad)) / ((yMax + yPad) - (yMin - yPad))) * innerH;
   const path = (vals, color) => `<polyline fill="none" stroke="${color}" stroke-width="2.5" points="${vals.map((v,i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}"/>`;
   const equityChart = `
-    <div style="font-weight:600;color:#58a6ff;font-size:0.95em;margin-bottom:6px">Equity Curve â€” Strategy vs Buy-and-Hold</div>
+    <div style="font-weight:600;color:#58a6ff;font-size:0.95em;margin-bottom:6px">Equity Curve — Strategy vs Buy-and-Hold</div>
     <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;max-width:100%">
       <line x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.t + innerH}" stroke="#30363d"/>
       <line x1="${M.l}" y1="${M.t + innerH}" x2="${M.l + innerW}" y2="${M.t + innerH}" stroke="#30363d"/>
@@ -2524,10 +2524,10 @@ window.openOOSRowModal = function(expNum) {
       <text x="${M.l + innerW}" y="${M.t + innerH + 20}" fill="#8b949e" font-size="12" text-anchor="end">${eq.dates[eq.dates.length-1]}</text>
       ${path(eq.buy_hold_pct, '#8b949e')}
       ${path(eq.strategy_pct, '#3fb950')}
-      <text x="${M.l + 10}" y="${M.t + 16}" fill="#3fb950" font-size="13" font-weight="600">â€” Strategy</text>
-      <text x="${M.l + 100}" y="${M.t + 16}" fill="#8b949e" font-size="13">â€” Buy &amp; Hold</text>
+      <text x="${M.l + 10}" y="${M.t + 16}" fill="#3fb950" font-size="13" font-weight="600">— Strategy</text>
+      <text x="${M.l + 100}" y="${M.t + 16}" fill="#8b949e" font-size="13">— Buy &amp; Hold</text>
     </svg>
-    <div style="margin-top:12px"><a href="${r.oos_csv}" download style="background:#238636;color:#fff;text-decoration:none;padding:6px 14px;border-radius:4px;font-weight:600">ðŸ“¥ Download Full Predictions CSV</a></div>`;
+    <div style="margin-top:12px"><a href="${r.oos_csv}" download style="background:#238636;color:#fff;text-decoration:none;padding:6px 14px;border-radius:4px;font-weight:600">📥 Download Full Predictions CSV</a></div>`;
 
   document.getElementById('oos-row-modal-body').innerHTML = cards + winnerInfo + equityChart;
 };
