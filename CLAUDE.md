@@ -1454,3 +1454,15 @@ User: *can you fix the look ahead thing - may be you can redo trading strategy b
 6. **Workflow contract:** decide trading-strategy rules using only train+val+in-sample-test. Lock them. Apply mechanically to OOS. Tuning any parameter on OOS = leakage.
 
 **For paper-trading: pick ONLY from green-badged strategies** (`is_leaky: false`).
+
+### Directive 70 (2026-05-10) -- REMOVE all leaky strategies
+
+User: *why leaky strategy ? i dont want. i want just non leaky*
+
+Builders amputated to NEVER compute leaky strategies. `_build_qqq_ensemble_summary.py` and `_build_qqq_smart_strategies.py` no longer include `by_oos_sharpe`, `by_oos_return`, `by_excess`, `by_hit`, `by_psr`, `by_min_dd`, `by_compound`, `by_sortino`, `by_recency_30d` in their selection/weight criteria. Only `by_train_*`, `all_*`, `vote_geq_*` plus all sizings/overlays/hedges remain (all causal).
+
+Smart-strategies builder also enriches members with TRAIN-TIME metrics from `experiment_log.jsonl` so the new `by_train_*` criteria can compute.
+
+Stale leaky CSVs purged from disk on 2026-05-10 cleanup (824 in QQQ).
+
+**Counts after Directive 70 cleanup:** Ensemble 332 (all clean) | Smart 686 (all clean) | Total deployable **1018**.

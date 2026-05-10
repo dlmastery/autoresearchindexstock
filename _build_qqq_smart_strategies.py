@@ -535,6 +535,37 @@ def build_ensemble_signals_from_members(individual_signals: dict[str, tuple[pd.S
     for r in table_data.get("table", []):
         if r.get("oos_status") == "completed":
             member_meta_by_exp[r["experiment_num"]] = r
+    # Per Directive 70: enrich each member with TRAIN-TIME metrics from
+    # experiment_log.jsonl so causal selection criteria (by_train_*) work.
+    log_path = R / "experiment_log.jsonl"
+    if log_path.exists():
+        with open(log_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    e = json.loads(line)
+                except Exception:
+                    continue
+                en = e.get("experiment_num")
+                if en is None or en not in member_meta_by_exp:
+                    continue
+                target = member_meta_by_exp[en]
+                tm = {
+                    "train_test_sharpe":   e.get("sharpe"),
+                    "train_val_sharpe":    e.get("val_sharpe"),
+                    "train_train_sharpe":  e.get("train_sharpe"),
+                    "train_hit":           e.get("hit"),
+                    "train_psr":           e.get("psr"),
+                    "train_equity":        e.get("equity"),
+                    "train_return_pct":    e.get("return_pct"),
+                    "train_excess_sharpe": e.get("excess_sharpe"),
+                    "train_composite":     e.get("composite"),
+                    "train_ic":            e.get("ic"),
+                }
+                for k, v in tm.items():
+                    target.setdefault(k, v)
 
     # Build a merged DataFrame with all members' predictions
     members_loaded: list[dict] = []
@@ -575,15 +606,16 @@ def build_ensemble_signals_from_members(individual_signals: dict[str, tuple[pd.S
 
     out: dict[str, tuple[pd.Series, pd.Series, dict]] = {}
 
-    # Selection criteria from member metadata
+    # Selection criteria — Directive 70 (2026-05-10): ONLY causal (train-time)
+    # metrics. Removed by_oos_*: they were post-hoc / look-ahead.
     criteria = [
-        ("by_oos_sharpe", lambda m: m.get("oos_strategy_annual_sharpe") or -99, False),
-        ("by_oos_return", lambda m: m.get("oos_strategy_total_return_pct") or -99, False),
-        ("by_excess",     lambda m: m.get("oos_excess_sharpe") or -99, False),
-        ("by_hit",        lambda m: m.get("oos_hit_rate_pct") or 0, False),
-        ("by_psr",        lambda m: m.get("oos_psr") or 0, False),
-        ("by_min_dd",     lambda m: -(m.get("oos_max_drawdown_pct") or -99), False),  # least-negative DD = best
-        ("by_train_composite", lambda m: m.get("train_composite") or -99, False),
+        ("by_train_composite",     lambda m: m.get("train_composite") or -99, False),
+        ("by_train_test_sharpe",   lambda m: m.get("train_test_sharpe") or m.get("sharpe") or -99, False),
+        ("by_train_val_sharpe",    lambda m: m.get("train_val_sharpe") or m.get("val_sharpe") or -99, False),
+        ("by_train_hit",           lambda m: m.get("train_hit") or m.get("hit") or 0, False),
+        ("by_train_psr",           lambda m: m.get("train_psr") or m.get("psr") or 0, False),
+        ("by_train_equity",        lambda m: m.get("train_equity") or m.get("equity") or 0, False),
+        ("by_train_excess_sharpe", lambda m: m.get("train_excess_sharpe") or m.get("excess_sharpe") or -99, False),
     ]
 
     def member_indices_top_k(key_fn, k: int) -> list[int]:

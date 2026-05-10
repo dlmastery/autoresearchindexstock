@@ -367,23 +367,15 @@ def main():
     base_signals.append((f"all{n}_vote", merged[[dir_col(m) for m in valid_members]].sum(axis=1) / n,
                          [m["experiment_num"] for m in valid_members]))
 
+    # Per Directive 70 (2026-05-10): NO LEAKY STRATEGIES. Only causal
+    # (train-time) weights. The by_oos_* family is removed.
     weight_metrics_full = [
-        # Hindsight (descriptive only — flagged is_leaky=True)
-        ("by_oos_sharpe", "oos_strategy_annual_sharpe"),
-        ("by_oos_return", "oos_strategy_total_return_pct"),
-        ("by_excess", "oos_excess_sharpe"),
-        ("by_hit", "oos_hit_rate_pct"),
-        ("by_psr", "oos_psr"),
-        ("by_compound", "compound_dollars"),
-        ("by_sortino", "sortino"),
-        ("by_recency_30d", "recency_30d_sharpe"),
-        # Causal (deployable) — Directive 68/69
-        ("by_train_composite",   "train_composite"),
-        ("by_train_test_sharpe", "train_test_sharpe"),
-        ("by_train_val_sharpe",  "train_val_sharpe"),
-        ("by_train_hit",         "train_hit"),
-        ("by_train_psr",         "train_psr"),
-        ("by_train_equity",      "train_equity"),
+        ("by_train_composite",    "train_composite"),
+        ("by_train_test_sharpe",  "train_test_sharpe"),
+        ("by_train_val_sharpe",   "train_val_sharpe"),
+        ("by_train_hit",          "train_hit"),
+        ("by_train_psr",          "train_psr"),
+        ("by_train_equity",       "train_equity"),
         ("by_train_excess_sharpe","train_excess_sharpe"),
     ]
     for tag, key in weight_metrics_full:
@@ -394,19 +386,8 @@ def main():
         base_signals.append((f"all{n}_weighted_{tag}", pd.Series(sig, index=merged.index),
                              [m["experiment_num"] for m in valid_members]))
 
-    # Top-K x criterion x aggregation grid (Directive 68/69 split)
+    # Per Directive 70 (2026-05-10) — ONLY causal (train-time) selection.
     selection_criteria = [
-        # POST-HOC (HINDSIGHT) — flagged is_leaky=True
-        ("by_oos_sharpe",   "oos_strategy_annual_sharpe", False),
-        ("by_oos_return",   "oos_strategy_total_return_pct", False),
-        ("by_excess",       "oos_excess_sharpe", False),
-        ("by_hit",          "oos_hit_rate_pct", False),
-        ("by_psr",          "oos_psr", False),
-        ("by_min_dd",       "oos_max_drawdown_pct", True),
-        ("by_compound",     "compound_dollars", False),
-        ("by_sortino",      "sortino", False),
-        ("by_recency_30d",  "recency_30d_sharpe", False),
-        # CAUSAL (TRAIN-TIME) — deployable
         ("by_train_composite",    "train_composite", False),
         ("by_train_test_sharpe",  "train_test_sharpe", False),
         ("by_train_val_sharpe",   "train_val_sharpe", False),
