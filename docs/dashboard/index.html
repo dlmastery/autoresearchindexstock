@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>AutoResearch QQQ Dashboard (build 20260509-090000 + mojibake-repaired)</title>
+<title>AutoResearch QQQ Dashboard (build 20260510-013000 + strategy-recipe-explainer + 16col-spy-ensemble-rebuilt)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }
@@ -568,6 +568,74 @@ document.querySelectorAll('#oos-ensemble-table th[data-esort]').forEach(th => {
     drawEnsembleTable();
   });
 });
+
+// Decode an ensemble/smart strategy name into a human-readable plan.
+function decodeStrategyName(name, s) {
+  const parts = name.split('__');
+  const sel = parts[0] || '';
+  let selDesc = '', aggDesc = '', sizingDesc = '', overlayDesc = '';
+  let m;
+  if ((m = sel.match(/^all(\d+)/))) selDesc = `Use ALL <b>${m[1]}</b> ensemble members.`;
+  else if ((m = sel.match(/^top(\d+)_by_(\w+?)(_(mean|vote|weighted))?$/))) selDesc = `Pick top <b>${m[1]}</b> members ranked by <b>${m[2]}</b> (per-member OOS metric).`;
+  else if ((m = sel.match(/^vote_geq_(\d+)_of_(\d+)/))) selDesc = `<b>High-confidence filter</b> — only trade when ≥ <b>${m[1]}</b> of <b>${m[2]}</b> members agree on direction.`;
+  else if (sel.startsWith('individual_')) selDesc = `<b>Single model</b> — ${sel.replace('individual_','')} (no ensembling).`;
+  else if (sel.startsWith('ensemble_')) selDesc = `<b>Pre-built ensemble</b> — ${sel.replace('ensemble_','')}.`;
+  else selDesc = `Selection: <code>${sel}</code>`;
+  if (sel.endsWith('_mean'))         aggDesc = '<b>Arithmetic mean</b> of member predictions; trade sign of the mean.';
+  else if (sel.endsWith('_vote'))    aggDesc = '<b>Majority vote</b> on direction; tie = no trade.';
+  else if (sel.endsWith('_weighted')) aggDesc = '<b>Weighted mean</b> (weight ∝ per-member ranking metric).';
+  else aggDesc = '<i>aggregation embedded in selection mode</i>';
+  const sizing = (parts[1] || 'raw');
+  if (sizing === 'raw' || !sizing) sizingDesc = '<b>raw</b> — full ±1 unit position when traded.';
+  else if (sizing === 'kelly')      sizingDesc = '<b>quarter-Kelly</b> (Thorp 1969) — size = 0.25 × edge/variance, capped ±1.';
+  else if (sizing === 'conf')       sizingDesc = '<b>confidence-weighted</b> — size ∝ |mean| / aleatoric uncertainty (Kendall-Gal 2017).';
+  else if (sizing === 'voltarget')  sizingDesc = '<b>vol-target 15% annualized</b> (Lim-Zohren-Roberts 2019).';
+  else sizingDesc = `<code>${sizing}</code>`;
+  const overlay = parts[2] || (parts[1] && !['raw','kelly','conf','voltarget'].includes(parts[1]) ? parts[1] : null);
+  if (!overlay)                                overlayDesc = '<b>no overlay</b> — trade every signal day at the sized position.';
+  else if (overlay === 'sma200filter')         overlayDesc = '<b>200-day SMA trend filter</b> (Faber 2007) — only LONG when underlying > 200d SMA, only SHORT when below; otherwise FLAT. <span style="color:#fbbf24">Main reason for low traded-day count.</span>';
+  else if (overlay === 'sma200_real')          overlayDesc = '<b>SMA-200 trend filter (real prices)</b> — only LONG when QQQ > 200d SMA on real yfinance closes; otherwise FLAT.';
+  else if (overlay === 'stoploss2pct')         overlayDesc = '<b>2% intraday stop-loss</b> — exit position when MTM loss hits 2%.';
+  else if (overlay === 'dd_gate_5pct' || overlay === 'drawdown_gate_5pct') overlayDesc = '<b>5% drawdown gate</b> — halt new entries if strategy equity has drawn down ≥ 5%.';
+  else if (overlay === 'protective_put')       overlayDesc = '<b>protective put hedge</b> — long underlying + buy 30d 5%-OTM put (Black-Scholes via VXN as IV proxy).';
+  else if (overlay === 'covered_call')         overlayDesc = '<b>covered call hedge</b> — long underlying + sell 30d 5%-OTM call (collect premium, cap upside).';
+  else if (overlay === 'collar')               overlayDesc = '<b>collar</b> — long underlying + protective put + covered call (bounded P&L).';
+  else if (overlay === 'cash_secured_put')     overlayDesc = '<b>cash-secured put</b> — sell 30d 5%-OTM put, hold cash to cover assignment.';
+  else if (overlay === 'vertical_call_spread') overlayDesc = '<b>vertical call spread</b> — long ATM call + short 5%-OTM call (defined-risk bullish).';
+  else if (overlay === 'synthetic_long')       overlayDesc = '<b>synthetic long</b> — long ATM call + short ATM put (replicates underlying).';
+  else if (overlay === 'hold_until_flip')      overlayDesc = '<b>hold-until-flip</b> — keep direction until prediction sign changes (reduces churn / txn cost).';
+  else if (overlay === 'dead_zone')            overlayDesc = '<b>dead-zone filter</b> — only trade when |prediction| > 1 std-dev (skip low-conviction days).';
+  else if (overlay === 'vol_regime_gate_15')   overlayDesc = '<b>vol-regime gate</b> — only trade when realized 60d vol > 15% (CRISIS-TRADE specialist).';
+  else if (overlay === 'quarter_kelly')        overlayDesc = '<b>quarter-Kelly sizing</b> — size = 0.25 × edge/variance (Thorp 1969).';
+  else if (overlay === 'vol_target_15pct')     overlayDesc = '<b>vol-target 15% annualized</b> (Lim-Zohren-Roberts 2019).';
+  else if (overlay === 'confidence_weighted')  overlayDesc = '<b>confidence-weighted sizing</b> — modulate by 1 - epistemic uncertainty.';
+  else if (overlay === 'raw')                  overlayDesc = '<b>raw</b> — no overlay; trade every signal day at full size.';
+  else                                          overlayDesc = `<code>${overlay}</code>`;
+  const nTotal = s.n_predictions || s.n_common_dates || (window._ensembleData ? window._ensembleData.n_common_dates : null) || 0;
+  const nTraded = s.n_traded_days != null ? s.n_traded_days : (s.exposure_pct != null ? Math.round(nTotal * s.exposure_pct / 100) : null);
+  const nSkipped = nTotal && nTraded != null ? (nTotal - nTraded) : null;
+  const exp = s.exposure_pct != null ? Number(s.exposure_pct).toFixed(1) + '%' : '—';
+  const stderr = nTraded ? (50 / Math.sqrt(nTraded)).toFixed(1) : '—';
+  const tradeBreakdown = `
+    <div style="margin-top:8px;padding:8px;background:#0d1117;border:1px dashed #c779dd;border-radius:4px">
+      <div style="color:#fbbf24;font-weight:600;margin-bottom:4px">📊 Trade-day breakdown — why only ${nTraded ?? '?'} of ${nTotal} OOS days were traded</div>
+      <div>• <b>${nTotal}</b> OOS days available (full forward window)</div>
+      <div>• <b>${nTraded ?? '?'}</b> days actually traded (position ≠ 0) → <b>exposure ${exp}</b></div>
+      ${nSkipped != null ? `<div>• <b>${nSkipped}</b> days FLAT — filtered out by overlay/dead-zone/SMA/vol-gate rule above</div>` : ''}
+      <div style="color:#8b949e;font-size:0.85em;margin-top:4px">Hit rate is computed only over the ${nTraded ?? '?'} traded days. Binomial std-error at n=${nTraded ?? '?'} is ≈ <b>${stderr}%</b> on a 50% baseline — a hit rate within ±2σ of 50% is statistically indistinguishable from coin-flip.</div>
+    </div>`;
+  return `
+    <div style="margin-top:14px;padding:12px;background:#1a0d28;border:1px solid #fbbf24;border-radius:6px">
+      <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px">📖 Strategy Recipe — <code>${name}</code></div>
+      <div style="margin-bottom:6px"><b style="color:#58a6ff">1. Member selection:</b> ${selDesc}</div>
+      <div style="margin-bottom:6px"><b style="color:#58a6ff">2. Prediction aggregation:</b> ${aggDesc}</div>
+      <div style="margin-bottom:6px"><b style="color:#58a6ff">3. Position sizing:</b> ${sizingDesc}</div>
+      <div style="margin-bottom:6px"><b style="color:#58a6ff">4. Overlay / filter / hedge:</b> ${overlayDesc}</div>
+      ${tradeBreakdown}
+    </div>`;
+}
+window.decodeStrategyName = decodeStrategyName;
+
 function loadEnsembleDetails(strategyName) {
   if (!_ensembleData || !_ensembleData.strategies) return;
   const s = _ensembleData.strategies[strategyName];
@@ -607,6 +675,7 @@ function loadEnsembleDetails(strategyName) {
     const y = (v) => M.t + innerH - ((v - (yMin - yPad)) / ((yMax + yPad) - (yMin - yPad))) * innerH;
     const path = (vals, color) => `<polyline fill="none" stroke="${color}" stroke-width="2" points="${vals.map((v,i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}"/>`;
     chartEl.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;max-width:100%"><line x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.t + innerH}" stroke="#30363d"/><line x1="${M.l}" y1="${M.t + innerH}" x2="${M.l + innerW}" y2="${M.t + innerH}" stroke="#30363d"/><line x1="${M.l}" y1="${y(0)}" x2="${M.l + innerW}" y2="${y(0)}" stroke="#484f58" stroke-dasharray="2,3"/><text x="${M.l}" y="${M.t + innerH + 18}" fill="#8b949e" font-size="11">${eq.dates[0]}</text><text x="${M.l + innerW}" y="${M.t + innerH + 18}" fill="#8b949e" font-size="11" text-anchor="end">${eq.dates[eq.dates.length - 1]}</text>${path(eq.buy_hold_pct, '#8b949e')}${path(eq.strategy_pct, '#fbbf24')}<text x="${M.l + 10}" y="${M.t + 14}" fill="#fbbf24" font-size="12" font-weight="600">— Ensemble (${strategyName})</text><text x="${M.l + 200}" y="${M.t + 14}" fill="#8b949e" font-size="12">— Buy &amp; Hold</text></svg>`
+      + decodeStrategyName(strategyName, s)
       + (window.buildTradingDetailsHTML ? window.buildTradingDetailsHTML({...s, strategy: strategyName, n_members: _ensembleData.n_members}, 'ensemble') : '')
       + (window.buildSmartVariantsHTML ? window.buildSmartVariantsHTML('ensemble_' + strategyName, 'Ensemble Strategy') : '');
   }
@@ -861,6 +930,7 @@ function loadSmartDetails(name) {
   const variantsHTML = (window.buildSmartVariantsHTML ? window.buildSmartVariantsHTML(s.signal_source, 'Other overlays on same signal source') : '');
 
   detailEl.innerHTML = header + cards + chartHTML
+    + decodeStrategyName(name, s)
     + `<div style="margin-top:10px">${csvBtn}</div>`
     + variantsHTML;
   detailEl.style.display = '';
