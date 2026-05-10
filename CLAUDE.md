@@ -1434,3 +1434,23 @@ User: *how did you come up with strategy to decide to trade or not for each row 
 **Mandatory dashboard display:** `decodeStrategyName(name, s)` detects leaky tags and renders a red ⚠️ LOOK-AHEAD WARNING badge for hindsight-biased strategies; clean strategies get a green ✅ badge. `getEnsembleChampion()` prefers clean strategies for the chart benchmark line.
 
 **Deployable** = `top<K>_by_train_composite__*`, `all<N>_mean__*`, `all<N>_vote__*`, `vote_geq_K_of_N__*` (any sizing/overlay combination is fine — those are causal). The `top<K>_by_oos_*` family stays in the JSON for oracle-bound analysis, NOT for deployment.
+
+### Directive 69 (2026-05-10) -- Causal-only ensemble selection (decide on TRAIN+VAL, evaluate on OOS)
+
+User: *can you fix the look ahead thing - may be you can redo trading strategy by figuring out the criteria on test and validation data only and not on oos data + all oos stuff need to be using test and validation to get the trading strategy and then use it on oos*
+
+**MANDATORY (effective 2026-05-10):**
+
+1. `_build_qqq_ensemble_summary.py:load_completed_members()` enriches every member with TRAIN-TIME metrics from `experiment_log.jsonl`: `train_test_sharpe`, `train_val_sharpe`, `train_train_sharpe`, `train_hit`, `train_psr`, `train_equity`, `train_return_pct`, `train_excess_sharpe`, `train_composite`, `train_ic`. Causal — observable BEFORE OOS.
+
+2. `selection_criteria` and `weight_metrics_full` split into HINDSIGHT vs CAUSAL blocks. New deployable selections: `by_train_test_sharpe`, `by_train_val_sharpe`, `by_train_hit`, `by_train_psr`, `by_train_equity`, `by_train_excess_sharpe`, `by_train_return_pct` (in addition to existing `by_train_composite`).
+
+3. Every strategy record in `oos_ensemble_summary.json` MUST carry `is_leaky` (bool) + `selection_basis` (string). Final-pass tagging walks all strategies after build (catches `stoploss2pct`, `ddgate5pct`, `sma200filter` overlays that bypass `add()`).
+
+4. Summary JSON adds `n_leaky_strategies`, `n_clean_strategies`, `leakage_audit_directive` at top level.
+
+5. Dashboard `decodeStrategyName()` prefers server-side `is_leaky` flag over client regex; renders red ⚠️ vs green ✅ DEPLOYABLE badge. `getEnsembleChampion()` prefers clean strategies for chart benchmark.
+
+6. **Workflow contract:** decide trading-strategy rules using only train+val+in-sample-test. Lock them. Apply mechanically to OOS. Tuning any parameter on OOS = leakage.
+
+**For paper-trading: pick ONLY from green-badged strategies** (`is_leaky: false`).

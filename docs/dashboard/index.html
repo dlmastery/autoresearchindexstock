@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>AutoResearch QQQ Dashboard (build 20260510-024000 + look-ahead-warning-badge + clean-benchmark)</title>
+<title>AutoResearch QQQ Dashboard (build 20260510-040000 + causal-train-selection + server-is_leaky-flag)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }
@@ -627,9 +627,12 @@ function decodeStrategyName(name, s) {
       ${nSkipped != null ? `<div>• <b>${nSkipped}</b> days FLAT — filtered out by overlay/dead-zone/SMA/vol-gate rule above</div>` : ''}
       <div style="color:#8b949e;font-size:0.85em;margin-top:4px">Hit rate is computed only over the ${nTraded ?? '?'} traded days. Binomial std-error at n=${nTraded ?? '?'} is ≈ <b>${stderr}%</b> on a 50% baseline — a hit rate within ±2σ of 50% is statistically indistinguishable from coin-flip.</div>
     </div>`;
-  const leakyBadge = isLeaky
-    ? `<div style="margin-bottom:8px;padding:8px;background:#3d0d0d;border:2px solid #f85149;border-radius:4px;font-size:0.92em"><b style="color:#f85149">⚠️ LOOK-AHEAD WARNING (hindsight bias):</b> this strategy ranks ensemble members by a metric computed on the OOS window itself. It is <b>descriptive</b> (what would have been best in hindsight) NOT <b>deployable</b> (you cannot know OOS metrics on day 1 of OOS). For real deployment use <code>by_train_composite</code>, <code>all_mean</code>, <code>all_vote</code>, or <code>vote_geq_K_of_N</code> instead. The OOS-ranked variants are useful only as upper bounds on what an oracle ensemble could achieve.</div>`
-    : `<div style="margin-bottom:8px;padding:6px;background:#0d2818;border:1px solid #3fb950;border-radius:4px;font-size:0.88em"><b style="color:#3fb950">✅ No look-ahead:</b> selection uses train-time metric or a non-selective per-day rule — deployable as-is.</div>`;
+  const serverLeaky = (s && typeof s.is_leaky === 'boolean') ? s.is_leaky : null;
+  const finalLeaky = serverLeaky != null ? serverLeaky : isLeaky;
+  const serverBasis = (s && s.selection_basis) ? s.selection_basis : '';
+  const leakyBadge = finalLeaky
+    ? `<div style="margin-bottom:8px;padding:8px;background:#3d0d0d;border:2px solid #f85149;border-radius:4px;font-size:0.92em"><b style="color:#f85149">⚠️ LOOK-AHEAD WARNING (hindsight bias):</b> selection uses OOS-realized metrics. <b>Descriptive only — NOT deployable.</b> Pick a green-badged strategy (<code>by_train_*</code>, <code>all_mean</code>, <code>all_vote</code>, <code>vote_geq_K</code>) for paper-trading.${serverBasis ? '<br><span style=\"color:#8b949e;font-size:0.8em\">Basis: ' + serverBasis + '</span>' : ''}</div>`
+    : `<div style="margin-bottom:8px;padding:6px;background:#0d2818;border:1px solid #3fb950;border-radius:4px;font-size:0.88em"><b style="color:#3fb950">✅ DEPLOYABLE (no look-ahead):</b> selection uses train-time / in-sample metrics or no member selection.${serverBasis ? '<br><span style=\"color:#8b949e;font-size:0.8em\">Basis: ' + serverBasis + '</span>' : ''}</div>`;
   return `
     <div style="margin-top:14px;padding:12px;background:#1a0d28;border:1px solid #fbbf24;border-radius:6px">
       ${leakyBadge}

@@ -74,6 +74,42 @@ def equity_path_dollars(log_pnl_series: pd.Series, start: float = START_CAPITAL)
 def load_completed_members() -> list[dict]:
     d = json.loads(TABLE.read_text(encoding="utf-8"))
     rows = [r for r in d["table"] if r.get("oos_status") == "completed" and r.get("oos_csv")]
+    # Per Directive 68/69: enrich each member with TRAIN-TIME (in-sample) metrics from
+    # experiment_log.jsonl so member selection can be done on causal metrics only.
+    log_path = R / "experiment_log.jsonl"
+    if log_path.exists():
+        train_meta = {}
+        with open(log_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    e = json.loads(line)
+                except Exception:
+                    continue
+                en = e.get("experiment_num")
+                if en is None:
+                    continue
+                train_meta[en] = {
+                    "train_test_sharpe":   e.get("sharpe"),
+                    "train_val_sharpe":    e.get("val_sharpe"),
+                    "train_train_sharpe":  e.get("train_sharpe"),
+                    "train_hit":           e.get("hit"),
+                    "train_psr":           e.get("psr"),
+                    "train_equity":        e.get("equity"),
+                    "train_return_pct":    e.get("return_pct"),
+                    "train_excess_sharpe": e.get("excess_sharpe"),
+                    "train_composite":     e.get("composite"),
+                    "train_ic":            e.get("ic"),
+                    "train_test_pos_folds":  e.get("test_pos_folds"),
+                    "train_val_pos_folds":   e.get("val_pos_folds"),
+                }
+        for r in rows:
+            en = r.get("experiment_num")
+            tm = train_meta.get(en) or {}
+            for k, v in tm.items():
+                r.setdefault(k, v)
     return rows
 
 
@@ -332,6 +368,7 @@ def main():
                          [m["experiment_num"] for m in valid_members]))
 
     weight_metrics_full = [
+        # Hindsight (descriptive only — flagged is_leaky=True)
         ("by_oos_sharpe", "oos_strategy_annual_sharpe"),
         ("by_oos_return", "oos_strategy_total_return_pct"),
         ("by_excess", "oos_excess_sharpe"),
@@ -340,6 +377,14 @@ def main():
         ("by_compound", "compound_dollars"),
         ("by_sortino", "sortino"),
         ("by_recency_30d", "recency_30d_sharpe"),
+        # Causal (deployable) — Directive 68/69
+        ("by_train_composite",   "train_composite"),
+        ("by_train_test_sharpe", "train_test_sharpe"),
+        ("by_train_val_sharpe",  "train_val_sharpe"),
+        ("by_train_hit",         "train_hit"),
+        ("by_train_psr",         "train_psr"),
+        ("by_train_equity",      "train_equity"),
+        ("by_train_excess_sharpe","train_excess_sharpe"),
     ]
     for tag, key in weight_metrics_full:
         ws = np.array([max(0.001, valid_members[i].get(key) or 0.001) for i in range(n)])
@@ -349,18 +394,27 @@ def main():
         base_signals.append((f"all{n}_weighted_{tag}", pd.Series(sig, index=merged.index),
                              [m["experiment_num"] for m in valid_members]))
 
-    # Top-K x criterion x aggregation grid
+    # Top-K x criterion x aggregation grid (Directive 68/69 split)
     selection_criteria = [
-        ("by_oos_sharpe", "oos_strategy_annual_sharpe", False),
-        ("by_oos_return", "oos_strategy_total_return_pct", False),
-        ("by_excess", "oos_excess_sharpe", False),
-        ("by_hit", "oos_hit_rate_pct", False),
-        ("by_psr", "oos_psr", False),
-        ("by_min_dd", "oos_max_drawdown_pct", True),
-        ("by_train_composite", "train_composite", False),
-        ("by_compound", "compound_dollars", False),         # Tier-3D
-        ("by_sortino", "sortino", False),                   # Tier-3D
-        ("by_recency_30d", "recency_30d_sharpe", False),    # Tier-3D
+        # POST-HOC (HINDSIGHT) — flagged is_leaky=True
+        ("by_oos_sharpe",   "oos_strategy_annual_sharpe", False),
+        ("by_oos_return",   "oos_strategy_total_return_pct", False),
+        ("by_excess",       "oos_excess_sharpe", False),
+        ("by_hit",          "oos_hit_rate_pct", False),
+        ("by_psr",          "oos_psr", False),
+        ("by_min_dd",       "oos_max_drawdown_pct", True),
+        ("by_compound",     "compound_dollars", False),
+        ("by_sortino",      "sortino", False),
+        ("by_recency_30d",  "recency_30d_sharpe", False),
+        # CAUSAL (TRAIN-TIME) — deployable
+        ("by_train_composite",    "train_composite", False),
+        ("by_train_test_sharpe",  "train_test_sharpe", False),
+        ("by_train_val_sharpe",   "train_val_sharpe", False),
+        ("by_train_hit",          "train_hit", False),
+        ("by_train_psr",          "train_psr", False),
+        ("by_train_equity",       "train_equity", False),
+        ("by_train_excess_sharpe","train_excess_sharpe", False),
+        ("by_train_return_pct",   "train_return_pct", False),
     ]
     for tag, rank_key, ascending in selection_criteria:
         for k in [2, 3, 5]:
@@ -434,8 +488,19 @@ def main():
 
     strategies: dict[str, dict] = {}
 
+    LEAKY_TAGS = ("by_oos_sharpe", "by_oos_return", "by_excess", "by_hit", "by_psr",
+                  "by_min_dd", "by_compound", "by_sortino", "by_recency_30d")
+    def is_leaky_name(nm: str) -> bool:
+        if any(f"_{t}_" in nm or nm.endswith(f"_{t}") for t in LEAKY_TAGS):
+            return True
+        if "weighted_by_oos" in nm:
+            return True
+        return False
+
     def add(name: str, sizing: str, overlay: str | None, position: pd.Series, members_used: list[int]):
         rec = make_strategy_record(name, sizing, overlay, position, actual, members_used, dates, write_csv=True)
+        rec["is_leaky"] = bool(is_leaky_name(name))
+        rec["selection_basis"] = "OOS-realized (POST-HOC, hindsight)" if rec["is_leaky"] else "train-time / non-selective (CAUSAL, deployable)"
         strategies[name] = rec
 
     # Pass 1: raw sizing for every base signal â€” needed to compute historical Sharpe for Kelly sizing
@@ -616,8 +681,33 @@ def main():
         "strategies": strategies,
         "selection_note": "All OOS-completed members included. Strategies = base_signals x sizing_modes [+ overlays on top-20]. Sort by final_dollars_on_1000 in dashboard.",
     }
+    # Final pass: tag every strategy with is_leaky based on its name (catches
+    # overlay strategies that bypass add() — stoploss2pct, ddgate5pct, sma200filter).
+    LEAKY_TAGS_FINAL = ("by_oos_sharpe", "by_oos_return", "by_excess", "by_hit", "by_psr",
+                        "by_min_dd", "by_compound", "by_sortino", "by_recency_30d")
+    def _is_leaky(nm: str) -> bool:
+        if any(f"_{t}_" in nm or nm.endswith(f"_{t}") for t in LEAKY_TAGS_FINAL):
+            return True
+        if "weighted_by_oos" in nm:
+            return True
+        return False
+    n_leaky = n_clean = 0
+    for nm, rec in strategies.items():
+        leaky = _is_leaky(nm)
+        rec["is_leaky"] = leaky
+        rec["selection_basis"] = (
+            "OOS-realized (POST-HOC, hindsight — descriptive only, NOT deployable)"
+            if leaky else
+            "train-time / non-selective (CAUSAL — deployable on day-1 of OOS)"
+        )
+        n_leaky += int(leaky); n_clean += int(not leaky)
+    summary["n_leaky_strategies"] = n_leaky
+    summary["n_clean_strategies"] = n_clean
+    summary["leakage_audit_directive"] = "CLAUDE.md Directive 68/69 — every strategy carries is_leaky bool + selection_basis string"
     ENSEMBLE_JSON.write_text(json.dumps(summary, indent=2, default=str), encoding="utf-8")
     print(f"\n[done] wrote {ENSEMBLE_JSON.name} ({ENSEMBLE_JSON.stat().st_size:,} bytes, {len(strategies)} strategies)")
+    print(f"  is_leaky=true (post-hoc, descriptive): {n_leaky}")
+    print(f"  is_leaky=false (causal, deployable):   {n_clean}")
 
 
 if __name__ == "__main__":
