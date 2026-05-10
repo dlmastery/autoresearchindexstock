@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>AutoResearch QQQ Dashboard (build 20260510-013000 + strategy-recipe-explainer + 16col-spy-ensemble-rebuilt)</title>
+<title>AutoResearch QQQ Dashboard (build 20260510-024000 + look-ahead-warning-badge + clean-benchmark)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }
@@ -573,6 +573,9 @@ document.querySelectorAll('#oos-ensemble-table th[data-esort]').forEach(th => {
 function decodeStrategyName(name, s) {
   const parts = name.split('__');
   const sel = parts[0] || '';
+  // Detect look-ahead: top<K>_by_<oos_metric> selections rank members by OOS-realized metrics (hindsight)
+  const leakyTags = ['by_oos_sharpe','by_oos_return','by_excess','by_hit','by_psr','by_min_dd','by_compound','by_sortino','by_recency_30d'];
+  const isLeaky = leakyTags.some(t => name.includes('_'+t+'_') || name.includes('_'+t+'__') || name.endsWith('_'+t)) || name.includes('weighted_by_oos');
   let selDesc = '', aggDesc = '', sizingDesc = '', overlayDesc = '';
   let m;
   if ((m = sel.match(/^all(\d+)/))) selDesc = `Use ALL <b>${m[1]}</b> ensemble members.`;
@@ -624,8 +627,12 @@ function decodeStrategyName(name, s) {
       ${nSkipped != null ? `<div>• <b>${nSkipped}</b> days FLAT — filtered out by overlay/dead-zone/SMA/vol-gate rule above</div>` : ''}
       <div style="color:#8b949e;font-size:0.85em;margin-top:4px">Hit rate is computed only over the ${nTraded ?? '?'} traded days. Binomial std-error at n=${nTraded ?? '?'} is ≈ <b>${stderr}%</b> on a 50% baseline — a hit rate within ±2σ of 50% is statistically indistinguishable from coin-flip.</div>
     </div>`;
+  const leakyBadge = isLeaky
+    ? `<div style="margin-bottom:8px;padding:8px;background:#3d0d0d;border:2px solid #f85149;border-radius:4px;font-size:0.92em"><b style="color:#f85149">⚠️ LOOK-AHEAD WARNING (hindsight bias):</b> this strategy ranks ensemble members by a metric computed on the OOS window itself. It is <b>descriptive</b> (what would have been best in hindsight) NOT <b>deployable</b> (you cannot know OOS metrics on day 1 of OOS). For real deployment use <code>by_train_composite</code>, <code>all_mean</code>, <code>all_vote</code>, or <code>vote_geq_K_of_N</code> instead. The OOS-ranked variants are useful only as upper bounds on what an oracle ensemble could achieve.</div>`
+    : `<div style="margin-bottom:8px;padding:6px;background:#0d2818;border:1px solid #3fb950;border-radius:4px;font-size:0.88em"><b style="color:#3fb950">✅ No look-ahead:</b> selection uses train-time metric or a non-selective per-day rule — deployable as-is.</div>`;
   return `
     <div style="margin-top:14px;padding:12px;background:#1a0d28;border:1px solid #fbbf24;border-radius:6px">
+      ${leakyBadge}
       <div style="color:#fbbf24;font-weight:700;font-size:1.05em;margin-bottom:8px">📖 Strategy Recipe — <code>${name}</code></div>
       <div style="margin-bottom:6px"><b style="color:#58a6ff">1. Member selection:</b> ${selDesc}</div>
       <div style="margin-bottom:6px"><b style="color:#58a6ff">2. Prediction aggregation:</b> ${aggDesc}</div>
@@ -828,12 +835,17 @@ document.querySelectorAll('#oos-smart-table th[data-ssort]').forEach(th => {
 // Returns {name, equity_curve} or null if no ensemble data loaded.
 function getEnsembleChampion() {
   if (!window._ensembleData || !window._ensembleData.strategies) return null;
+  const leakyTags = ['by_oos_sharpe','by_oos_return','by_excess','by_hit','by_psr','by_min_dd','by_compound','by_sortino','by_recency_30d'];
+  const isLeaky = (n) => leakyTags.some(t => n.includes('_'+t+'_') || n.includes('_'+t+'__') || n.endsWith('_'+t)) || n.includes('weighted_by_oos');
   const all = Object.entries(window._ensembleData.strategies)
     .map(([k, v]) => ({name: k, ...v}))
     .filter(s => s.hit_rate_pct != null && s.equity_curve && s.equity_curve.dates && s.equity_curve.dates.length > 0
                   && (s.n_traded_days == null || s.n_traded_days >= 10));
   if (!all.length) return null;
-  return all.reduce((a, c) => (a.hit_rate_pct > c.hit_rate_pct ? a : c));
+  // Prefer leakage-free strategies (deployable). Fall back to any if none qualify.
+  const clean = all.filter(s => !isLeaky(s.name));
+  const pool = clean.length ? clean : all;
+  return pool.reduce((a, c) => (a.hit_rate_pct > c.hit_rate_pct ? a : c));
 }
 
 // Inline detail card for smart-strategy click (CLAUDE.md Directive 65 — show hit rate prominently)

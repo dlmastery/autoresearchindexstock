@@ -1414,3 +1414,23 @@ User: *when i click on smart trading strategy i need to see an inline card / the
 **Why 3 lines?** Strategy alone says whether the model worked; BH says whether doing nothing would have been better; ensemble champion says whether the single-model is competitive against the deep-ensemble baseline (Lakshminarayanan 2017). All three are the minimum honest comparison set per Directive 65.
 
 **Build-stamp bump on every dashboard JS edit** is mandatory for browser cache invalidation. Format: `(build YYYYMMDD-HHMMSS + descriptive-tag)`.
+
+### Directive 68 (2026-05-10) -- LOOK-AHEAD audit on ensemble selection criteria (mirrored from SPY)
+
+User: *how did you come up with strategy to decide to trade or not for each row - did you leak into data?*
+
+**Honest audit:**
+
+| Family | Causal? | Deployable? | Notes |
+|---|---|---|---|
+| `sma200filter`, `sma200_real`, `vol_regime_gate_15`, `dead_zone`, `hold_until_flip`, `stoploss2pct`, `dd_gate_5pct` | ✅ YES | ✅ YES | Use only data observable at decision-time T. |
+| All sizing modes (`raw`, `kelly`, `conf`, `voltarget`) | ✅ YES | ✅ YES | From past predictions / past vol. |
+| All hedging (`protective_put`, `covered_call`, `collar`, etc.) | ✅ YES | ✅ YES | Black-Scholes priced at close[T-1] using observable VXN. |
+| `all<N>_mean`, `all<N>_vote`, `vote_geq_K_of_N` | ✅ YES | ✅ YES | No member selection. |
+| `top<K>_by_train_composite` | ✅ YES | ✅ YES | Train-time metric only. |
+| **`top<K>_by_oos_*` (sharpe/return/excess/hit/psr/min_dd/compound/sortino/recency_30d)** | ❌ **NO** | ❌ **NO** | **POST-HOC SELECTION — uses OOS metrics. Hindsight bias. Upper-bound only.** |
+| `all<N>_weighted_by_<oos_*>` | ❌ NO | ❌ NO | Weights from OOS perf. |
+
+**Mandatory dashboard display:** `decodeStrategyName(name, s)` detects leaky tags and renders a red ⚠️ LOOK-AHEAD WARNING badge for hindsight-biased strategies; clean strategies get a green ✅ badge. `getEnsembleChampion()` prefers clean strategies for the chart benchmark line.
+
+**Deployable** = `top<K>_by_train_composite__*`, `all<N>_mean__*`, `all<N>_vote__*`, `vote_geq_K_of_N__*` (any sizing/overlay combination is fine — those are causal). The `top<K>_by_oos_*` family stays in the JSON for oracle-bound analysis, NOT for deployment.
