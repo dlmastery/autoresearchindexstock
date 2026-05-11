@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>AutoResearch QQQ Dashboard (build 20260510-070000 + full-narrative-WHAT-HOW-WHEN-WHY)</title>
+<title>AutoResearch QQQ Dashboard (build 20260510-090000 + transparency-always-shown + ensemble_pct)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }
@@ -676,17 +676,30 @@ function loadEnsembleDetails(strategyName) {
   const methEl = document.getElementById('oos-methodology'); if (methEl) methEl.innerHTML = `<div style="font-weight:600;color:#fbbf24;margin-bottom:6px">Ensemble Methodology</div><div><b>OOS window:</b> ${_ensembleData.oos_window?.start} → ${_ensembleData.oos_window?.end}</div><div><b>Predictions:</b> ${s.n_predictions} (${s.n_with_actuals} with realised actuals)</div><div><b>Aggregation:</b> ${strategyName.includes('vote') ? 'majority vote' : strategyName.includes('weighted') ? 'weighted by individual excess Sharpe' : 'unweighted mean'}</div><div><b>Inference only:</b> read pre-computed predictions from <code>oos_exp&lt;N&gt;_prod.csv</code></div><div style="margin-top:6px"><a href="${s.csv}" download style="background:#fbbf24;color:#0d1117;text-decoration:none;padding:4px 10px;border-radius:4px;font-weight:600">📥 Download ${strategyName}.csv</a></div>`;
   const eq = s.equity_curve;
   const chartEl = document.getElementById('oos-chart');
-  if (chartEl && eq && eq.dates && eq.dates.length > 0) {
-    const W = 800, H = 240, M = {l:50, r:20, t:20, b:30};
-    const innerW = W - M.l - M.r, innerH = H - M.t - M.b;
-    const allVals = [...eq.strategy_pct, ...eq.buy_hold_pct, 0];
-    const yMin = Math.min(...allVals), yMax = Math.max(...allVals);
-    const yPad = (yMax - yMin) * 0.05 || 1;
-    const x = (i) => M.l + (i / (eq.dates.length - 1)) * innerW;
-    const y = (v) => M.t + innerH - ((v - (yMin - yPad)) / ((yMax + yPad) - (yMin - yPad))) * innerH;
-    const path = (vals, color) => `<polyline fill="none" stroke="${color}" stroke-width="2" points="${vals.map((v,i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}"/>`;
-    chartEl.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;max-width:100%"><line x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.t + innerH}" stroke="#30363d"/><line x1="${M.l}" y1="${M.t + innerH}" x2="${M.l + innerW}" y2="${M.t + innerH}" stroke="#30363d"/><line x1="${M.l}" y1="${y(0)}" x2="${M.l + innerW}" y2="${y(0)}" stroke="#484f58" stroke-dasharray="2,3"/><text x="${M.l}" y="${M.t + innerH + 18}" fill="#8b949e" font-size="11">${eq.dates[0]}</text><text x="${M.l + innerW}" y="${M.t + innerH + 18}" fill="#8b949e" font-size="11" text-anchor="end">${eq.dates[eq.dates.length - 1]}</text>${path(eq.buy_hold_pct, '#8b949e')}${path(eq.strategy_pct, '#fbbf24')}<text x="${M.l + 10}" y="${M.t + 14}" fill="#fbbf24" font-size="12" font-weight="600">— Ensemble (${strategyName})</text><text x="${M.l + 200}" y="${M.t + 14}" fill="#8b949e" font-size="12">— Buy &amp; Hold</text></svg>`
-      + decodeStrategyName(strategyName, s)
+  // ALWAYS render transparency + recipe regardless of equity-curve availability (Directive 73)
+  let svgHTML = '';
+  if (eq && eq.dates && eq.dates.length > 0) {
+    const sd = eq.strategy_dollars || [];
+    const bd = eq.buy_hold_dollars || [];
+    const sp = eq.strategy_pct || sd.map(v => (v / 1000 - 1) * 100);
+    const bp = eq.buy_hold_pct  || bd.map(v => (v / 1000 - 1) * 100);
+    if (sp.length && bp.length) {
+      const W = 800, H = 240, M = {l:50, r:20, t:20, b:30};
+      const innerW = W - M.l - M.r, innerH = H - M.t - M.b;
+      const allVals = [...sp, ...bp, 0];
+      const yMin = Math.min(...allVals), yMax = Math.max(...allVals);
+      const yPad = (yMax - yMin) * 0.05 || 1;
+      const x = (i) => M.l + (i / (eq.dates.length - 1)) * innerW;
+      const y = (v) => M.t + innerH - ((v - (yMin - yPad)) / ((yMax + yPad) - (yMin - yPad))) * innerH;
+      const path = (vals, color) => `<polyline fill="none" stroke="${color}" stroke-width="2" points="${vals.map((v,i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}"/>`;
+      svgHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="background:#0d1117;border:1px solid #30363d;border-radius:6px;max-width:100%"><line x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.t + innerH}" stroke="#30363d"/><line x1="${M.l}" y1="${M.t + innerH}" x2="${M.l + innerW}" y2="${M.t + innerH}" stroke="#30363d"/><line x1="${M.l}" y1="${y(0)}" x2="${M.l + innerW}" y2="${y(0)}" stroke="#484f58" stroke-dasharray="2,3"/><text x="${M.l}" y="${M.t + innerH + 18}" fill="#8b949e" font-size="11">${eq.dates[0]}</text><text x="${M.l + innerW}" y="${M.t + innerH + 18}" fill="#8b949e" font-size="11" text-anchor="end">${eq.dates[eq.dates.length - 1]}</text>${path(bp, '#8b949e')}${path(sp, '#fbbf24')}<text x="${M.l + 10}" y="${M.t + 14}" fill="#fbbf24" font-size="12" font-weight="600">— Ensemble (${strategyName})</text><text x="${M.l + 200}" y="${M.t + 14}" fill="#8b949e" font-size="12">— Buy &amp; Hold</text></svg>`;
+    }
+  } else {
+    svgHTML = '<div style="color:#8b949e;padding:14px;background:#0d1117;border:1px dashed #30363d;border-radius:6px;font-size:0.85em">⚠️ No equity curve data on this strategy record. Recipe + transparency below still apply.</div>';
+  }
+  if (chartEl) {
+    chartEl.innerHTML = svgHTML
+      + (typeof decodeStrategyName === 'function' ? decodeStrategyName(strategyName, s) : '')
       + (window.buildNarrativeHTML ? window.buildNarrativeHTML(s, strategyName, 'Ensemble Strategy') : '')
       + (window.buildTransparencyHTML ? window.buildTransparencyHTML(s, 'Ensemble Strategy: ' + strategyName) : '')
       + (window.buildTradingDetailsHTML ? window.buildTradingDetailsHTML({...s, strategy: strategyName, n_members: _ensembleData.n_members}, 'ensemble') : '')

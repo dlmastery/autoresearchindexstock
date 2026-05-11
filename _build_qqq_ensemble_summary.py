@@ -281,6 +281,8 @@ def make_strategy_record(name: str, sizing: str, overlay: str | None, position: 
             "dates": [d.strftime("%Y-%m-%d") for d in dates],
             "strategy_dollars": equity_strategy,
             "buy_hold_dollars": equity_bh,
+            "strategy_pct": [round((v / START_CAPITAL - 1) * 100, 4) for v in equity_strategy],
+            "buy_hold_pct": [round((v / START_CAPITAL - 1) * 100, 4) for v in equity_bh],
         },
     }
 
