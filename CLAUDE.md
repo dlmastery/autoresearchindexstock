@@ -1466,3 +1466,29 @@ Smart-strategies builder also enriches members with TRAIN-TIME metrics from `exp
 Stale leaky CSVs purged from disk on 2026-05-10 cleanup (824 in QQQ).
 
 **Counts after Directive 70 cleanup:** Ensemble 332 (all clean) | Smart 686 (all clean) | Total deployable **1018**.
+
+### Directive 71 (2026-05-10) -- Full transparency on every clickable row
+
+User: *one way you can help me is being very transparent in dashboard. when one clicks on row the detail should explain everthing in there + a detailed description of what and how part is very important + do the same for every row click of every table*
+
+Every clickable row in every table (OOS Top-30, OOS Deep Ensemble, Smart Trading Strategies, main experiment-log table) renders 2 expandable blocks beneath the metric cards + chart:
+
+1. **`buildNarrativeHTML(s, name, contextLabel)`** — 5-section "what / how / when / why / limits" prose: 📖 WHAT (plain-English step-by-step with each strategy-name token decoded), 🔬 HOW (exact formulas at every step), ⏱️ WHEN (observability table proving causality), 📐 WHY (per-metric formula+intuition+caveat), ⚠️ HONEST LIMITS (explicit can/cannot conclude list).
+
+2. **`buildTransparencyHTML(s, ctx)`** — 6 sections: 👥 member roster, 📡 data sources & timing, ⚙️ backtest assumptions (8 ❌-list items NOT modeled), 📊 statistical caveats (binomial CI, Sharpe std-error band, multi-testing inflation), 📋 last 5 trade-days from CSV, 📐 naive baselines.
+
+JS contract: both helpers attached to `window.*`. Wired into `loadEnsembleDetails`, `loadSmartDetails`, `loadOOSDetailsForRow`, `showDetail` (main table). Build stamp must bump on every helper edit.
+
+### Directive 72 (2026-05-10) -- TRAIN-FIT strategies (design on in-sample, lock, evaluate OOS)
+
+User: *now a very important question. you identified some trading strategies using cheating - now i told you to fix that and you fixed but used the same trading strategy. dont you think you need to come up with new trading strategies as well using test/validation data set and apply on oos and ensemble on oos etc.,,.*
+
+**Background:** Directive 70 removed leaky `top<K>_by_oos_*` selection but the surviving strategies still relied on **literature-default parameter values** (200d SMA, 15% vol-target, 0.25 Kelly, 5% OTM) — those defaults were never themselves *fit* to data.
+
+**Pipeline:** in-sample test-fold trades (`trade_logs/exp<N>_trades.csv`) → sweep/fit/calibrate using ONLY in-sample data → LOCK chosen parameter → apply mechanically to OOS → report OOS as the test of the locked strategy. Tag with `is_leaky=False` + `selection_basis` + `fit_method` + `fit_param_pool` + `fit_param_chosen` + `in_sample_sharpe_at_choice`.
+
+**Implemented categories** (`_build_train_fit_strategies_qqq.py`): per-member parameter sweeps (`train_optim_conf_thresh`, `train_optim_kelly_frac`, `train_optim_voltarget`), ensemble meta-learners (`meta_ridgeCV`, `meta_logreg`, `meta_xgb`), per-member isotonic calibration (`calib_isotonic`).
+
+**Pending (Categories D+E next session):** regime detection (k-means on (vol, momentum) → per-regime weights) + walk-forward refit (gold standard).
+
+**Counts after Directive 72:** QQQ ensemble panel total = 347 | train-fit = 15 (9 sweeps + 3 meta + 3 calib) | leaky = 0.

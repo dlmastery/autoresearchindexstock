@@ -1,11 +1,11 @@
 ---
 name: AutoResearch QQQ Checkpoint
-description: Session 2026-05-09 final. 259 experiments, 8 archived winners. Full SPY-parity dashboard ported (deep ensemble, smart strategies, OOS top-30, metrics glossary, hit-rate champion). 3 of 30 OOS top-30 completed (exp52/48/17 — only archived). 392 ensembles + 686 smart strategies built with 16-col CSVs. Hit rate is now SOLE winner metric (Directive 65). Build stamp 20260509-090000.
+description: Session 2026-05-10 final. 259 experiments, 8 archived winners. Dashboard at http://localhost:8889 with 347 ensemble + 686 smart strategies, ALL CAUSAL/DEPLOYABLE (0 leaky per Directive 70). NEW Directive 72: 15 train-fit strategies (parameters/weights LEARNED on in-sample test fold, locked, evaluated OOS). Directive 71: full narrative panel + transparency block on every clickable row. Best train-fit: train_optim_kelly_frac_exp52__0.10 hit 55.1% / Sh +0.84 (98 trade days).
 ---
 
-# QQQ AutoResearch — Session Checkpoint (2026-05-09 final)
+# QQQ AutoResearch — Session Checkpoint (2026-05-10 final)
 
-> **READ THIS FIRST on session resume.** Self-contained for QQQ resumption.
+> Self-contained QQQ resumption — fresh session reads only this + CLAUDE.md.
 
 ---
 
@@ -14,105 +14,89 @@ description: Session 2026-05-09 final. 259 experiments, 8 archived winners. Full
 | Item | Value |
 |---|---|
 | Local working dir | `C:\Users\evija\autoresearchqqq_local\` |
-| GitHub repo | https://github.com/dlmastery/autoresearchindexstock |
-| Branch | `master` |
-| Latest commit (2026-05-09) | `cec2785` (mojibake repair) |
+| GitHub repo | https://github.com/dlmastery/autoresearchindexstock (branch `master`) |
+| Latest commit (2026-05-10) | `bd5e883` (Directive 72 train-fit strategies) |
 | Live Pages dashboard | https://dlmastery.github.io/autoresearchindexstock/dashboard/ |
-| Local dashboard server | `python -m http.server 8889 --directory docs/dashboard` |
-| Snapshot zip (this session) | `C:\Users\evija\autoresearch_qqq_snapshot_20260509_011440.zip` (63.2 MB) |
-| Companion repo (SPY) | https://github.com/dlmastery/autoresearchspy @ `2a8a188` |
+| Local server | `python -m http.server 8889 --directory docs/dashboard` |
+| Snapshot zip (latest) | `C:\Users\evija\autoresearch_qqq_snapshot_20260510_112616.zip` (62.8 MB / 3203 files) |
+| Companion repo (SPY) | https://github.com/dlmastery/autoresearchspy @ `58ce0d1` |
 
 ---
 
-## State summary (this session 2026-05-08 → 2026-05-09)
+## Champion roster (all CAUSAL — Directive 70+72)
 
-| Counter | Value |
+| Metric | Strategy | Value |
+|---|---|---|
+| **OOS hit-rate champion** (Directive 65) | exp52 / exp48 mamba | **55.1%** hit (98 trade days each) |
+| Best train-fit by hit | `train_optim_kelly_frac_exp52__0.10` | 55.1% hit / Sh +0.84 / $1000 |
+| Best train-fit by Sharpe | `train_optim_kelly_frac_exp52__0.10` (tie cluster) | Sh +0.84 |
+| Best smart strategy ($) | `*__protective_put` cluster | $1423 / Sh +8.14 |
+| Best ensemble | `all3_*__sma200filter` | $1107 / Sh +7.84 / hit 67.9% |
+
+---
+
+## Counts (after Directive 72, 2026-05-10)
+
+| Panel | Total | Train-fit | Leaky |
+|---|---|---|---|
+| Ensemble strategies | **347** | 15 (`train_optim_*` 9, `meta_*` 3, `calib_*` 3) | **0** |
+| Smart strategies | 686 | 0 (next session) | **0** |
+| OOS Top-30 rows | 3 of 30 completed | — | — |
+| Auto-archived checkpoints | 8 | — | — |
+| Total experiments in JSONL | 259 | — | — |
+
+---
+
+## CLAUDE.md Directives 64-72 (binding rules — mirrored from SPY)
+
+| # | Date | Rule (one-line) |
+|---|---|---|
+| **64** | 2026-05-06 | Per-strategy CSVs MUST carry **16-col schema** |
+| **65** | 2026-05-06 | **HIT RATE is the SOLE winner-identification metric** |
+| **66** | 2026-05-08 | Per-experiment OOS CSVs same 16-col schema; row dicts MUST have `equity_curve` with `_dollars` AND `_pct` arrays |
+| **67** | 2026-05-09 | Every clickable row → inline detail card with 3-line equity chart |
+| **68** | 2026-05-09 | Look-ahead audit: leaky strategies tagged with red ⚠️ badge |
+| **69** | 2026-05-09 | Causal-only ensemble selection: `by_train_*` family added |
+| **70** | 2026-05-10 | **REMOVE all leaky strategies** — builders amputated |
+| **71** | 2026-05-10 | Full transparency on every row click (`buildNarrativeHTML` + `buildTransparencyHTML`) |
+| **72** | 2026-05-10 | TRAIN-FIT strategies — `train_optim_*` + `meta_*` + `calib_*` (parameters fit on in-sample, locked, evaluated OOS) |
+
+---
+
+## Files of record
+
+| File | Purpose |
 |---|---|
-| Total experiments in log | 259 |
-| Auto-archived checkpoints in `winners/` | 8 |
-| OOS Top-30 completed rows | **3 of 30** (exp52, exp48, exp17 — only 3 archived match top-30) |
-| Smart strategies built | **686** (with full 16-col CSVs) |
-| Ensemble strategies built | **392** (with full 16-col CSVs) |
-
-### Champion (DEPLOYABLE)
-
-| Metric | Value |
-|---|---|
-| **Hit-rate champion (Directive 65 — sole winner metric)** | DLinear / mamba family — see `experiment_log.jsonl[hit].max()` |
-| In-sample composite-leader (legacy secondary) | mamba dmamba exp 52 composite +1.32 (single-seed lucky basin) |
-| OOS hit-rate champion (98 trade days) | exp52 / exp48 mamba at **55.1%** hit each |
-| Best smart strategy ($) | `*__protective_put` cluster at **$1423** Sharpe +8.14 hit 55.1% |
-| Top ensemble | `all3_*__sma200filter` $1107 Sharpe +7.84 hit 67.9% |
-
----
-
-## Dashboard ports completed this session
-
-The QQQ dashboard was full-parity ported from SPY (was 57 KB → 173 KB). It now has ALL the SPY panels:
-
-- 🎯 **Hit Rate Champion ★** prominent gold cards (in-sample + OOS)
-- 🛰️ OOS Live-Data Inference panel
-- 📋 OOS Top-30 — Per-Winner Inference Results (3 completed)
-- 🎯 OOS Deep Ensemble — Lakshminarayanan 2017 (392 strategies)
-- 💡 Smart Trading Strategies — Overlays & Options-Stock Hedging (686)
-- 📖 Metrics Glossary (10x expanded)
-- Trading Strategies docs (8 overlays + 6 hedging w/ Black-Scholes)
-- 📁 Fold Reference (7-fold super-fold + prod-mode split)
-
-Every clickable row produces an inline detail card with **3-line equity chart**:
-- Strategy (purple/green) + Buy & Hold (grey) + Ensemble champion (gold)
-
----
-
-## CLAUDE.md Directives 64-67 (QQQ-mirrored from SPY)
-
-| # | Rule |
-|---|---|
-| **64** | Per-strategy CSVs MUST carry full 16-col schema |
-| **65** | HIT RATE is the SOLE winner-identification metric |
-| **66** | Per-experiment OOS CSVs (`oos_exp<N>.csv`) MUST carry the 16-col schema; row dicts MUST have `equity_curve` with both `_dollars` and `_pct` arrays |
-| **67** | Every clickable row → inline detail card with 3-line equity chart |
-
-### Mandatory 16-column CSV schema
-
-```
-date, position, pred_direction, traded, actual_ret_1d, bh_log_ret,
-strategy_pnl, correct, equity_dollars, buy_hold_dollars, excess_dollars,
-cumret_pct, bh_cumret_pct, excess_cumret_pct, drawdown_pct, underwater
-```
-
----
-
-## QQQ-specific scripts (this session)
-
-- `run_oos_top30_qqq.py` — OOS Top-30 inference. Adapted from SPY. Uses 2-yr download (2024-01-01 → 2026-04-30) for SMA-200 warmup. Auto-detects mamba `d_state`/`expand`/`variant` from state_dict shapes (handles dmamba `trend_mlp.*` layers).
-- `_build_qqq_ensemble_summary.py` — adapted from SPY ensemble builder
-- `_build_qqq_smart_strategies.py` — adapted from SPY smart builder. Uses real **QQQ + ^VXN** (Nasdaq vol index, not VIX) as IV proxy for Black-Scholes options pricing.
-
-Bridge to SPY package: `sys.path.insert(0, r'C:\Users\evija\autoresearchindexspy\autoresearchspy')` makes `autoresearchspy.*` (model.backbone, _pin_to_safe_cores) importable for QQQ scripts.
+| `CLAUDE.md` | Full directive history (Directives 1-72) |
+| `_build_qqq_ensemble_summary.py` | Ensemble builder — only `by_train_*` selection (D70) |
+| `_build_qqq_smart_strategies.py` | Smart-strategy builder — only causal criteria + train-time enrichment |
+| `_build_train_fit_strategies_qqq.py` | **NEW (D72)**: train-fit builder (sweeps + meta + calib) |
+| `run_oos_top30_qqq.py` | OOS top-30 inference — emits 16-col CSV + equity_curve (D66); auto-detects mamba `d_state`/`expand`/`variant` from state_dict |
+| `docs/dashboard/index.html` | Build stamp `20260510-070000`. Same JS contract as SPY |
 
 ---
 
 ## Pending work (next session)
 
-1. **Backfill retrain 27 missing OOS Top-30 checkpoints** — most QQQ winners weren't archived under the always-archive Directive 62 (which was added in SPY this session). Same patch needs porting to QQQ's `run_autoresearch.py`.
-2. **Multi-seed verification** of any QQQ hit-rate champion (binomial std error at n~100 is ~5pp).
-3. **DSR correction** for the 686 smart strategies.
+1. Categories D + E from Directive 72 (regime detection k-means + walk-forward refit)
+2. **Backfill retrain 27 missing OOS Top-30 checkpoints** — same Directive-62 always-archive patch needs porting to QQQ runner (currently runner only auto-archives composite-champions)
+3. DSR multi-testing correction
+4. Multi-seed verification of any QQQ hit-rate champion
 
 ---
 
-## How to resume
+## Resume command
 
 ```bash
 cd C:/Users/evija/autoresearchqqq_local
 git pull origin master
 # Read this checkpoint + CLAUDE.md
-python run_oos_top30_qqq.py    # if want to re-run OOS
 python -m http.server 8889 --directory docs/dashboard
+# Pick from Pending work above
 ```
 
 ---
 
-## Mojibake gotcha (also affected QQQ on 2026-05-09)
+## Mojibake gotcha
 
-**NEVER edit `index.html` using PowerShell `Get-Content -Raw` + `Set-Content -Encoding UTF8`** — it silently corrupts multi-byte UTF-8 chars. Use Python or `[System.IO.File]::WriteAllText` with `UTF8Encoding(false)` instead. If corruption happens, run `C:\Users\evija\_fix_mojibake_v2.py` then `C:\Users\evija\_fix_remaining3.py` to repair.
+NEVER use PowerShell `Get-Content -Raw` + `Set-Content -Encoding UTF8` on `index.html`. Use Python's `Path.write_text(encoding='utf-8')` or the Edit tool. Repair scripts: `_fix_mojibake_v2.py` + `_fix_remaining3.py`.
