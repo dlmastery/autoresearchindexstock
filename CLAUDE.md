@@ -1492,3 +1492,36 @@ User: *now a very important question. you identified some trading strategies usi
 **Pending (Categories D+E next session):** regime detection (k-means on (vol, momentum) → per-regime weights) + walk-forward refit (gold standard).
 
 **Counts after Directive 72:** QQQ ensemble panel total = 347 | train-fit = 15 (9 sweeps + 3 meta + 3 calib) | leaky = 0.
+
+### Directive 73 (2026-05-10) -- Transparency must ALWAYS render on row click
+
+User: *when i see Ensemble Strategy: ... - i click on but i dont see any other details on click - update to have more transparency*
+
+**Bug:** transparency append was inside `if (chartEl && eq && eq.dates...)`, AND chart code crashed silently because ensemble JSON had `_dollars` but not `_pct`. Fix: (1) JS computes `_pct` fallback from `_dollars`; (2) transparency moved OUTSIDE chart-conditional so it always renders; (3) builders now emit BOTH `_dollars` AND `_pct` arrays in `equity_curve`.
+
+### Directive 74 (2026-05-10) -- 8 ADVANCED train-fit strategies (sector-rotation/pairs/RL skipped)
+
+User: *Strategies NOT YET implemented (roadmap) [...] except rl execution can you add remaining strategies in oos ? remember to use validation/test data sets for parameters and then final run on oos + make sure forensic auditor no leakage at any cost + some of these strategies may need additional data which may not be there in data source then skip*
+
+**Implemented (`_build_advanced_train_fit_strategies_qqq.py`):** 5d-on-1d, stop-loss+trailing, regime k-means (k=2,3), bandit Thompson, HRP, risk reversal, iron condor, calendar spread.
+
+**Skipped (per "skip if needs additional data"):** sector rotation (needs XLK/XLF/etc fetch), long-short pairs (no 2nd asset spec), RL execution timing (per user direction).
+
+**Forensic causality audit — every advanced strategy verified leakage-free:**
+- 5d-on-1d: σ-threshold sweep on in-sample B-pred only
+- Stop-loss+trailing: walks day-by-day, only past P&L seen, sweep on in-sample → lock
+- Regime k-means: KMeans+StandardScaler fit on in-sample (vol_20, mom_60d); LOCKED model classifies OOS regime
+- Bandit Thompson: Beta posterior pre-loaded on in-sample; on OOS day i, weights sampled BEFORE seeing actual[i]; posterior update AFTER position-decision
+- HRP: correlation matrix from in-sample member-PREDICTIONS only (not actuals/future); weights LOCKED
+- Risk reversal / Iron condor / Calendar spread: spot+IV via `.shift(1)` (close[T-1] / VXN[T-1] observable at T); strike/tenor sweep on in-sample → lock
+
+**The `.shift(1)` discipline on price+IV** is the single most important guarantee. Spot at "open of day T" is operationally `close[T-1]` (previous-day's close, observable overnight). IV at the same moment is `VXN[T-1]`. 1-day option P&L is realized as price evolves from `close[T-1]` to `close[T]`, where realized return = `actual_ret_1d[T]`.
+
+**Counts after Directive 74:** QQQ ensemble panel total = **363** | train-fit total = **31** (15 simple D72 + 16 advanced D74) | leaky = **0**.
+
+**Audit checklist for any new strategy:**
+1. Identify every data source (predictions, actuals, prices, IV, regime features, etc.)
+2. For each, verify observable at decision time T (use `.shift(1)` if needed)
+3. Confirm parameter/weight choice was made using in-sample data ONLY
+4. LOCK the choice; don't re-tune on OOS
+5. Tag with `is_leaky=False` + `selection_basis` + `fit_method` + `fit_param_pool` + `fit_param_chosen` + `in_sample_sharpe_at_choice`
